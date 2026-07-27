@@ -351,6 +351,13 @@ section {
   flex-shrink: 0;
   object-fit: cover;
   border-radius: 14px;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease;
+}
+
+.brand:hover img {
+  transform: scale(1.09);
+  box-shadow: 0 6px 18px rgba(42, 88, 92, 0.22);
 }
 
 .brand-block {
@@ -1800,8 +1807,13 @@ section {
   .btn,
   .product-card,
   .service-card,
-  .event-card {
+  .event-card,
+  .brand img {
     transition: none;
+  }
+
+  .brand:hover img {
+    transform: none;
   }
 }
 
