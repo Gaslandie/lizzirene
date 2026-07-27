@@ -17,10 +17,14 @@ export const CONTACT = {
 }
 
 // Photos de la boutique (fichiers déposés dans /public).
-// Ajouter une photo ici puis la passer en `src` au composant Media.
+// `BASE_URL` préfixe le chemin quand le site est servi depuis un
+// sous-dossier (GitHub Pages) — ne jamais écrire les chemins en dur.
+const asset = (fichier) => `${import.meta.env.BASE_URL}${fichier}`
+
 export const PHOTOS = {
-  vedette: '/photoVedette.jpeg',
-  bouquet: '/bouquetFleurs.jpeg',
+  logo: asset('logo.jpeg'),
+  vedette: asset('photoVedette.jpeg'),
+  bouquet: asset('bouquetFleurs.jpeg'),
 }
 
 // Communes et quartiers de Conakry proposés à la livraison.

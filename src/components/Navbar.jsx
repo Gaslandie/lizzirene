@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import Icon from './Icon.jsx'
-import { CONTACT, waLink } from '../config.js'
+import { CONTACT, PHOTOS, waLink } from '../config.js'
 import { useCart } from '../context/CartContext.jsx'
 
 const LINKS = [
@@ -48,7 +48,7 @@ function Navbar() {
       <header className="navbar">
         <div className="container">
           <a href="#accueil" className="brand">
-            <img src="/logo.jpeg" alt="Logo Lizzirene Déco" />
+            <img src={PHOTOS.logo} alt="Logo Lizzirene Déco" />
             <span className="brand-block">
               <span className="brand-name">
                 LIZZIRENE <span>DECO</span>
