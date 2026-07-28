@@ -29,3 +29,27 @@
 - Ajout des états page / produit introuvable et des métadonnées dynamiques.
 - Vérifications : lint, build, routes HTTP 200, DOM Chrome headless, ancienne URL, 404 produit, captures desktop 1440 px et mobile 390 px.
 - Correction de l'alignement mobile de `Nos Produits` d'après la capture iPhone fournie : libellé centré, chevron conservé à droite ; lint et build validés.
+
+## 2026-07-28 — Images de fond du hero
+
+- Création de la discussion `discussionsIA/2026-07-28-hero-images.md`.
+- Remplacement du visuel en pot à droite par les trois images de `public/hero-images` en arrière-plan pleine largeur.
+- Première vue : `hero-image3.jpg`, puis changement automatique entre les trois images toutes les 5 secondes.
+- Ajout de commandes de sélection et pause, d'un voile de lisibilité et de la prise en charge de `prefers-reduced-motion`.
+- Vérifications : diff, lint, build et présence des trois ressources dans la production.
+- Point restant avant production : optimiser `hero-image1.jpg` et surtout `hero-image3.jpg`, actuellement trop lourdes.
+
+## 2026-07-28 — Optimisation et réutilisation des images
+
+- Création de la discussion `discussionsIA/2026-07-28-optimisation-images.md`.
+- Ajout d'un pipeline Sharp reproductible pour générer les variantes WebP.
+- Centralisation des photos responsives dans `src/config.js` et réutilisation des
+  mêmes URL entre catalogue, fiches, panier et galerie.
+- Intégration prudente des nouvelles photos : coffret emballé sur les offres
+  correspondantes, photos florales dans la galerie.
+- Ajout d'une image sociale 1200 × 630 et du préchargement de la première image
+  du hero.
+- Déplacement conservatoire des originaux dans `image-sources/` et de la capture
+  iPhone dans `captures/`, afin qu'ils ne soient pas copiés dans le site publié.
+- Le lint, le build et le contrôle final des références seront consignés après
+  leur exécution.

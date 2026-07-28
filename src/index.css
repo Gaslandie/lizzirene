@@ -558,19 +558,62 @@ section[id] {
 
 /* ============ HERO ============ */
 .hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-height: 690px;
   padding: 90px 0 110px;
-  background:
-    radial-gradient(ellipse at 88% 10%, rgba(54, 192, 192, 0.18), transparent 55%),
-    radial-gradient(ellipse at 4% 92%, rgba(251, 221, 19, 0.14), transparent 45%),
-    var(--bg-soft);
+  background: var(--primary-darker);
   overflow: hidden;
 }
 
 .hero .container {
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: 80px;
-  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-background-image,
+.hero-background-overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-background-image {
+  background-image: var(--hero-image);
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0;
+  transform: scale(1.035);
+  transition: opacity 1s ease, transform 5s ease;
+}
+
+.hero-background-image.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hero-background-overlay {
+  z-index: 2;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(17, 52, 55, 0.96) 0%,
+      rgba(25, 64, 67, 0.88) 38%,
+      rgba(24, 57, 60, 0.62) 66%,
+      rgba(16, 42, 45, 0.4) 100%
+    ),
+    linear-gradient(0deg, rgba(12, 36, 38, 0.42), transparent 45%);
+}
+
+.hero-content {
+  max-width: 790px;
 }
 
 .hero-eyebrow {
@@ -580,7 +623,7 @@ section[id] {
   font-size: 14px;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: var(--primary-dark);
+  color: rgba(255, 255, 255, 0.92);
   font-weight: 600;
   margin-bottom: 24px;
 }
@@ -596,18 +639,19 @@ section[id] {
 .hero h1 {
   font-size: clamp(40px, 5.8vw, 72px);
   margin-bottom: 26px;
-  color: var(--primary-dark);
+  color: var(--white);
+  text-shadow: 0 3px 22px rgba(0, 0, 0, 0.18);
 }
 
 .hero h1 em {
   font-style: normal;
-  color: var(--primary);
+  color: var(--accent);
 }
 
 .hero-sub {
   font-size: 20px;
-  color: var(--muted);
-  max-width: 560px;
+  color: rgba(255, 255, 255, 0.84);
+  max-width: 650px;
   margin-bottom: 40px;
 }
 
@@ -616,6 +660,27 @@ section[id] {
   flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 54px;
+}
+
+.hero .btn-primary {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+.hero .btn-primary:hover {
+  background: var(--white);
+}
+
+.hero .btn-outline {
+  border-color: rgba(255, 255, 255, 0.86);
+  color: var(--white);
+  background: rgba(19, 54, 57, 0.26);
+  backdrop-filter: blur(8px);
+}
+
+.hero .btn-outline:hover {
+  background: var(--white);
+  color: var(--primary-dark);
 }
 
 .hero-stats {
@@ -628,15 +693,79 @@ section[id] {
   display: block;
   font-family: var(--font-heading);
   font-size: 32px;
-  color: var(--primary);
+  color: var(--accent);
   line-height: 1.1;
   white-space: nowrap;
 }
 
 .hero-stats span {
   font-size: 14px;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.78);
   letter-spacing: 0.5px;
+}
+
+.hero-slider-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 34px;
+  padding: 7px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(18, 50, 53, 0.5);
+  backdrop-filter: blur(10px);
+}
+
+.hero-pause,
+.hero-dots button {
+  border: 0;
+  color: var(--white);
+  cursor: pointer;
+}
+
+.hero-pause {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.hero-pause:hover,
+.hero-pause:focus-visible {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.hero-pause:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.hero-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-dots button {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+  transition: width 0.25s ease, background 0.25s ease;
+}
+
+.hero-dots button.active {
+  width: 28px;
+  background: var(--accent);
+}
+
+.hero-pause:focus-visible,
+.hero-dots button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
 .hero-visual {
@@ -1980,6 +2109,8 @@ section[id] {
 
   .media img,
   .btn,
+  .hero-background-image,
+  .hero-dots button,
   .product-card,
   .service-card,
   .event-card,
@@ -1989,6 +2120,10 @@ section[id] {
   }
 
   .brand:hover img {
+    transform: none;
+  }
+
+  .hero-background-image {
     transform: none;
   }
 }
@@ -2011,6 +2146,10 @@ section[id] {
 
 /* --- Bascule en menu burger (avant que la nav ne déborde) --- */
 @media (max-width: 900px) {
+  .hero-background-image {
+    background-image: var(--hero-image-mobile);
+  }
+
   .nav-links,
   .nav-cta .nav-shop {
     display: none;
@@ -2253,7 +2392,18 @@ section[id] {
 
   /* Hero */
   .hero {
+    min-height: calc(100svh - 74px);
     padding: 44px 0 64px;
+  }
+
+  .hero-background-overlay {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(17, 52, 55, 0.94),
+        rgba(20, 55, 58, 0.82)
+      ),
+      linear-gradient(0deg, rgba(10, 32, 34, 0.5), transparent 52%);
   }
 
   .hero h1 {
@@ -2284,6 +2434,10 @@ section[id] {
 
   .hero-stats span {
     font-size: 13px;
+  }
+
+  .hero-slider-controls {
+    margin-top: 28px;
   }
 
   .hero-visual .placeholder,
@@ -3093,5 +3247,154 @@ section[id] {
 
   .not-found-actions .btn {
     width: 100%;
+  }
+}
+
+/* ============ PAGE SERVICES ============ */
+.services-page {
+  background: var(--bg-soft);
+  padding-top: 72px;
+}
+
+.theme-intro {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 44px;
+  color: var(--muted);
+  font-size: 18px;
+}
+
+.services-page-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.service-tile {
+  background: var(--white);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.service-tile:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow);
+}
+
+.service-tile-media {
+  position: relative;
+}
+
+.service-tile-media .media,
+.service-tile-media .placeholder {
+  aspect-ratio: 16 / 10;
+  border-radius: 0;
+}
+
+.service-tile:hover .media img {
+  transform: scale(1.06);
+}
+
+/* Pastille d'icône à cheval sur le visuel et le texte */
+.service-tile-icon {
+  position: absolute;
+  left: 24px;
+  bottom: -26px;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: var(--white);
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-soft);
+}
+
+.service-tile-body {
+  padding: 42px 26px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.service-tile-body h2 {
+  font-size: 21px;
+  color: var(--primary-dark);
+}
+
+.service-tile-body p {
+  font-size: 15.5px;
+  color: var(--muted);
+  flex: 1;
+}
+
+.service-tile-body .add-btn {
+  align-self: flex-start;
+  margin-top: 6px;
+}
+
+/* Les filtres de thème sont des liens : même allure que les boutons produits */
+.filters a.filter {
+  text-decoration: none;
+}
+
+/* --- Cartes de thème sur l'accueil (devenues cliquables) --- */
+a.service-card {
+  display: flex;
+  flex-direction: column;
+  color: inherit;
+}
+
+.service-card-lien {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  color: var(--primary);
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.service-card:hover .service-card-lien {
+  color: var(--primary-dark);
+}
+
+.service-card p {
+  flex: 1;
+}
+
+@media (max-width: 1100px) {
+  .services-page-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .services-page {
+    padding-top: 48px;
+  }
+
+  .theme-intro {
+    font-size: 16px;
+    margin-bottom: 32px;
+  }
+
+  .services-page-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .service-tile-body {
+    padding: 40px 22px 24px;
+  }
+
+  .service-tile-body .add-btn {
+    align-self: stretch;
   }
 }

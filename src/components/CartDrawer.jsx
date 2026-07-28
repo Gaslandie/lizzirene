@@ -89,7 +89,16 @@ function CartDrawer() {
                 <ul className="cart-list">
                   {items.map((i) => (
                     <li className="cart-item" key={i.id}>
-                      <Media src={i.src} variant={i.variant} label={i.name} />
+                      <Media
+                        src={i.src}
+                        srcSet={i.srcSet}
+                        sizes="84px"
+                        alt={i.alt}
+                        width={i.width}
+                        height={i.height}
+                        variant={i.variant}
+                        label={i.name}
+                      />
                       <div className="cart-item-info">
                         <strong>{i.name}</strong>
                         <span className="price">{formatPrice(i.price)}</span>

@@ -12,6 +12,11 @@ export const urlProduits = (categorie = 'tous') =>
 export const urlProduit = (id) =>
   `${BASE}produits/${encodeURIComponent(id)}`
 
+export const urlServices = (theme = 'tous') =>
+  `${BASE}services${
+    theme && theme !== 'tous' ? `?theme=${encodeURIComponent(theme)}` : ''
+  }`
+
 export const urlContact = () => `${BASE}contact`
 
 // N'intercepte que le clic principal simple. Les clics avec Ctrl/Cmd,

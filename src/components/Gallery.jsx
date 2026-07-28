@@ -4,20 +4,29 @@ import { PHOTOS } from '../config.js'
 
 const ITEMS = [
   {
-    src: PHOTOS.vedette,
+    ...PHOTOS.vedette,
     label: 'Composition en pot',
     alt: 'Composition florale en pot noir avec ruban jaune',
     tall: true,
   },
-  { variant: 'sun', label: 'Bouquet anniversaire' },
-  { variant: 'slate', label: 'Salon décoré' },
   {
-    src: PHOTOS.bouquet,
+    ...PHOTOS.fleursFraiches,
+    label: 'Fleurs fraîches',
+  },
+  {
+    ...PHOTOS.decoFlorale,
+    label: 'Décoration florale',
+  },
+  {
+    ...PHOTOS.bouquet,
     label: 'Bouquet de roses',
     alt: 'Bouquet de roses rouges et gerbera blanc emballé de blanc et or',
     tall: true,
   },
-  { variant: 'slate', label: 'Table de mariage' },
+  {
+    ...PHOTOS.paquetEmballe,
+    label: 'Coffret cadeau',
+  },
   { variant: 'teal', label: 'Vitrine boutique' },
 ]
 
@@ -27,11 +36,11 @@ function Gallery() {
       <div className="container">
         <Reveal>
           <div className="section-head">
-            <span className="eyebrow">Galerie</span>
-            <h2>Nos réalisations en images</h2>
+            <span className="eyebrow">En images</span>
+            <h2>Inspirations florales & cadeaux</h2>
             <p>
-              Un aperçu de nos créations — les visuels restants seront
-              remplacés par les photos de la boutique.
+              Des fleurs, des compositions et des attentions qui reflètent
+              l'univers Lizzirene Déco.
             </p>
           </div>
         </Reveal>
@@ -45,7 +54,11 @@ function Gallery() {
             >
               <Media
                 src={it.src}
+                srcSet={it.srcSet}
+                sizes="(max-width: 980px) 50vw, 25vw"
                 alt={it.alt}
+                width={it.width}
+                height={it.height}
                 variant={it.variant}
                 label={it.label}
               />

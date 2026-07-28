@@ -26,7 +26,11 @@ function ProductCard({ produit, onProduit, headingLevel = 'h3' }) {
         <div className="product-media">
           <Media
             src={produit.src}
+            srcSet={produit.srcSet}
+            sizes={produit.sizes}
             alt={produit.alt}
+            width={produit.width}
+            height={produit.height}
             variant={produit.variant}
             label={produit.name}
           />

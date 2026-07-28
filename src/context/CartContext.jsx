@@ -1,14 +1,52 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { PRODUCTS } from '../data/products.js'
 
 const CartContext = createContext(null)
 const STORAGE_KEY = 'lizzirene-panier'
+
+const creerLignePanier = (product, qty) => {
+  const {
+    id,
+    name,
+    price,
+    src,
+    srcSet,
+    sizes,
+    alt,
+    width,
+    height,
+    variant,
+  } = product
+
+  return {
+    id,
+    name,
+    price,
+    src,
+    srcSet,
+    sizes,
+    alt,
+    width,
+    height,
+    variant,
+    qty,
+  }
+}
 
 // Panier côté client, conservé dans le navigateur.
 // À brancher plus tard sur l'API NestJS (mêmes champs : id, name, price, qty).
 function readStored() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : []
+    if (!raw) return []
+
+    return JSON.parse(raw)
+      .map((ligne) => {
+        const produit = PRODUCTS.find((item) => item.id === ligne.id)
+        if (!produit?.price) return null
+        return creerLignePanier(produit, Math.max(1, Number(ligne.qty) || 1))
+      })
+      .filter(Boolean)
   } catch {
     return []
   }
@@ -20,7 +58,12 @@ export function CartProvider({ children }) {
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
+      // Seuls l'identifiant et la quantité persistent. Les prix, textes et
+      // images sont réhydratés depuis PRODUCTS au prochain chargement.
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(items.map(({ id, qty }) => ({ id, qty }))),
+      )
     } catch {
       /* stockage indisponible : le panier reste en mémoire */
     }
@@ -43,8 +86,7 @@ export function CartProvider({ children }) {
             i.id === product.id ? { ...i, qty: i.qty + qty } : i,
           )
         }
-        const { id, name, price, src, variant } = product
-        return [...prev, { id, name, price, src, variant, qty }]
+        return [...prev, creerLignePanier(product, qty)]
       })
       setOpen(true)
     }

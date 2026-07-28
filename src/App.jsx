@@ -7,6 +7,7 @@ import CartDrawer from './components/CartDrawer.jsx'
 import Accueil from './pages/Accueil.jsx'
 import PageContact from './pages/Contact.jsx'
 import Produits from './pages/Produits.jsx'
+import Services from './pages/Services.jsx'
 import Produit from './pages/Produit.jsx'
 import Introuvable from './pages/Introuvable.jsx'
 import { useRouter } from './hooks/useRouter.js'
@@ -23,6 +24,11 @@ const METADONNEES = {
     description:
       'Découvrez les fleurs naturelles et artificielles, plantes, vases, cadeaux et objets décoratifs de Lizzirene Déco.',
   },
+  services: {
+    title: 'Nos services — Lizzirene Déco · Conakry',
+    description:
+      "Décoration d'intérieur, bouquets sur mesure, mariages, baptêmes, événements professionnels et hommages floraux à Conakry.",
+  },
   contact: {
     title: 'Contact — Lizzirene Déco · Kipé, Conakry',
     description:
@@ -38,9 +44,11 @@ function App() {
   const {
     page,
     categorie,
+    theme,
     produitId,
     aller,
     choisirCategorie,
+    choisirTheme,
     allerProduit,
   } = useRouter()
 
@@ -67,7 +75,13 @@ function App() {
 
   let contenu
   if (page === 'accueil') {
-    contenu = <Accueil onCategorie={choisirCategorie} onAller={aller} />
+    contenu = (
+      <Accueil
+        onCategorie={choisirCategorie}
+        onTheme={choisirTheme}
+        onAller={aller}
+      />
+    )
   } else if (page === 'produits') {
     contenu = (
       <Produits
@@ -85,6 +99,8 @@ function App() {
         onProduit={allerProduit}
       />
     )
+  } else if (page === 'services') {
+    contenu = <Services theme={theme} onTheme={choisirTheme} />
   } else if (page === 'contact') {
     contenu = <PageContact />
   } else {
@@ -96,11 +112,17 @@ function App() {
       <Navbar
         page={page}
         categorie={categorie}
+        theme={theme}
         onAller={aller}
         onCategorie={choisirCategorie}
+        onTheme={choisirTheme}
       />
       <main>{contenu}</main>
-      <Footer onAller={aller} onCategorie={choisirCategorie} />
+      <Footer
+        onAller={aller}
+        onCategorie={choisirCategorie}
+        onTheme={choisirTheme}
+      />
       <WhatsAppFab />
       <CartDrawer />
     </CartProvider>

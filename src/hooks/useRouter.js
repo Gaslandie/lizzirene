@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import { normaliserCategorie } from '../data/products.js'
-import { BASE, urlAccueil, urlContact, urlProduit, urlProduits } from '../utils/navigation.js'
+import { normaliserTheme } from '../data/services.js'
+import {
+  BASE,
+  urlAccueil,
+  urlContact,
+  urlProduit,
+  urlProduits,
+  urlServices,
+} from '../utils/navigation.js'
 
 const cheminRelatif = () => {
   const chemin = window.location.pathname
@@ -26,19 +34,23 @@ const lireEtat = () => {
     'categorie',
   )
   const categorie = normaliserCategorie(categorieDemandee || 'tous')
+  const theme = normaliserTheme(
+    new URLSearchParams(window.location.search).get('theme') || 'tous',
+  )
   const ancienneUrl =
     relatif !== null &&
     segments.length === 0 &&
     (categorieDemandee !== null || window.location.hash === '#boutique')
 
   if (ancienneUrl) {
-    return { page: 'produits', categorie, produitId: null, ancienneUrl: true }
+    return { page: 'produits', categorie, theme: 'tous', produitId: null, ancienneUrl: true }
   }
 
   if (relatif === null) {
     return {
       page: 'introuvable',
       categorie: 'tous',
+      theme: 'tous',
       produitId: null,
       ancienneUrl: false,
     }
@@ -48,6 +60,7 @@ const lireEtat = () => {
     return {
       page: 'accueil',
       categorie: 'tous',
+      theme: 'tous',
       produitId: null,
       ancienneUrl: false,
     }
@@ -57,6 +70,7 @@ const lireEtat = () => {
     return {
       page: 'contact',
       categorie: 'tous',
+      theme: 'tous',
       produitId: null,
       ancienneUrl: false,
     }
@@ -66,6 +80,7 @@ const lireEtat = () => {
     return {
       page: 'produits',
       categorie,
+      theme: 'tous',
       produitId: null,
       ancienneUrl: false,
     }
@@ -75,7 +90,18 @@ const lireEtat = () => {
     return {
       page: 'produit',
       categorie: 'tous',
+      theme: 'tous',
       produitId: decoder(segments[1]),
+      ancienneUrl: false,
+    }
+  }
+
+  if (segments.length === 1 && segments[0] === 'services') {
+    return {
+      page: 'services',
+      categorie: 'tous',
+      theme,
+      produitId: null,
       ancienneUrl: false,
     }
   }
@@ -83,6 +109,7 @@ const lireEtat = () => {
   return {
     page: 'introuvable',
     categorie: 'tous',
+    theme: 'tous',
     produitId: null,
     ancienneUrl: false,
   }
@@ -152,6 +179,7 @@ export function useRouter() {
     (page, { ancre } = {}) => {
       let href = urlAccueil(ancre)
       if (page === 'produits') href = urlProduits()
+      if (page === 'services') href = urlServices()
       if (page === 'contact') href = urlContact()
 
       window.history.pushState({}, '', href)
@@ -175,6 +203,21 @@ export function useRouter() {
     [],
   )
 
+  const choisirTheme = useCallback(
+    (id, { ajouterHistorique = false } = {}) => {
+      const theme = normaliserTheme(id)
+      const methode = ajouterHistorique ? 'pushState' : 'replaceState'
+      window.history[methode]({}, '', urlServices(theme))
+      setEtat(lireEtat())
+
+      if (ajouterHistorique) {
+        remonterEnHaut()
+        window.requestAnimationFrame(() => focaliserTitre())
+      }
+    },
+    [],
+  )
+
   const allerProduit = useCallback((id) => {
     window.history.pushState({}, '', urlProduit(id))
     setEtat(lireEtat())
@@ -182,5 +225,5 @@ export function useRouter() {
     window.requestAnimationFrame(() => focaliserTitre())
   }, [])
 
-  return { ...etat, aller, choisirCategorie, allerProduit }
+  return { ...etat, aller, choisirCategorie, choisirTheme, allerProduit }
 }

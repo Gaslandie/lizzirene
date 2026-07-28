@@ -60,7 +60,13 @@ function Produit({ produitId, onAller, onCategorie, onProduit }) {
               <div className="product-detail-visual">
                 <Media
                   src={produit.src}
+                  srcSet={produit.srcSet}
+                  sizes="(max-width: 720px) calc(100vw - 40px), (max-width: 980px) 620px, 560px"
                   alt={produit.alt}
+                  width={produit.width}
+                  height={produit.height}
+                  loading="eager"
+                  fetchPriority="high"
                   variant={produit.variant}
                   label={produit.name}
                 />

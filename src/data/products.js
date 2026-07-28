@@ -69,7 +69,7 @@ export const PRODUCTS = [
     category: 'fleurs-naturelles',
     price: 300000,
     tag: 'Best-seller',
-    src: PHOTOS.bouquet,
+    ...PHOTOS.bouquet,
     alt: 'Bouquet de roses rouges, gerbera blanc et gypsophile',
     desc: 'Roses fraîches, gerbera et gypsophile, emballage blanc et or.',
   },
@@ -97,7 +97,7 @@ export const PRODUCTS = [
     category: 'fleurs-artificielles',
     price: 500000,
     tag: 'Coup de cœur',
-    src: PHOTOS.vedette,
+    ...PHOTOS.vedette,
     alt: 'Composition florale en pot noir avec ruban jaune',
     desc: 'Composition généreuse dans son pot noir, nouée d’un ruban satin.',
   },
@@ -117,6 +117,7 @@ export const PRODUCTS = [
     price: null,
     tag: 'Sur mesure',
     variant: 'sun',
+    ...PHOTOS.paquetEmballe,
     desc: 'Soins, chocolats, peluches et surprises romantiques réunis dans un coffret.',
   },
   {
@@ -135,6 +136,7 @@ export const PRODUCTS = [
     price: null,
     tag: 'Packaging',
     variant: 'teal',
+    ...PHOTOS.paquetEmballe,
     desc: 'Votre cadeau emballé avec soin : papier, ruban et carte manuscrite.',
   },
   {

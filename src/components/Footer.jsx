@@ -1,16 +1,18 @@
 import Icon from './Icon.jsx'
 import { CONTACT, waLink } from '../config.js'
 import { FAMILLES } from '../data/products.js'
+import { FAMILLES_SERVICES } from '../data/services.js'
 import {
   intercepterNavigation,
   urlAccueil,
   urlContact,
   urlProduits,
+  urlServices,
 } from '../utils/navigation.js'
 
 // Les colonnes de liens passent par le routeur (pas de rechargement de
 // page) tout en gardant de vraies URL dans les href.
-function Footer({ onAller, onCategorie }) {
+function Footer({ onAller, onCategorie, onTheme }) {
   const versAncre = (e, ancre) => {
     if (!intercepterNavigation(e)) return
     onAller?.('accueil', { ancre })
@@ -19,6 +21,11 @@ function Footer({ onAller, onCategorie }) {
   const versCategorie = (e, id) => {
     if (!intercepterNavigation(e)) return
     onCategorie?.(id, { ajouterHistorique: true })
+  }
+
+  const versTheme = (e, id) => {
+    if (!intercepterNavigation(e)) return
+    onTheme?.(id, { ajouterHistorique: true })
   }
 
   return (
@@ -81,6 +88,11 @@ function Footer({ onAller, onCategorie }) {
                 </a>
               </li>
               <li>
+                <a href={urlServices()} onClick={(e) => versTheme(e, 'tous')}>
+                  Nos services
+                </a>
+              </li>
+              <li>
                 <a
                   href={urlAccueil('evenements')}
                   onClick={(e) => versAncre(e, 'evenements')}
@@ -127,6 +139,21 @@ function Footer({ onAller, onCategorie }) {
                     onClick={(e) => versCategorie(e, famille.id)}
                   >
                     {famille.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h4>Nos services</h4>
+            <ul>
+              {FAMILLES_SERVICES.map((t) => (
+                <li key={t.id}>
+                  <a
+                    href={urlServices(t.id)}
+                    onClick={(e) => versTheme(e, t.id)}
+                  >
+                    {t.label}
                   </a>
                 </li>
               ))}

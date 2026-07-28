@@ -29,7 +29,8 @@ npm run preview  # prévisualise le build
 ## Structure
 
 ```
-public/                 logo et photos de la boutique
+image-sources/          originaux conservés hors du site publié
+public/optimized/       variantes légères générées pour le site
 src/
   config.js             coordonnées, photos, zones de livraison, format des prix
   data/products.js      catalogue (nom, catégorie, prix, photo)
@@ -46,8 +47,26 @@ src/
 - **Couleurs / typographie** → variables en haut de `src/index.css`
 - **Téléphone, WhatsApp, email, adresse** → `src/config.js`
 - **Produits et prix** → `src/data/products.js` (`price: null` affiche « Sur devis »)
-- **Photos** → déposer dans `public/`, référencer dans `PHOTOS` (`src/config.js`),
-  puis passer en `src` au composant `Media`
+- **Photos** → déposer les sources dans `image-sources/`, les ajouter au manifeste de
+  `scripts/optimize-images.mjs`, puis référencer leurs variantes dans `PHOTOS`
+  (`src/config.js`)
+
+### Optimisation des images
+
+```bash
+npm run optimize:images
+```
+
+La commande produit dans `public/optimized/` des variantes WebP redimensionnées,
+sans agrandir les sources. Elle est aussi lancée automatiquement avant chaque build.
+Les composants utilisent `srcSet` et `sizes` pour laisser le navigateur choisir la
+bonne largeur. Une photo répétée doit rester définie une seule fois dans `PHOTOS`, puis
+être réutilisée dans les produits, les fiches, le panier et la galerie : le navigateur
+ne la télécharge ainsi qu'une fois grâce à son cache.
+
+Les fichiers source restent dans `image-sources/` pour permettre une nouvelle compression
+sans perte quand d'autres formats ou dimensions seront nécessaires. Comme ce dossier est
+hors de `public/`, GitHub Pages ne publie que les variantes de `public/optimized/`.
 
 La palette est extraite du logo officiel : turquoise `#36C0C0`, bleu-vert `#2A585C`,
 jaune `#FBDD13`.

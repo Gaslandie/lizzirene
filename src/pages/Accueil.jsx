@@ -8,12 +8,12 @@ import About from '../components/About.jsx'
 import Testimonials from '../components/Testimonials.jsx'
 import ContactCta from '../components/ContactCta.jsx'
 
-function Accueil({ onCategorie, onAller }) {
+function Accueil({ onCategorie, onTheme, onAller }) {
   return (
     <>
       <Hero onCategorie={onCategorie} />
       <Ticker />
-      <Services />
+      <Services onTheme={onTheme} />
       <Quote />
       <Events />
       <Gallery />

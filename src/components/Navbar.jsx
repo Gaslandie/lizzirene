@@ -1,135 +1,51 @@
 import { useEffect, useRef, useState } from 'react'
 import Icon from './Icon.jsx'
+import MenuDeroulant from './MenuDeroulant.jsx'
 import { CONTACT, PHOTOS, waLink } from '../config.js'
 import { useCart } from '../context/CartContext.jsx'
-import { FAMILLES, normaliserCategorie } from '../data/products.js'
+import { FAMILLES } from '../data/products.js'
+import { FAMILLES_SERVICES } from '../data/services.js'
 import {
   intercepterNavigation,
   urlAccueil,
   urlContact,
   urlProduits,
+  urlServices,
 } from '../utils/navigation.js'
+
+// Entrées des deux panneaux déroulants, construites depuis la source de
+// vérité de chaque domaine (produits / services).
+const ENTREES_PRODUITS = [
+  { valeur: 'tous', label: 'Tout le catalogue', href: urlProduits() },
+  ...FAMILLES.map((f) => ({
+    valeur: f.id,
+    label: f.label,
+    href: urlProduits(f.id),
+  })),
+]
+
+const ENTREES_SERVICES = [
+  { valeur: 'tous', label: 'Tous nos services', href: urlServices() },
+  ...FAMILLES_SERVICES.map((t) => ({
+    valeur: t.id,
+    label: t.label,
+    href: urlServices(t.id),
+  })),
+]
 
 const LIENS_APRES_PRODUITS = [
   { ancre: 'apropos', label: 'À propos' },
   { page: 'contact', label: 'Contact' },
 ]
 
-const hoverDisponible = () =>
-  window.matchMedia('(hover: hover) and (pointer: fine)').matches
-
-function MenuProduits({ page, categorie, onCategorie, onNaviguer }) {
-  const [ouvert, setOuvert] = useState(false)
-  const zoneRef = useRef(null)
-  const boutonRef = useRef(null)
-  const fermetureRef = useRef()
-  const produitsActifs = page === 'produits' || page === 'produit'
-  const categorieActive = normaliserCategorie(categorie)
-
-  useEffect(() => {
-    if (!ouvert) return undefined
-
-    const fermerHorsZone = (event) => {
-      if (!zoneRef.current?.contains(event.target)) setOuvert(false)
-    }
-
-    const fermerEchap = (event) => {
-      if (event.key !== 'Escape') return
-      setOuvert(false)
-      boutonRef.current?.focus()
-    }
-
-    document.addEventListener('pointerdown', fermerHorsZone)
-    document.addEventListener('keydown', fermerEchap)
-
-    return () => {
-      document.removeEventListener('pointerdown', fermerHorsZone)
-      document.removeEventListener('keydown', fermerEchap)
-    }
-  }, [ouvert])
-
-  useEffect(() => () => clearTimeout(fermetureRef.current), [])
-
-  const ouvrirAuSurvol = () => {
-    if (!hoverDisponible()) return
-    clearTimeout(fermetureRef.current)
-    setOuvert(true)
-  }
-
-  const fermerAuSurvol = () => {
-    if (!hoverDisponible()) return
-    fermetureRef.current = setTimeout(() => setOuvert(false), 160)
-  }
-
-  const fermerAuDepartDuFocus = (event) => {
-    if (!zoneRef.current?.contains(event.relatedTarget)) setOuvert(false)
-  }
-
-  const choisir = (event, id) => {
-    if (!intercepterNavigation(event)) return
-    onCategorie?.(id, { ajouterHistorique: true })
-    setOuvert(false)
-    onNaviguer?.()
-  }
-
-  return (
-    <div
-      className="nav-produits"
-      ref={zoneRef}
-      onMouseEnter={ouvrirAuSurvol}
-      onMouseLeave={fermerAuSurvol}
-      onBlur={fermerAuDepartDuFocus}
-    >
-      <button
-        ref={boutonRef}
-        type="button"
-        className={`nav-produits-btn ${produitsActifs ? 'active-page' : ''}`}
-        aria-expanded={ouvert}
-        aria-controls="sous-menu-produits"
-        onClick={() => setOuvert((etat) => !etat)}
-      >
-        Nos Produits
-        <Icon name="chevron" size={16} className={ouvert ? 'pivote' : ''} />
-      </button>
-
-      <ul
-        id="sous-menu-produits"
-        className={`sous-menu ${ouvert ? 'ouvert' : ''}`}
-      >
-        <li>
-          <a
-            href={urlProduits()}
-            aria-current={
-              page === 'produits' && categorieActive === 'tous'
-                ? 'page'
-                : undefined
-            }
-            onClick={(event) => choisir(event, 'tous')}
-          >
-            Tout le catalogue
-          </a>
-        </li>
-        {FAMILLES.map((famille) => (
-          <li key={famille.id}>
-            <a
-              href={urlProduits(famille.id)}
-              aria-current={
-                page === 'produits' && categorieActive === famille.id
-                  ? 'page'
-                  : undefined
-              }
-              onClick={(event) => choisir(event, famille.id)}
-            >
-              {famille.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
-
-function Navbar({ page = 'accueil', categorie = 'tous', onAller, onCategorie }) {
+function Navbar({
+  page = 'accueil',
+  categorie = 'tous',
+  theme = 'tous',
+  onAller,
+  onCategorie,
+  onTheme,
+}) {
   const [open, setOpen] = useState(false)
   const burgerRef = useRef(null)
   const { count, setOpen: openCart } = useCart()
@@ -197,7 +113,12 @@ function Navbar({ page = 'accueil', categorie = 'tous', onAller, onCategorie }) 
             className="brand"
             onClick={(event) => allerPage(event, 'accueil')}
           >
-            <img src={PHOTOS.logo} alt="Logo Lizzirene Déco" />
+            <img
+              src={PHOTOS.logo.src}
+              alt={PHOTOS.logo.alt}
+              width={PHOTOS.logo.width}
+              height={PHOTOS.logo.height}
+            />
             <span className="brand-block">
               <span className="brand-name">
                 LIZZIRENE <span>DECO</span>
@@ -218,10 +139,22 @@ function Navbar({ page = 'accueil', categorie = 'tous', onAller, onCategorie }) 
             >
               Accueil
             </a>
-            <MenuProduits
-              page={page}
-              categorie={categorie}
-              onCategorie={onCategorie}
+            <MenuDeroulant
+              id="sous-menu-produits"
+              libelle="Nos Produits"
+              actif={page === 'produits' || page === 'produit'}
+              entrees={ENTREES_PRODUITS}
+              valeurActive={categorie}
+              onChoisir={(id) => onCategorie?.(id, { ajouterHistorique: true })}
+              onNaviguer={() => setOpen(false)}
+            />
+            <MenuDeroulant
+              id="sous-menu-services"
+              libelle="Nos Services"
+              actif={page === 'services'}
+              entrees={ENTREES_SERVICES}
+              valeurActive={theme}
+              onChoisir={(id) => onTheme?.(id, { ajouterHistorique: true })}
               onNaviguer={() => setOpen(false)}
             />
             {LIENS_APRES_PRODUITS.map((lien) => (
