@@ -16,7 +16,7 @@ const QUESTIONS = [
   },
   {
     q: 'Comment se passe le paiement ?',
-    r: "Le paiement se fait à la livraison, en espèces, à la réception de votre commande. Aucun paiement en ligne n'est demandé.",
+    r: 'Le paiement se fait à la livraison, en espèces, à la réception de votre commande. Aucun paiement en ligne n’est demandé.',
   },
   {
     q: 'Livrez-vous partout à Conakry ?',
@@ -55,7 +55,7 @@ function PageContact() {
               {CONTACT.whatsappDisplay}
             </a>
             <a
-              href={`tel:+224${CONTACT.phoneDisplay.replace(/\s/g, '')}`}
+              href={`tel:${CONTACT.phone.replace(/\s/g, '')}`}
               className="btn btn-outline"
             >
               <Icon name="phone" size={18} />

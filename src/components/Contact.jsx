@@ -47,7 +47,7 @@ function Contact() {
                 </span>
                 <div>
                   <strong>Téléphone</strong>
-                  <a href={`tel:+224${CONTACT.phoneDisplay.replace(/\s/g, '')}`}>
+                  <a href={`tel:${CONTACT.phone.replace(/\s/g, '')}`}>
                     {CONTACT.phoneDisplay}
                   </a>
                 </div>
@@ -108,15 +108,24 @@ function Contact() {
           <form className="contact-form" onSubmit={handleSubmit}>
             <h3>Demande de devis</h3>
             <div className="form-row">
-              <input name="nom" type="text" placeholder="Votre nom" required />
+              <input
+                name="nom"
+                type="text"
+                placeholder="Votre nom"
+                aria-label="Votre nom"
+                autoComplete="name"
+                required
+              />
               <input
                 name="telephone"
                 type="tel"
                 placeholder="Votre téléphone"
+                aria-label="Votre téléphone"
+                autoComplete="tel"
                 required
               />
             </div>
-            <select name="type" defaultValue="">
+            <select name="type" defaultValue="" aria-label="Type de demande">
               <option value="" disabled>
                 Type de demande
               </option>
@@ -124,17 +133,22 @@ function Contact() {
               <option>Fleurs artificielles</option>
               <option>Plantes, vases ou caches postes</option>
               <option>Box cadeau</option>
+              <option>Peluches</option>
               <option>Tableaux ou matériel décoratif</option>
               <option>Luminaire professionnel</option>
               <option>Événement (mariage, anniversaire…)</option>
             </select>
-            <textarea name="message" placeholder="Décrivez votre projet…" />
+            <textarea
+              name="message"
+              placeholder="Décrivez votre projet…"
+              aria-label="Décrivez votre projet"
+            />
             <button type="submit" className="btn btn-primary">
               <Icon name="whatsapp" size={18} />
               Envoyer via WhatsApp
             </button>
             <p className="form-note">
-              Votre demande s'ouvre dans WhatsApp — il ne reste qu'à appuyer
+              Votre demande s’ouvre dans WhatsApp — il ne reste qu’à appuyer
               sur Envoyer. Réponse rapide, 7j/7.
             </p>
           </form>

@@ -424,6 +424,7 @@ section[id] {
 }
 
 .nav-links a:hover::after,
+.nav-links a[aria-current='page']::after,
 .nav-produits-btn:hover::after,
 .nav-produits-btn.active-page::after {
   width: 100%;
@@ -1982,7 +1983,8 @@ section[id] {
   .product-card,
   .service-card,
   .event-card,
-  .brand img {
+  .brand img,
+  .faq-item summary .icon {
     transition: none;
   }
 
@@ -2660,7 +2662,9 @@ section[id] {
 }
 
 .faq-item summary .icon {
-  color: var(--primary);
+  /* --primary-dark : le chevron est un indicateur d'interface,
+     il doit tenir le contraste 3:1 sur fond blanc (WCAG 1.4.11). */
+  color: var(--primary-dark);
   transition: transform 0.25s ease;
 }
 
@@ -2734,11 +2738,6 @@ section[id] {
   flex-direction: column;
   gap: 14px;
   flex-shrink: 0;
-}
-
-/* --- Lien actif dans la navigation --- */
-.nav-links a[aria-current='page']::after {
-  width: 100%;
 }
 
 /* --- Responsive page contact --- */
