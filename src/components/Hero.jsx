@@ -1,15 +1,25 @@
 import Media from './Media.jsx'
 import Icon from './Icon.jsx'
 import { PHOTOS, CONTACT, waLink } from '../config.js'
+import { intercepterNavigation, urlProduits } from '../utils/navigation.js'
 
-function Hero() {
+function Hero({ onCategorie }) {
+  const [avant, apres] = CONTACT.heroTitle.split('chaque fleur')
+
+  const ouvrirFleurs = (event) => {
+    if (!intercepterNavigation(event)) return
+    onCategorie?.('fleurs', { ajouterHistorique: true })
+  }
+
   return (
     <section className="hero" id="accueil">
       <div className="container">
         <div className="hero-content">
           <span className="hero-eyebrow">Kipé · Conakry · Guinée</span>
-          <h1>
-            Des fleurs pour chaque <em>émotion</em>
+          <h1 tabIndex={-1}>
+            {avant}
+            <em>chaque fleur</em>
+            {apres}
           </h1>
           <p className="hero-sub">
             Bouquets personnalisés, compositions florales, plantes et box
@@ -17,7 +27,11 @@ function Hero() {
             livrons partout à Conakry.
           </p>
           <div className="hero-actions">
-            <a href="#boutique" className="btn btn-primary">
+            <a
+              href={urlProduits('fleurs')}
+              className="btn btn-primary"
+              onClick={ouvrirFleurs}
+            >
               Commander un bouquet
             </a>
             <a

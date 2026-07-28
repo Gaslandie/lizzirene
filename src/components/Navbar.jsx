@@ -1,20 +1,165 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Icon from './Icon.jsx'
 import { CONTACT, PHOTOS, waLink } from '../config.js'
 import { useCart } from '../context/CartContext.jsx'
+import { FAMILLES, normaliserCategorie } from '../data/products.js'
+import {
+  intercepterNavigation,
+  urlAccueil,
+  urlContact,
+  urlProduits,
+} from '../utils/navigation.js'
 
-const LINKS = [
-  { href: '#services', label: 'Univers' },
-  { href: '#boutique', label: 'Boutique' },
-  { href: '#evenements', label: 'Événements' },
-  { href: '#galerie', label: 'Galerie' },
-  { href: '#apropos', label: 'À propos' },
-  { href: '#contact', label: 'Contact' },
+const LIENS_APRES_PRODUITS = [
+  { ancre: 'apropos', label: 'À propos' },
+  { page: 'contact', label: 'Contact' },
 ]
 
-function Navbar() {
+const hoverDisponible = () =>
+  window.matchMedia('(hover: hover) and (pointer: fine)').matches
+
+function MenuProduits({ page, categorie, onCategorie, onNaviguer }) {
+  const [ouvert, setOuvert] = useState(false)
+  const zoneRef = useRef(null)
+  const boutonRef = useRef(null)
+  const fermetureRef = useRef()
+  const produitsActifs = page === 'produits' || page === 'produit'
+  const categorieActive = normaliserCategorie(categorie)
+
+  useEffect(() => {
+    if (!ouvert) return undefined
+
+    const fermerHorsZone = (event) => {
+      if (!zoneRef.current?.contains(event.target)) setOuvert(false)
+    }
+
+    const fermerEchap = (event) => {
+      if (event.key !== 'Escape') return
+      setOuvert(false)
+      boutonRef.current?.focus()
+    }
+
+    document.addEventListener('pointerdown', fermerHorsZone)
+    document.addEventListener('keydown', fermerEchap)
+
+    return () => {
+      document.removeEventListener('pointerdown', fermerHorsZone)
+      document.removeEventListener('keydown', fermerEchap)
+    }
+  }, [ouvert])
+
+  useEffect(() => () => clearTimeout(fermetureRef.current), [])
+
+  const ouvrirAuSurvol = () => {
+    if (!hoverDisponible()) return
+    clearTimeout(fermetureRef.current)
+    setOuvert(true)
+  }
+
+  const fermerAuSurvol = () => {
+    if (!hoverDisponible()) return
+    fermetureRef.current = setTimeout(() => setOuvert(false), 160)
+  }
+
+  const fermerAuDepartDuFocus = (event) => {
+    if (!zoneRef.current?.contains(event.relatedTarget)) setOuvert(false)
+  }
+
+  const choisir = (event, id) => {
+    if (!intercepterNavigation(event)) return
+    onCategorie?.(id, { ajouterHistorique: true })
+    setOuvert(false)
+    onNaviguer?.()
+  }
+
+  return (
+    <div
+      className="nav-produits"
+      ref={zoneRef}
+      onMouseEnter={ouvrirAuSurvol}
+      onMouseLeave={fermerAuSurvol}
+      onBlur={fermerAuDepartDuFocus}
+    >
+      <button
+        ref={boutonRef}
+        type="button"
+        className={`nav-produits-btn ${produitsActifs ? 'active-page' : ''}`}
+        aria-expanded={ouvert}
+        aria-controls="sous-menu-produits"
+        onClick={() => setOuvert((etat) => !etat)}
+      >
+        Nos Produits
+        <Icon name="chevron" size={16} className={ouvert ? 'pivote' : ''} />
+      </button>
+
+      <ul
+        id="sous-menu-produits"
+        className={`sous-menu ${ouvert ? 'ouvert' : ''}`}
+      >
+        <li>
+          <a
+            href={urlProduits()}
+            aria-current={
+              page === 'produits' && categorieActive === 'tous'
+                ? 'page'
+                : undefined
+            }
+            onClick={(event) => choisir(event, 'tous')}
+          >
+            Tout le catalogue
+          </a>
+        </li>
+        {FAMILLES.map((famille) => (
+          <li key={famille.id}>
+            <a
+              href={urlProduits(famille.id)}
+              aria-current={
+                page === 'produits' && categorieActive === famille.id
+                  ? 'page'
+                  : undefined
+              }
+              onClick={(event) => choisir(event, famille.id)}
+            >
+              {famille.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function Navbar({ page = 'accueil', categorie = 'tous', onAller, onCategorie }) {
   const [open, setOpen] = useState(false)
+  const burgerRef = useRef(null)
   const { count, setOpen: openCart } = useCart()
+
+  useEffect(() => {
+    if (!open) return undefined
+
+    const fermerEchap = (event) => {
+      if (event.key !== 'Escape') return
+      setOpen(false)
+      burgerRef.current?.focus()
+    }
+
+    document.addEventListener('keydown', fermerEchap)
+    return () => document.removeEventListener('keydown', fermerEchap)
+  }, [open])
+
+  const allerPage = (event, destination, options) => {
+    if (!intercepterNavigation(event)) return
+    setOpen(false)
+    onAller?.(destination, options)
+  }
+
+  const naviguer = (event, lien) => {
+    allerPage(
+      event,
+      lien.page || 'accueil',
+      lien.ancre ? { ancre: lien.ancre } : undefined,
+    )
+  }
 
   return (
     <>
@@ -47,7 +192,11 @@ function Navbar() {
 
       <header className="navbar">
         <div className="container">
-          <a href="#accueil" className="brand">
+          <a
+            href={urlAccueil()}
+            className="brand"
+            onClick={(event) => allerPage(event, 'accueil')}
+          >
             <img src={PHOTOS.logo} alt="Logo Lizzirene Déco" />
             <span className="brand-block">
               <span className="brand-name">
@@ -57,10 +206,36 @@ function Navbar() {
             </span>
           </a>
 
-          <nav className={`nav-links ${open ? 'open' : ''}`}>
-            {LINKS.map((l) => (
-              <a key={l.href} href={l.href} onClick={() => setOpen(false)}>
-                {l.label}
+          <nav
+            id="navigation-principale"
+            className={`nav-links ${open ? 'open' : ''}`}
+            aria-label="Navigation principale"
+          >
+            <a
+              href={urlAccueil()}
+              aria-current={page === 'accueil' ? 'page' : undefined}
+              onClick={(event) => allerPage(event, 'accueil')}
+            >
+              Accueil
+            </a>
+            <MenuProduits
+              page={page}
+              categorie={categorie}
+              onCategorie={onCategorie}
+              onNaviguer={() => setOpen(false)}
+            />
+            {LIENS_APRES_PRODUITS.map((lien) => (
+              <a
+                key={lien.label}
+                href={
+                  lien.page ? urlContact() : urlAccueil(lien.ancre)
+                }
+                aria-current={
+                  lien.page && page === lien.page ? 'page' : undefined
+                }
+                onClick={(event) => naviguer(event, lien)}
+              >
+                {lien.label}
               </a>
             ))}
           </nav>
@@ -74,14 +249,20 @@ function Navbar() {
               <Icon name="bag" size={22} />
               {count > 0 && <span className="cart-count">{count}</span>}
             </button>
-            <a href="#boutique" className="btn btn-primary nav-shop">
+            <a
+              href={urlProduits()}
+              className="btn btn-primary nav-shop"
+              onClick={(event) => allerPage(event, 'produits')}
+            >
               Commander
             </a>
             <button
+              ref={burgerRef}
               className="burger"
-              onClick={() => setOpen(!open)}
+              onClick={() => setOpen((etat) => !etat)}
               aria-label={open ? 'Fermer le menu' : 'Ouvrir le menu'}
               aria-expanded={open}
+              aria-controls="navigation-principale"
             >
               <Icon name={open ? 'close' : 'menu'} size={24} />
             </button>

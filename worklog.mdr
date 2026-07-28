@@ -1,0 +1,31 @@
+# Worklog
+
+## 2026-07-28 — Mise en place du mode de collaboration IA
+
+- Création du dossier `discussionsIA/`.
+- Chaque nouveau thème de travail aura son propre fichier de discussion.
+- Codex y écrira son analyse et sa proposition.
+- Claude Code pourra y indiquer son accord, ses corrections ou ses améliorations.
+- Codex relira la discussion consolidée avant de passer à l’implémentation.
+- Après l’implémentation, le résultat et les vérifications effectuées seront consignés ici.
+
+## 2026-07-28 — Améliorations site web
+
+- Création de la discussion `discussionsIA/2026-07-28-ameliorations-site-web.md`.
+- Avis Codex ajouté : mise à jour des familles produits, horaires et phrase principale du site.
+- Précision ajoutée : créer l’onglet `Nos Produits`, retirer `Galerie` et `Événements` de la barre de navigation.
+- Précision ajoutée : `Nos Produits` doit afficher les familles en sous-menu au survol sur desktop et au clic sur mobile.
+- Implémentation effectuée après lecture de l’avis de Claude Code : sous-menu `Nos Produits`, filtres par URL, horaires, H1 hero, catégories produits et correction `caches-postes`.
+- Vérifications : `npm run lint`, `npm run build`, requête locale HTTP 200 sur `?categorie=vases#boutique`, contrôles statiques des URLs/accessibilité/catégories.
+
+## 2026-07-28 — Page Nos Produits et fiches produits
+
+- Transformation du catalogue en page dédiée `/produits` ; retrait de la grille complète de l'accueil.
+- Ajout des fiches `/produits/<id>` avec fil d'Ariane, prix ou devis, panier / WhatsApp et produits apparentés.
+- Navigation réordonnée : `Accueil` en premier, puis `Nos Produits` ; suppression de `Univers` dans la navbar.
+- Regroupement de `Fleurs naturelles` et `Fleurs artificielles` sous une seule entrée `Fleurs`, avec deux groupes distincts dans le catalogue.
+- Mise à jour du hero, du footer et du bouton `Commander` vers les nouvelles URL.
+- Compatibilité conservée avec les anciennes URL `?categorie=...#boutique`.
+- Ajout des états page / produit introuvable et des métadonnées dynamiques.
+- Vérifications : lint, build, routes HTTP 200, DOM Chrome headless, ancienne URL, 404 produit, captures desktop 1440 px et mobile 390 px.
+- Correction de l'alignement mobile de `Nos Produits` d'après la capture iPhone fournie : libellé centré, chevron conservé à droite ; lint et build validés.

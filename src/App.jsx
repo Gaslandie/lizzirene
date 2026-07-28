@@ -1,36 +1,106 @@
+import { useEffect } from 'react'
 import { CartProvider } from './context/CartContext.jsx'
 import Navbar from './components/Navbar.jsx'
-import Hero from './components/Hero.jsx'
-import Ticker from './components/Ticker.jsx'
-import Services from './components/Services.jsx'
-import Boutique from './components/Boutique.jsx'
-import Quote from './components/Quote.jsx'
-import Events from './components/Events.jsx'
-import Gallery from './components/Gallery.jsx'
-import About from './components/About.jsx'
-import Testimonials from './components/Testimonials.jsx'
-import Contact from './components/Contact.jsx'
 import Footer from './components/Footer.jsx'
 import WhatsAppFab from './components/WhatsAppFab.jsx'
 import CartDrawer from './components/CartDrawer.jsx'
+import Accueil from './pages/Accueil.jsx'
+import PageContact from './pages/Contact.jsx'
+import Produits from './pages/Produits.jsx'
+import Produit from './pages/Produit.jsx'
+import Introuvable from './pages/Introuvable.jsx'
+import { useRouter } from './hooks/useRouter.js'
+import { trouverProduit } from './data/products.js'
+
+const METADONNEES = {
+  accueil: {
+    title: 'Lizzirene Déco — Fleuriste & décoration à Kipé, Conakry',
+    description:
+      'Bouquets, fleurs, plantes, cadeaux et décoration à Kipé, Conakry. Livraison 7j/7 et paiement à la livraison.',
+  },
+  produits: {
+    title: 'Nos produits — Lizzirene Déco · Conakry',
+    description:
+      'Découvrez les fleurs naturelles et artificielles, plantes, vases, cadeaux et objets décoratifs de Lizzirene Déco.',
+  },
+  contact: {
+    title: 'Contact — Lizzirene Déco · Kipé, Conakry',
+    description:
+      'Contactez Lizzirene Déco à Kipé pour une commande, une livraison à Conakry ou un projet de décoration.',
+  },
+  introuvable: {
+    title: 'Page introuvable — Lizzirene Déco',
+    description: "Cette page n'existe pas ou n'est plus disponible.",
+  },
+}
 
 function App() {
+  const {
+    page,
+    categorie,
+    produitId,
+    aller,
+    choisirCategorie,
+    allerProduit,
+  } = useRouter()
+
+  useEffect(() => {
+    const produit = page === 'produit' ? trouverProduit(produitId) : null
+    const meta = produit
+      ? {
+          title: `${produit.name} — Lizzirene Déco`,
+          description: produit.desc,
+        }
+      : METADONNEES[page] || METADONNEES.introuvable
+
+    document.title = meta.title
+    document
+      .querySelector('meta[name="description"]')
+      ?.setAttribute('content', meta.description)
+    document
+      .querySelector('meta[property="og:title"]')
+      ?.setAttribute('content', meta.title)
+    document
+      .querySelector('meta[property="og:description"]')
+      ?.setAttribute('content', meta.description)
+  }, [page, produitId])
+
+  let contenu
+  if (page === 'accueil') {
+    contenu = <Accueil onCategorie={choisirCategorie} onAller={aller} />
+  } else if (page === 'produits') {
+    contenu = (
+      <Produits
+        categorie={categorie}
+        onCategorie={choisirCategorie}
+        onProduit={allerProduit}
+      />
+    )
+  } else if (page === 'produit') {
+    contenu = (
+      <Produit
+        produitId={produitId}
+        onAller={aller}
+        onCategorie={choisirCategorie}
+        onProduit={allerProduit}
+      />
+    )
+  } else if (page === 'contact') {
+    contenu = <PageContact />
+  } else {
+    contenu = <Introuvable onAller={aller} />
+  }
+
   return (
     <CartProvider>
-      <Navbar />
-      <main>
-        <Hero />
-        <Ticker />
-        <Services />
-        <Boutique />
-        <Quote />
-        <Events />
-        <Gallery />
-        <About />
-        <Testimonials />
-        <Contact />
-      </main>
-      <Footer />
+      <Navbar
+        page={page}
+        categorie={categorie}
+        onAller={aller}
+        onCategorie={choisirCategorie}
+      />
+      <main>{contenu}</main>
+      <Footer onAller={aller} onCategorie={choisirCategorie} />
       <WhatsAppFab />
       <CartDrawer />
     </CartProvider>

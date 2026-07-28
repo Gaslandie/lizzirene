@@ -6,6 +6,9 @@ _« Des fleurs pour chaque émotion »_
 Bouquets personnalisés, compositions florales, terrariums faits main, box cadeaux, plantes
 et décoration florale d'événements. Livraison partout à Conakry, **paiement à la livraison**.
 
+Le front propose plusieurs pages avec des URL partageables : accueil, catalogue,
+fiches produits et contact.
+
 ## Stack
 
 | Étape | Technologie |
@@ -31,7 +34,10 @@ src/
   config.js             coordonnées, photos, zones de livraison, format des prix
   data/products.js      catalogue (nom, catégorie, prix, photo)
   context/CartContext   panier (état + persistance navigateur)
-  components/           un fichier par section de la page
+  components/           sections et composants réutilisables
+  pages/                accueil, catalogue, fiche produit et contact
+  hooks/useRouter.js    navigation entre les pages sans dépendance externe
+  utils/navigation.js  construction centralisée des URL internes
   index.css             toute la mise en forme (palette en haut du fichier)
 ```
 

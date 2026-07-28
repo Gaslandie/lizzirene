@@ -1,9 +1,12 @@
+import { CONTACT } from '../config.js'
+
 const ITEMS = [
-  'Des fleurs pour chaque émotion',
+  CONTACT.tagline,
   'Bouquets personnalisés',
   'Fleurs fraîches de qualité',
   'Box cadeaux',
-  'Terrariums faits main',
+  'Vases & caches postes',
+  'Luminaires professionnels',
   'Décoration florale d’événements',
   'Livraison à Conakry',
 ]

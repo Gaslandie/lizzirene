@@ -122,6 +122,7 @@ const OUTLINE = {
     </>
   ),
   arrow: <path d="M5 12h14m-7-7 7 7-7 7" />,
+  chevron: <path d="m6 9 6 6 6-6" />,
   scissors: (
     <>
       <circle cx="6" cy="6" r="3" />

@@ -3,10 +3,22 @@ import Icon from './Icon.jsx'
 import { CONTACT, waLink } from '../config.js'
 
 function Contact() {
+  // Le formulaire compose un message WhatsApp prêt à envoyer — même canal
+  // que les commandes. Il sera doublé d'un POST vers l'API NestJS plus tard.
   const handleSubmit = (e) => {
     e.preventDefault()
-    // Maquette : le formulaire sera branché sur le backend NestJS plus tard.
-    alert('Merci ! Votre demande a bien été prise en compte (démo).')
+    const data = Object.fromEntries(new FormData(e.target))
+    const message = [
+      'Demande de devis — site Lizzirene Déco',
+      '',
+      `Nom : ${data.nom}`,
+      `Téléphone : ${data.telephone}`,
+      data.type ? `Demande : ${data.type}` : null,
+      data.message ? `Projet : ${data.message}` : null,
+    ]
+      .filter(Boolean)
+      .join('\n')
+    window.open(waLink(message), '_blank', 'noopener')
   }
 
   return (
@@ -70,7 +82,11 @@ function Contact() {
                 </span>
                 <div>
                   <strong>Horaires</strong>
-                  <span>{CONTACT.hours}</span>
+                  <span className="hours-lines">
+                    {CONTACT.hours.map((ligne) => (
+                      <span key={ligne}>{ligne}</span>
+                    ))}
+                  </span>
                 </div>
               </li>
             </ul>
@@ -92,23 +108,35 @@ function Contact() {
           <form className="contact-form" onSubmit={handleSubmit}>
             <h3>Demande de devis</h3>
             <div className="form-row">
-              <input type="text" placeholder="Votre nom" required />
-              <input type="tel" placeholder="Votre téléphone" required />
+              <input name="nom" type="text" placeholder="Votre nom" required />
+              <input
+                name="telephone"
+                type="tel"
+                placeholder="Votre téléphone"
+                required
+              />
             </div>
-            <select defaultValue="">
+            <select name="type" defaultValue="">
               <option value="" disabled>
                 Type de demande
               </option>
               <option>Bouquet personnalisé</option>
-              <option>Composition ou terrarium</option>
+              <option>Fleurs artificielles</option>
+              <option>Plantes, vases ou caches postes</option>
               <option>Box cadeau</option>
-              <option>Décoration d'intérieur</option>
+              <option>Tableaux ou matériel décoratif</option>
+              <option>Luminaire professionnel</option>
               <option>Événement (mariage, anniversaire…)</option>
             </select>
-            <textarea placeholder="Décrivez votre projet…" />
+            <textarea name="message" placeholder="Décrivez votre projet…" />
             <button type="submit" className="btn btn-primary">
-              Envoyer ma demande
+              <Icon name="whatsapp" size={18} />
+              Envoyer via WhatsApp
             </button>
+            <p className="form-note">
+              Votre demande s'ouvre dans WhatsApp — il ne reste qu'à appuyer
+              sur Envoyer. Réponse rapide, 7j/7.
+            </p>
           </form>
         </Reveal>
       </div>

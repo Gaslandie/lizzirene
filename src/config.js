@@ -1,6 +1,7 @@
 // Coordonnées officielles de la boutique — un seul endroit à modifier.
 export const CONTACT = {
   tagline: 'Des fleurs pour chaque émotion',
+  heroTitle: "L'amour se dit en fleur et chaque fleur a une histoire ...",
   founder: 'Irma',
   phone: '+224 610 81 17 17',
   phoneDisplay: '610 81 17 17',
@@ -13,7 +14,7 @@ export const CONTACT = {
   address: 'Kipé, Conakry — Guinée II',
   addressDetail:
     "À 50 m de l'école française, rue non bitumée, en face du collège Koffi Annan",
-  hours: 'Lun – Sam : 9h00 – 19h00',
+  hours: ['Lun – Sam : 8h30 – 21h30', 'Dim : 10h – 18h'],
 }
 
 // Photos de la boutique (fichiers déposés dans /public).

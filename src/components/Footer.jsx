@@ -1,7 +1,26 @@
 import Icon from './Icon.jsx'
 import { CONTACT, waLink } from '../config.js'
+import { FAMILLES } from '../data/products.js'
+import {
+  intercepterNavigation,
+  urlAccueil,
+  urlContact,
+  urlProduits,
+} from '../utils/navigation.js'
 
-function Footer() {
+// Les colonnes de liens passent par le routeur (pas de rechargement de
+// page) tout en gardant de vraies URL dans les href.
+function Footer({ onAller, onCategorie }) {
+  const versAncre = (e, ancre) => {
+    if (!intercepterNavigation(e)) return
+    onAller?.('accueil', { ancre })
+  }
+
+  const versCategorie = (e, id) => {
+    if (!intercepterNavigation(e)) return
+    onCategorie?.(id, { ajouterHistorique: true })
+  }
+
   return (
     <footer className="footer">
       <div className="container">
@@ -14,8 +33,8 @@ function Footer() {
             </div>
             <p className="footer-tagline">{CONTACT.tagline}</p>
             <p>
-              Bouquets personnalisés, compositions florales, plantes et box
-              cadeaux. Notre boutique vous accueille à Kipé, Conakry.
+              Fleurs naturelles et artificielles, plantes, vases, box cadeaux
+              et décoration. Notre boutique vous accueille à Kipé, Conakry.
             </p>
             <div className="socials">
               <a
@@ -42,20 +61,75 @@ function Footer() {
           <div>
             <h4>Navigation</h4>
             <ul>
-              <li><a href="#services">Notre univers</a></li>
-              <li><a href="#boutique">Boutique</a></li>
-              <li><a href="#evenements">Événements</a></li>
-              <li><a href="#galerie">Galerie</a></li>
-              <li><a href="#apropos">À propos</a></li>
+              <li>
+                <a
+                  href={urlAccueil()}
+                  onClick={(e) => {
+                    if (!intercepterNavigation(e)) return
+                    onAller?.('accueil')
+                  }}
+                >
+                  Accueil
+                </a>
+              </li>
+              <li>
+                <a
+                  href={urlProduits()}
+                  onClick={(e) => versCategorie(e, 'tous')}
+                >
+                  Nos produits
+                </a>
+              </li>
+              <li>
+                <a
+                  href={urlAccueil('evenements')}
+                  onClick={(e) => versAncre(e, 'evenements')}
+                >
+                  Événements
+                </a>
+              </li>
+              <li>
+                <a
+                  href={urlAccueil('galerie')}
+                  onClick={(e) => versAncre(e, 'galerie')}
+                >
+                  Galerie
+                </a>
+              </li>
+              <li>
+                <a
+                  href={urlAccueil('apropos')}
+                  onClick={(e) => versAncre(e, 'apropos')}
+                >
+                  À propos
+                </a>
+              </li>
+              <li>
+                <a
+                  href={urlContact()}
+                  onClick={(e) => {
+                    if (!intercepterNavigation(e)) return
+                    onAller?.('contact')
+                  }}
+                >
+                  Contact
+                </a>
+              </li>
             </ul>
           </div>
           <div>
-            <h4>Nos créations</h4>
+            <h4>Nos produits</h4>
             <ul>
-              <li><a href="#boutique">Bouquets personnalisés</a></li>
-              <li><a href="#boutique">Compositions & terrariums</a></li>
-              <li><a href="#boutique">Box cadeaux</a></li>
-              <li><a href="#boutique">Plantes & déco</a></li>
+              {FAMILLES.slice(0, 6).map((famille) => (
+                <li key={famille.id}>
+                  <a
+                    href={urlProduits(famille.id)}
+                    onClick={(e) => versCategorie(e, famille.id)}
+                  >
+                    {famille.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
           <div>
@@ -90,7 +164,11 @@ function Footer() {
               </li>
               <li>
                 <Icon name="clock" size={17} />
-                <span>{CONTACT.hours}</span>
+                <span className="hours-lines">
+                  {CONTACT.hours.map((ligne) => (
+                    <span key={ligne}>{ligne}</span>
+                  ))}
+                </span>
               </li>
             </ul>
           </div>
