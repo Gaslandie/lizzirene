@@ -56,15 +56,33 @@ restent disponibles pour les futures réexportations sans alourdir le site publi
 - Génération des variantes dans `public/optimized/`.
 - Conservation des originaux dans `image-sources/` et de la capture de contrôle
   dans `captures/`, donc hors du déploiement GitHub Pages.
-- Images du hero adaptées au mobile (768 px) et au desktop (jusqu'à 1920 px).
+- Images du hero recadrées en portrait pour le mobile (jusqu'à 900 × 1200 px)
+  et redimensionnées jusqu'à 1920 px pour le desktop.
 - Ajout de `srcSet`, `sizes`, dimensions intrinsèques, lazy loading et décodage
   asynchrone au composant `Media`.
 - Propagation des métadonnées d'image jusqu'au panier afin de conserver la même
   ressource entre carte, fiche et panier.
 - Réutilisation du coffret emballé sur les emplacements cohérents du catalogue.
 - Ajout des deux nouvelles photos florales à la galerie.
-- Création d'un visuel Open Graph 1200 × 630 et préchargement responsive de la
-  première image du hero.
+- Création d'un visuel Open Graph 1200 × 630. Les fonds du hero utilisent un
+  `<picture>` responsive : la première image est prioritaire et les suivantes
+  ne sont montées qu'après le chargement initial.
 
-Les résultats détaillés des contrôles finaux seront ajoutés après le lint et le
-build de production.
+Résultats des contrôles :
+
+- `npm run optimize:images` : 9,02 Mo de sources transformés en 2,09 Mo pour
+  l'ensemble des variantes WebP et du JPEG social ;
+- première image du hero : environ 4 Mo à l'origine, 191 Ko sur desktop et
+  104 Ko sur mobile ;
+- `dist/` : environ 2,5 Mo, contre environ 12 Mo lorsque les originaux étaient
+  encore copiés dans le site publié ;
+- aucune référence aux anciens JPEG ni à la capture de contrôle dans `dist/` ;
+- `git diff --check` : OK ;
+- `npm run lint` : OK, avec le seul avertissement Fast Refresh historique de
+  `CartContext.jsx` ;
+- `npm run build` : OK ;
+- contrôle HTTP local : ressources WebP servies en 200 avec le bon type MIME et
+  un contenu identique aux fichiers générés ;
+- contrôle visuel Chrome headless : hero validé à 1440 px et à 390 px, logo et
+  recadrage mobile corrects ; fiche produit contrôlée dans le DOM, image chargée
+  depuis le `srcSet` optimisé avec ses dimensions naturelles.

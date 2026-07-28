@@ -600,6 +600,6 @@ Verifications effectuees :
   dans la navbar, aucune occurrence de `role="menu"` ou `aria-haspopup`, et une
   seule entree publique `Fleurs` dans les familles de navigation.
 - Correction visuelle mobile apres inspection de
-  `public/iPhone-13-PRO-localhost.png` : le libelle `Nos Produits` est centre
+  `captures/iPhone-13-PRO-localhost.png` : le libelle `Nos Produits` est centre
   sur le meme axe que les autres liens du burger, tandis que le chevron reste
   positionne a droite. Lint et build verifies apres correction.

@@ -9,6 +9,7 @@ function Hero({ onCategorie }) {
   const [avant, apres] = CONTACT.heroTitle.split('chaque fleur')
   const [imageActive, setImageActive] = useState(0)
   const [imagesAutorisees, setImagesAutorisees] = useState(() => new Set([0]))
+  const [premiereChargee, setPremiereChargee] = useState(false)
   const [enPause, setEnPause] = useState(false)
   const [mouvementReduit, setMouvementReduit] = useState(() =>
     window.matchMedia('(prefers-reduced-motion: reduce)').matches,
@@ -23,20 +24,24 @@ function Hero({ onCategorie }) {
   }, [])
 
   useEffect(() => {
-    if (rotationEnPause || HERO_IMAGES.length < 2) return undefined
+    if (!premiereChargee || rotationEnPause || HERO_IMAGES.length < 2) {
+      return undefined
+    }
 
     const intervalle = window.setInterval(() => {
       setImageActive((index) => (index + 1) % HERO_IMAGES.length)
     }, dureeDiapositive)
 
     return () => window.clearInterval(intervalle)
-  }, [rotationEnPause])
+  }, [premiereChargee, rotationEnPause])
 
-  // Le premier fond est préchargé depuis index.html. La diapositive suivante
-  // n'est autorisée qu'une fois le chargement initial passé, afin de ne pas
-  // lancer les trois grandes images en concurrence avec le LCP.
+  // Le premier fond est prioritaire dans son <picture>. La diapositive suivante
+  // n'est montée qu'une fois le chargement initial passé, afin de ne pas lancer
+  // les trois grandes images en concurrence avec le LCP.
   useEffect(() => {
-    if (rotationEnPause || HERO_IMAGES.length < 2) return undefined
+    if (!premiereChargee || rotationEnPause || HERO_IMAGES.length < 2) {
+      return undefined
+    }
 
     const attente = window.setTimeout(() => {
       const prochaine = (imageActive + 1) % HERO_IMAGES.length
@@ -47,7 +52,7 @@ function Hero({ onCategorie }) {
     }, 1200)
 
     return () => window.clearTimeout(attente)
-  }, [imageActive, rotationEnPause])
+  }, [imageActive, premiereChargee, rotationEnPause])
 
   const ouvrirFleurs = (event) => {
     if (!intercepterNavigation(event)) return
@@ -65,23 +70,33 @@ function Hero({ onCategorie }) {
   return (
     <section className="hero hero-with-background" id="accueil">
       <div className="hero-background" aria-hidden="true">
-        {HERO_IMAGES.map((image, index) => (
-          <div
-            key={image.src}
-            className={`hero-background-image ${
-              imageActive === index ? 'active' : ''
-            }`}
-            style={{
-              '--hero-image': imagesAutorisees.has(index)
-                ? `url("${image.src}")`
-                : 'none',
-              '--hero-image-mobile': imagesAutorisees.has(index)
-                ? `url("${image.mobileSrc}")`
-                : 'none',
-              backgroundPosition: image.position,
-            }}
-          />
-        ))}
+        {HERO_IMAGES.map(
+          (image, index) =>
+            imagesAutorisees.has(index) && (
+              <picture
+                key={image.src}
+                className={`hero-background-image ${
+                  imageActive === index ? 'active' : ''
+                }`}
+                style={{ '--hero-position': image.position }}
+              >
+                <source media="(max-width: 900px)" srcSet={image.mobileSrc} />
+                <img
+                  src={image.src}
+                  alt=""
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  fetchPriority={index === 0 ? 'high' : 'low'}
+                  decoding="async"
+                  onLoad={
+                    index === 0 ? () => setPremiereChargee(true) : undefined
+                  }
+                  onError={
+                    index === 0 ? () => setPremiereChargee(true) : undefined
+                  }
+                />
+              </picture>
+            ),
+        )}
         <div className="hero-background-overlay" />
       </div>
 

@@ -33,11 +33,12 @@
 ## 2026-07-28 — Images de fond du hero
 
 - Création de la discussion `discussionsIA/2026-07-28-hero-images.md`.
-- Remplacement du visuel en pot à droite par les trois images de `public/hero-images` en arrière-plan pleine largeur.
+- Remplacement du visuel en pot à droite par les trois images initialement déposées dans `public/hero-images`, désormais archivées dans `image-sources/hero-images`.
 - Première vue : `hero-image3.jpg`, puis changement automatique entre les trois images toutes les 5 secondes.
 - Ajout de commandes de sélection et pause, d'un voile de lisibilité et de la prise en charge de `prefers-reduced-motion`.
 - Vérifications : diff, lint, build et présence des trois ressources dans la production.
-- Point restant avant production : optimiser `hero-image1.jpg` et surtout `hero-image3.jpg`, actuellement trop lourdes.
+- Le point d'optimisation avant production est maintenant traité par les variantes
+  responsives générées automatiquement.
 
 ## 2026-07-28 — Optimisation et réutilisation des images
 
@@ -47,9 +48,13 @@
   mêmes URL entre catalogue, fiches, panier et galerie.
 - Intégration prudente des nouvelles photos : coffret emballé sur les offres
   correspondantes, photos florales dans la galerie.
-- Ajout d'une image sociale 1200 × 630 et du préchargement de la première image
-  du hero.
+- Ajout d'une image sociale 1200 × 630 ; passage du hero à des `<picture>`
+  responsives avec priorité à la première image et chargement différé des autres.
 - Déplacement conservatoire des originaux dans `image-sources/` et de la capture
   iPhone dans `captures/`, afin qu'ils ne soient pas copiés dans le site publié.
-- Le lint, le build et le contrôle final des références seront consignés après
-  leur exécution.
+- Résultat : 9,02 Mo de sources donnent 2,09 Mo pour toutes les variantes ; le
+  build publié passe d'environ 12 Mo à 2,5 Mo et l'image initiale du hero tombe
+  à 191 Ko sur desktop / 104 Ko sur mobile.
+- Vérifications : `git diff --check`, lint (seul avertissement historique de
+  `CartContext.jsx`), build de production, types MIME et empreintes HTTP, absence
+  des anciens JPEG dans `dist`, captures Chrome à 1440 px et 390 px.
