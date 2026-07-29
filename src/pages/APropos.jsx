@@ -34,28 +34,22 @@ const ETAPES = [
 
 const VALEURS = [
   {
-    icon: 'bouquet',
-    titre: 'Fait main, sans exception',
-    texte:
-      'Aucune composition industrielle : chaque bouquet est monté à la commande, selon vos couleurs et votre budget.',
-  },
-  {
     icon: 'leaf',
-    titre: 'Des fleurs choisies',
+    titre: "Respect de l'environnement",
     texte:
-      'Fleurs fraîches sélectionnées une à une, complétées par des fleurs artificielles haut de gamme quand la durée compte.',
+      "Nous privilégions, lorsque cela est possible, des pratiques durables et des solutions d'emballage plus responsables.",
   },
   {
-    icon: 'heart',
-    titre: 'Le geste juste',
+    icon: 'sparkles',
+    titre: 'Innovation',
     texte:
-      "Une naissance, un rétablissement, un adieu : nous adaptons le ton de la création à ce que vous avez à dire.",
+      "Nous restons à l'écoute des tendances et des besoins de nos clients pour proposer des concepts novateurs en matière d'emballage et de design floral.",
   },
   {
-    icon: 'cash',
-    titre: 'La confiance d’abord',
+    icon: 'bouquet',
+    titre: 'Créativité',
     texte:
-      'Paiement à la livraison, prix annoncés clairement, frais confirmés avant l’envoi. Aucune mauvaise surprise.',
+      'Chaque création florale et chaque emballage sont pensés pour apporter une touche unique et personnalisée.',
   },
 ]
 
@@ -70,11 +64,11 @@ function APropos({ onAller, onCategorie, onTheme }) {
       <header className="page-hero">
         <div className="container">
           <span className="eyebrow">À propos</span>
-          <h1 tabIndex={-1}>Lizzirene Déco, by {CONTACT.founder}</h1>
+          <h1 tabIndex={-1}>L'histoire de Lizzirene Déco</h1>
           <p>
-            Une boutique de fleurs à Kipé, née d'une passion : créer des
-            instants de beauté au quotidien, et donner à chaque émotion la
-            fleur qui lui ressemble.
+            Fondée par {CONTACT.founder}, notre boutique de fleurs à Kipé est
+            née d'une passion : créer des instants de beauté au quotidien et
+            donner à chaque émotion la fleur qui lui ressemble.
           </p>
         </div>
       </header>
@@ -108,10 +102,9 @@ function APropos({ onAller, onCategorie, onTheme }) {
               <span className="eyebrow">La fondatrice</span>
               <h2>{CONTACT.founder}</h2>
               <p>
-                C'est elle qui donne son nom et son goût à la maison :
-                Lizzirene Déco, <em>by {CONTACT.founder}</em>. Des compositions
-                pensées une à une, un accueil en boutique, et le souci du
-                détail jusque dans l'emballage.
+                À la tête de Lizzirene Déco, elle imagine des compositions
+                pensées une à une, cultive un accueil chaleureux en boutique
+                et veille au détail jusque dans l'emballage.
               </p>
               <blockquote className="fondatrice-citation">
                 Venez découvrir notre univers floral et partager avec nous
@@ -140,14 +133,14 @@ function APropos({ onAller, onCategorie, onTheme }) {
               </ul>
               <a
                 href={waLink(
-                  `Bonjour ${CONTACT.founder} ! J’aimerais échanger sur un projet floral.`,
+                  'Bonjour Lizzirene Déco ! J’aimerais échanger sur un projet floral.',
                 )}
                 target="_blank"
                 rel="noreferrer"
                 className="btn btn-whatsapp"
               >
                 <Icon name="whatsapp" size={19} />
-                Échanger avec {CONTACT.founder}
+                Échanger sur un projet floral
               </a>
             </div>
           </Reveal>
@@ -188,8 +181,8 @@ function APropos({ onAller, onCategorie, onTheme }) {
         <div className="container">
           <Reveal>
             <div className="section-head">
-              <span className="eyebrow">Nos engagements</span>
-              <h2>Ce sur quoi nous ne transigeons pas</h2>
+              <span className="eyebrow">Nos valeurs</span>
+              <h2>Ce qui guide nos créations</h2>
             </div>
           </Reveal>
           <div className="valeurs-grille">

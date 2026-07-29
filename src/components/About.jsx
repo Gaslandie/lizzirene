@@ -32,7 +32,7 @@ function About({ onAller }) {
         <Reveal variant="right" delay={120}>
           <div className="about-content">
             <span className="eyebrow">À propos</span>
-            <h2>Lizzirene Déco, by {CONTACT.founder}</h2>
+            <h2>Bienvenue chez Lizzirene Déco</h2>
             <p>
               Notre nouvelle boutique de fleurs a ouvert ses portes à Kipé.
               Nous vous y accueillons dans un espace chaleureux : bouquets,

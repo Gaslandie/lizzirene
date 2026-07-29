@@ -98,3 +98,53 @@
   répétées sur toutes les prestations d'une même famille. Elles sont utilisées
   uniquement sur les prestations qui correspondent au titre disponible.
 - Vérifications : `npm run build`, `npm run lint` et `git diff --check`.
+
+## 2026-07-29 — Extraction du catalogue imprimé prioritaire
+
+- Analyse de 10 photos WhatsApp correspondant à 8 pages uniques du catalogue
+  imprimé de Lizzirene Déco.
+- Transcription des variétés florales, bouquets, coffrets, réalisations,
+  services supplémentaires et valeurs de marque.
+- Création de la discussion
+  `discussionsIA/2026-07-29-catalogue-imprime-informations-prioritaires.md`.
+- Définition d'une règle de priorité : informations confirmées directement,
+  puis catalogue imprimé, puis contenus de démonstration actuels.
+- Aucune modification du site à cette étape ; attente de l'avis de Claude Code
+  avant migration des contenus.
+
+## 2026-07-29 — Catalogue prioritaire, phase 0
+
+- Lecture et prise en compte de l'avis de Claude Code dans la discussion
+  commune.
+- Remplacement des valeurs provisoires par les trois valeurs officielles du
+  catalogue : respect de l'environnement, innovation et créativité.
+- Ajout des services de conseil en aménagement floral, ateliers de création
+  florale et emballage/conservation.
+- Retrait complet des trois témoignages fictifs de l'accueil, du composant et
+  de leurs styles.
+- Raccourcissement des formulations autour du nom complet de la fondatrice sans
+  inventer de forme courte.
+- Remplacement du badge non vérifié `Best-seller` et retrait de la statistique
+  absolue `100 % fait main`.
+- Maintien provisoire des produits payants et du panier jusqu'à confirmation
+  des prix des bouquets officiels.
+- Vérifications : `git diff --check`, `npm run lint` et `npm run build`.
+
+## 2026-07-29 — Produits officiels et prix provisoires
+
+- Remplacement des produits nommés de démonstration par huit références du
+  catalogue : Poussa, Simoda, Lill Skate, Miss Fati, Carino, La vida, Maritou
+  et Choco Coeur.
+- Attribution de prix de travail à 300 000, 500 000 ou 800 000 GNF, tous
+  marqués `prixProvisoire` jusqu'à validation de la cliente.
+- Propagation de la mention provisoire sur les cartes, fiches produit, lignes
+  du panier, total et message de commande WhatsApp.
+- Exclusion volontaire de Berto, du double Bouquet Russe et des gerbes sans
+  nom jusqu'à clarification.
+- Ajout d'un nuancier textuel séparé : 10 familles et 31 références florales,
+  avec disponibilité selon les arrivages.
+- Réutilisation de la photo du coffret cœur uniquement pour Maritou ; maintien
+  de visuels neutres pour les autres modèles en attendant les originaux.
+- Vérifications : lint, build, `git diff --check`, contrôle du nombre de
+  références, HTTP 200 et captures locales desktop/mobile des familles Fleurs
+  et Box cadeaux.

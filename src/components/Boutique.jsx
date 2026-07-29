@@ -1,4 +1,5 @@
 import Icon from './Icon.jsx'
+import FlowerAvailability from './FlowerAvailability.jsx'
 import ProductCard from './ProductCard.jsx'
 import Reveal from './Reveal.jsx'
 import {
@@ -129,6 +130,7 @@ function Boutique({ categorie = 'tous', onCategorie, onProduit }) {
                     Cette sélection sera enrichie prochainement.
                   </p>
                 )}
+                {groupe.id === 'fleurs-naturelles' && <FlowerAvailability />}
               </div>
             ))}
           </div>
@@ -164,8 +166,24 @@ function Boutique({ categorie = 'tous', onCategorie, onProduit }) {
 
         <Reveal variant="fade">
           <p className="boutique-note">
-            Les bouquets démarrent à <strong>300 000 GNF</strong> et évoluent
-            selon la quantité de fleurs demandée.
+            {categorieActive === 'fleurs' ? (
+              <>
+                Prix provisoires : les bouquets démarrent à{' '}
+                <strong>300 000 GNF</strong>. Le montant final est confirmé
+                avec vous avant la préparation.
+              </>
+            ) : categorieActive === 'box-cadeaux' ? (
+              <>
+                Les prix des créations cadeaux sont provisoires. Leur contenu
+                et leur montant final sont confirmés avec vous avant la
+                préparation.
+              </>
+            ) : (
+              <>
+                Les prix et disponibilités du catalogue sont confirmés avec
+                vous avant chaque commande.
+              </>
+            )}
             <a
               href={waLink(
                 'Bonjour Lizzirene Déco ! Je souhaite recevoir votre catalogue complet.',

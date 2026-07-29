@@ -5,7 +5,17 @@ import { useCart } from '../context/CartContext.jsx'
 import { CONTACT, ZONES, formatPrice, waLink } from '../config.js'
 
 function CartDrawer() {
-  const { items, setQty, remove, clear, open, setOpen, count, total } = useCart()
+  const {
+    items,
+    setQty,
+    remove,
+    clear,
+    open,
+    setOpen,
+    count,
+    total,
+    totalProvisoire,
+  } = useCart()
   const [step, setStep] = useState('panier') // panier | commande | confirme
   const [order, setOrder] = useState(null)
 
@@ -22,7 +32,12 @@ function CartDrawer() {
     // Maquette : la commande part sur WhatsApp.
     // Plus tard : POST /commandes vers l'API NestJS.
     const lignes = items
-      .map((i) => `• ${i.name} × ${i.qty} — ${formatPrice(i.price * i.qty)}`)
+      .map(
+        (i) =>
+          `• ${i.name} × ${i.qty} — ${formatPrice(i.price * i.qty)}${
+            i.prixProvisoire ? ' (prix provisoire)' : ''
+          }`,
+      )
       .join('\n')
 
     const message = [
@@ -30,7 +45,10 @@ function CartDrawer() {
       '',
       lignes,
       '',
-      `TOTAL : ${formatPrice(total)}`,
+      `TOTAL${totalProvisoire ? ' PROVISOIRE' : ''} : ${formatPrice(total)}`,
+      totalProvisoire
+        ? 'Les prix provisoires sont indicatifs et seront confirmés avec vous avant validation.'
+        : null,
       'Paiement à la livraison',
       '',
       `Nom : ${data.nom}`,
@@ -101,7 +119,14 @@ function CartDrawer() {
                       />
                       <div className="cart-item-info">
                         <strong>{i.name}</strong>
-                        <span className="price">{formatPrice(i.price)}</span>
+                        <div className="price-stack">
+                          <span className="price">{formatPrice(i.price)}</span>
+                          {i.prixProvisoire && (
+                            <small className="price-provisional">
+                              Prix provisoire
+                            </small>
+                          )}
+                        </div>
                         <div className="qty">
                           <button
                             onClick={() => setQty(i.id, i.qty - 1)}
@@ -134,13 +159,14 @@ function CartDrawer() {
             {items.length > 0 && (
               <footer className="drawer-foot">
                 <div className="cart-total">
-                  <span>Total</span>
+                  <span>{totalProvisoire ? 'Total provisoire' : 'Total'}</span>
                   <strong>{formatPrice(total)}</strong>
                 </div>
                 <p className="cart-note">
                   <Icon name="cash" size={17} />
-                  Paiement à la livraison · frais de livraison confirmés avec
-                  vous avant l'envoi.
+                  {totalProvisoire
+                    ? 'Prix indicatifs à confirmer avec Lizzirene Déco avant validation.'
+                    : "Paiement à la livraison · frais de livraison confirmés avec vous avant l'envoi."}
                 </p>
                 <button
                   className="btn btn-primary"
@@ -212,9 +238,19 @@ function CartDrawer() {
             </label>
 
             <div className="cart-total">
-              <span>Total à payer à la livraison</span>
+              <span>
+                {totalProvisoire
+                  ? 'Total provisoire à confirmer'
+                  : 'Total à payer à la livraison'}
+              </span>
               <strong>{formatPrice(total)}</strong>
             </div>
+            {totalProvisoire && (
+              <p className="checkout-price-note">
+                Ces prix sont indicatifs en attendant la confirmation de
+                Lizzirene Déco.
+              </p>
+            )}
 
             <button type="submit" className="btn btn-primary">
               Valider ma commande

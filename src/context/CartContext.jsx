@@ -9,6 +9,7 @@ const creerLignePanier = (product, qty) => {
     id,
     name,
     price,
+    prixProvisoire,
     src,
     srcSet,
     sizes,
@@ -22,6 +23,7 @@ const creerLignePanier = (product, qty) => {
     id,
     name,
     price,
+    prixProvisoire,
     src,
     srcSet,
     sizes,
@@ -43,7 +45,7 @@ function readStored() {
     return JSON.parse(raw)
       .map((ligne) => {
         const produit = PRODUCTS.find((item) => item.id === ligne.id)
-        if (!produit?.price) return null
+        if (produit?.price == null) return null
         return creerLignePanier(produit, Math.max(1, Number(ligne.qty) || 1))
       })
       .filter(Boolean)
@@ -111,6 +113,7 @@ export function CartProvider({ children }) {
       setOpen,
       count: items.reduce((n, i) => n + i.qty, 0),
       total: items.reduce((n, i) => n + i.price * i.qty, 0),
+      totalProvisoire: items.some((item) => item.prixProvisoire),
     }
   }, [items, open])
 

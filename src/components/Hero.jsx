@@ -135,15 +135,15 @@ function Hero({ onCategorie }) {
           <div className="hero-stats">
             <div>
               <strong>Dès 300 000</strong>
-              <span>GNF le bouquet</span>
+              <span>GNF · prix provisoire</span>
             </div>
             <div>
               <strong>7j/7</strong>
               <span>Livraison à Conakry</span>
             </div>
             <div>
-              <strong>100%</strong>
-              <span>Fait main</span>
+              <strong>Fait main</strong>
+              <span>Créations florales</span>
             </div>
           </div>
 

@@ -79,6 +79,13 @@ const SERVICES_BASE = [
     desc: "Ouverture de boutique ou de bureau : ruban, arche florale et compositions pour marquer le premier jour.",
     image: 'services/inauguration.jpg',
   },
+  {
+    id: 'conseil-amenagement-floral',
+    theme: 'decoration',
+    icon: 'building',
+    name: 'Conseil en aménagement floral',
+    desc: "Nous vous accompagnons dans l'aménagement floral des espaces de travail, des événements et des hôtels.",
+  },
 
   // ---- Créations florales ----
   {
@@ -86,7 +93,7 @@ const SERVICES_BASE = [
     theme: 'creations',
     icon: 'bouquet',
     name: 'Confection de bouquets',
-    desc: 'Bouquets composés à la main selon vos couleurs, votre occasion et votre budget — à partir de 300 000 GNF.',
+    desc: 'Bouquets composés à la main selon vos couleurs, votre occasion et votre budget — tarif provisoire à partir de 300 000 GNF.',
     image: 'services/confection-bouquet.jpg',
   },
   {
@@ -104,6 +111,20 @@ const SERVICES_BASE = [
     name: 'Accueil fleuri',
     desc: 'Bouquet de bienvenue remis à vos invités, délégations ou clients — à l’aéroport, à l’hôtel ou au bureau.',
     image: 'services/accueil-fleuri.jpg',
+  },
+  {
+    id: 'atelier-creation-florale',
+    theme: 'creations',
+    icon: 'scissors',
+    name: 'Ateliers de création florale',
+    desc: 'Des ateliers de création florale pour les entreprises et les particuliers, sur devis.',
+  },
+  {
+    id: 'emballage-conservation',
+    theme: 'creations',
+    icon: 'leaf',
+    name: 'Emballage & conservation',
+    desc: "Des solutions d'emballage anti-humidité et ventilées, conçues pour favoriser une meilleure conservation des fleurs.",
   },
 
   // ---- Célébrations ----

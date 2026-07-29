@@ -48,9 +48,14 @@ function ProductCard({ produit, onProduit, headingLevel = 'h3' }) {
       </a>
 
       <div className="product-foot">
-        {produit.price ? (
+        {produit.price != null ? (
           <>
-            <span className="price">{formatPrice(produit.price)}</span>
+            <div className="price-stack">
+              <span className="price">{formatPrice(produit.price)}</span>
+              {produit.prixProvisoire && (
+                <small className="price-provisional">Prix provisoire</small>
+              )}
+            </div>
             <button
               className="btn btn-primary add-btn"
               onClick={() => add(produit)}

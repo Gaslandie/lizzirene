@@ -82,11 +82,20 @@ function Produit({ produitId, onAller, onCategorie, onProduit }) {
                 <h1 tabIndex={-1}>{produit.name}</h1>
                 <p className="product-detail-description">{produit.desc}</p>
                 <div className="product-detail-price">
-                  {produit.price ? formatPrice(produit.price) : 'Prix sur devis'}
+                  {produit.price != null ? (
+                    <>
+                      <span>{formatPrice(produit.price)}</span>
+                      {produit.prixProvisoire && (
+                        <small>Prix provisoire — à confirmer</small>
+                      )}
+                    </>
+                  ) : (
+                    'Prix sur devis'
+                  )}
                 </div>
 
                 <div className="product-detail-actions">
-                  {produit.price ? (
+                  {produit.price != null ? (
                     <button
                       className="btn btn-primary"
                       onClick={() => add(produit)}

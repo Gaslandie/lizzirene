@@ -1069,6 +1069,20 @@ section[id] {
   color: var(--primary-dark);
 }
 
+.price-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.price-provisional {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
 .price-devis {
   font-size: 16px;
   color: var(--muted);
@@ -1215,6 +1229,87 @@ section[id] {
 .flower-groups {
   display: grid;
   gap: 72px;
+}
+
+.flower-availability {
+  margin-top: 54px;
+  padding: clamp(28px, 4vw, 46px);
+  border: 1px solid rgba(42, 88, 92, 0.12);
+  border-radius: var(--radius);
+  background: var(--white);
+  box-shadow: var(--shadow-soft);
+}
+
+.flower-availability-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  margin-bottom: 30px;
+}
+
+.flower-availability-head .eyebrow {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.flower-availability-head h4 {
+  color: var(--primary-dark);
+  font-size: clamp(24px, 3vw, 34px);
+  margin-bottom: 10px;
+}
+
+.flower-availability-head p {
+  max-width: 720px;
+  color: var(--muted);
+}
+
+.flower-variety-count {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.flower-variety-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 16px;
+}
+
+.flower-variety-card {
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--bg-soft);
+}
+
+.flower-variety-card h5 {
+  color: var(--primary-dark);
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.flower-variety-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.flower-variety-list li {
+  padding: 5px 10px;
+  border: 1px solid rgba(42, 88, 92, 0.14);
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.flower-availability-cta {
+  width: fit-content;
+  margin-top: 28px;
 }
 
 .product-group-head {
@@ -1840,6 +1935,14 @@ section[id] {
   margin: 3px 0 10px;
 }
 
+.cart-item-info .price-stack {
+  margin: 3px 0 10px;
+}
+
+.cart-item-info .price-stack .price {
+  margin: 0;
+}
+
 .qty {
   display: inline-flex;
   align-items: center;
@@ -1980,6 +2083,13 @@ section[id] {
   border-top: 1px solid rgba(42, 88, 92, 0.1);
   padding-top: 18px;
   margin-top: 8px;
+}
+
+.checkout-price-note {
+  margin: -2px 0 18px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .checkout .btn {
@@ -3028,6 +3138,15 @@ section[id] {
   margin-bottom: 30px;
 }
 
+.product-detail-price small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .product-detail-actions {
   display: flex;
   flex-wrap: wrap;
@@ -3160,6 +3279,20 @@ section[id] {
 
   .flower-groups {
     gap: 54px;
+  }
+
+  .flower-availability {
+    margin-top: 38px;
+    padding: 24px 20px;
+  }
+
+  .flower-availability-head {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .flower-availability-cta {
+    width: 100%;
   }
 
   .product-group-head {

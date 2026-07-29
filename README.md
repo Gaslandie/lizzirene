@@ -82,8 +82,8 @@ MongoDB : le branchement sur l'API NestJS se fera sans retoucher l'interface.
 
 ## Reste à faire avant la mise en ligne
 
-- [ ] Remplacer les **témoignages provisoires** par de vrais avis clients
-      (`src/components/Testimonials.jsx`) — ne pas publier de faux avis
+- [x] Retirer les **témoignages provisoires** ; cette section ne reviendra
+      qu'avec de vrais avis clients et leur accord de publication
 - [ ] Confirmer les **prix** des articles actuellement « Sur devis »
 - [ ] Ajouter les **photos** manquantes (galerie, boutique, produits)
 - [ ] Vérifier le **pseudo Instagram** exact dans `src/config.js`

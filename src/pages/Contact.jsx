@@ -24,7 +24,7 @@ const QUESTIONS = [
   },
   {
     q: 'Peut-on personnaliser un bouquet ?',
-    r: 'Bien sûr — c’est notre spécialité. Dites-nous l’occasion, vos couleurs et votre budget (à partir de 300 000 GNF) : nous composons un bouquet unique, à la main.',
+    r: 'Bien sûr — c’est notre spécialité. Dites-nous l’occasion, vos couleurs et votre budget : nos tarifs provisoires démarrent à 300 000 GNF et sont confirmés avec vous avant la préparation.',
   },
   {
     q: 'Décorez-vous les événements ?',
