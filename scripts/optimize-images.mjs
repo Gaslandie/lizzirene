@@ -107,6 +107,24 @@ const images = [
     largeurs: [480, 960],
     qualite: 80,
   },
+  {
+    source: 'evenements/mariage.jpg',
+    nom: 'prestation-mariage',
+    largeurs: [480, 800, 1280],
+    qualite: 78,
+  },
+  {
+    source: 'evenements/anniversaire.jpg',
+    nom: 'prestation-anniversaire',
+    largeurs: [480, 800, 1280],
+    qualite: 78,
+  },
+  {
+    source: 'evenements/bureau-fleuri.png',
+    nom: 'prestation-conseil-amenagement',
+    largeurs: [480, 800, 1280],
+    qualite: 78,
+  },
 ]
 
 const taille = async (fichier) => (await stat(fichier)).size

@@ -1,6 +1,6 @@
 // Prestations de la boutique, regroupées en quatre thèmes pour tenir dans
 // le sous-menu « Nos Services ». Une prestation = une carte sur /services.
-import { SERVICE_THEME_PHOTOS } from '../config.js'
+import { PHOTOS_PRESTATIONS, SERVICE_THEME_PHOTOS } from '../config.js'
 
 // Chaque thème reçoit une photo optimisée pour l'accueil. Sur la page services,
 // seules les prestations qui correspondent vraiment aux images disponibles les
@@ -188,11 +188,18 @@ const SERVICES_BASE = [
   },
 ]
 
+// Une photo par prestation, et une seule : rien n'est réutilisé pour
+// combler un manque. Les prestations absentes d'ici gardent leur visuel
+// provisoire jusqu'à ce qu'une photo leur soit propre.
 const PHOTOS_PAR_PRESTATION = {
   'decoration-interieur': SERVICE_THEME_PHOTOS.decoration,
   'confection-bouquet': SERVICE_THEME_PHOTOS.creations,
-  mariage: SERVICE_THEME_PHOTOS.celebrations,
   hommage: SERVICE_THEME_PHOTOS.attentions,
+  // `mariage` empruntait la photo du thème Célébrations, déjà utilisée sur
+  // l'accueil ; il a désormais la sienne.
+  mariage: PHOTOS_PRESTATIONS.mariage,
+  anniversaire: PHOTOS_PRESTATIONS.anniversaire,
+  'conseil-amenagement-floral': PHOTOS_PRESTATIONS.conseilAmenagement,
 }
 
 export const SERVICES = SERVICES_BASE.map((service) => ({

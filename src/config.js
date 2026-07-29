@@ -149,6 +149,36 @@ export const SERVICE_THEME_PHOTOS = {
   }),
 }
 
+// Photos rattachées à une prestation précise, et à elle seule : chacune
+// n'illustre qu'un seul service, jamais un thème entier.
+const PHOTO_PRESTATION = (nom, alt, height) =>
+  responsivePhoto({
+    nom,
+    largeurs: [480, 800, 1280],
+    alt,
+    width: 1280,
+    height,
+    sizes: '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 33vw',
+  })
+
+export const PHOTOS_PRESTATIONS = {
+  mariage: PHOTO_PRESTATION(
+    'prestation-mariage',
+    'Salle de réception de mariage dressée, tables fleuries et compositions pastel',
+    844,
+  ),
+  anniversaire: PHOTO_PRESTATION(
+    'prestation-anniversaire',
+    'Table d’anniversaire décorée avec gâteau, ballons et guirlande de fête',
+    853,
+  ),
+  conseilAmenagement: PHOTO_PRESTATION(
+    'prestation-conseil-amenagement',
+    'Bureau aménagé avec des compositions florales blanches et des plantes vertes',
+    720,
+  ),
+}
+
 export const HERO_IMAGES = [
   {
     src: asset('optimized/hero-image3-1920.webp'),
