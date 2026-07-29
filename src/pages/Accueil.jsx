@@ -6,6 +6,7 @@ import Events from '../components/Events.jsx'
 import Gallery from '../components/Gallery.jsx'
 import About from '../components/About.jsx'
 import Testimonials from '../components/Testimonials.jsx'
+import Partenaires from '../components/Partenaires.jsx'
 import ContactCta from '../components/ContactCta.jsx'
 
 function Accueil({ onCategorie, onTheme, onAller }) {
@@ -19,6 +20,7 @@ function Accueil({ onCategorie, onTheme, onAller }) {
       <Gallery />
       <About />
       <Testimonials />
+      <Partenaires />
       <ContactCta onAller={onAller} />
     </>
   )
