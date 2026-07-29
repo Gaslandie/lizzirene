@@ -65,6 +65,30 @@ const images = [
     qualite: 76,
     mobile: { largeur: 900, hauteur: 1200, qualite: 78 },
   },
+  {
+    source: 'nosServices/deco-interieur.jpg',
+    nom: 'service-decoration-espaces',
+    largeurs: [480, 800, 1280],
+    qualite: 78,
+  },
+  {
+    source: 'nosServices/creation-florale.jpg',
+    nom: 'service-creations-florales',
+    largeurs: [480, 800, 1280],
+    qualite: 78,
+  },
+  {
+    source: 'nosServices/celebration.jpg',
+    nom: 'service-celebrations',
+    largeurs: [480, 800, 1280],
+    qualite: 78,
+  },
+  {
+    source: 'nosServices/attention-hommage.jpg',
+    nom: 'service-attentions-hommages',
+    largeurs: [480, 800, 1280],
+    qualite: 78,
+  },
 ]
 
 const taille = async (fichier) => (await stat(fichier)).size

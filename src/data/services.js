@@ -1,32 +1,36 @@
 // Prestations de la boutique, regroupées en quatre thèmes pour tenir dans
 // le sous-menu « Nos Services ». Une prestation = une carte sur /services.
-// `image` indique le nom de la future source dans /image-sources. Elle ne doit
-// être affichée qu'une fois optimisée et enregistrée dans `photo` avec
-// src/srcSet/dimensions ; jusque-là la carte affiche son icône sur un fond aux
-// couleurs de la marque.
+import { SERVICE_THEME_PHOTOS } from '../config.js'
+
+// Chaque thème reçoit une photo optimisée réutilisée sur l'accueil et sur les
+// prestations de sa famille tant que les photos détaillées ne sont pas fournies.
 export const THEMES = [
   { id: 'tous', label: 'Tous nos services' },
   {
     id: 'decoration',
     label: 'Décoration & espaces',
+    photo: SERVICE_THEME_PHOTOS.decoration,
     intro:
       'Nous habillons vos lieux de vie et de travail, du salon à la salle de conférence.',
   },
   {
     id: 'creations',
     label: 'Créations florales',
+    photo: SERVICE_THEME_PHOTOS.creations,
     intro:
       'Bouquets, coffrets et attentions composés à la main, selon votre occasion et votre budget.',
   },
   {
     id: 'celebrations',
     label: 'Célébrations',
+    photo: SERVICE_THEME_PHOTOS.celebrations,
     intro:
       'Mariages, baptêmes, anniversaires : nous mettons vos grands jours en fleurs.',
   },
   {
     id: 'attentions',
     label: 'Attentions & hommages',
+    photo: SERVICE_THEME_PHOTOS.attentions,
     intro:
       'Les moments qui comptent méritent un geste juste — une naissance, un rétablissement, un adieu.',
   },
@@ -40,7 +44,7 @@ const IDS_THEMES = new Set(THEMES.map((theme) => theme.id))
 
 export const normaliserTheme = (id) => (IDS_THEMES.has(id) ? id : 'tous')
 
-export const SERVICES = [
+const SERVICES_BASE = [
   // ---- Décoration & espaces ----
   {
     id: 'decoration-interieur',
@@ -161,6 +165,11 @@ export const SERVICES = [
     image: 'services/hommage.jpg',
   },
 ]
+
+export const SERVICES = SERVICES_BASE.map((service) => ({
+  ...service,
+  photo: SERVICE_THEME_PHOTOS[service.theme],
+}))
 
 export const trouverService = (id) =>
   SERVICES.find((service) => service.id === id) || null

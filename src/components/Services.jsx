@@ -3,15 +3,6 @@ import Icon from './Icon.jsx'
 import { THEMES } from '../data/services.js'
 import { intercepterNavigation, urlServices } from '../utils/navigation.js'
 
-// Aperçu des quatre thèmes de prestations sur l'accueil ; le détail vit
-// sur /services. Les icônes reprennent celles des services phares.
-const ICONES = {
-  decoration: 'maison',
-  creations: 'bouquet',
-  celebrations: 'gem',
-  attentions: 'heart',
-}
-
 function Services({ onTheme }) {
   const themes = THEMES.filter((theme) => theme.id !== 'tous')
 
@@ -41,14 +32,25 @@ function Services({ onTheme }) {
                 href={urlServices(theme.id)}
                 onClick={(event) => choisir(event, theme.id)}
               >
-                <span className="service-icon">
-                  <Icon name={ICONES[theme.id]} size={28} />
+                <span className="service-card-media">
+                  <img
+                    src={theme.photo.src}
+                    srcSet={theme.photo.srcSet}
+                    sizes={theme.photo.sizes}
+                    alt={theme.photo.alt}
+                    width={theme.photo.width}
+                    height={theme.photo.height}
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </span>
-                <h3>{theme.label}</h3>
-                <p>{theme.intro}</p>
-                <span className="service-card-lien">
-                  Voir les prestations
-                  <Icon name="arrow" size={17} />
+                <span className="service-card-body">
+                  <h3>{theme.label}</h3>
+                  <p>{theme.intro}</p>
+                  <span className="service-card-lien">
+                    Voir les prestations
+                    <Icon name="arrow" size={17} />
+                  </span>
                 </span>
               </a>
             </Reveal>

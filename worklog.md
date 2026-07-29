@@ -76,3 +76,14 @@
 - Harmonisation du nom visible en `Lizzirene Déco`, avec accent sur `Déco`.
 - Conservation volontaire des identifiants techniques sans accent : domaine,
   email, handles sociaux, noms de fichiers et nom de package.
+
+## 2026-07-29 — Images de la section Nos services
+
+- Déplacement des 4 images fournies de `public/nosServices` vers
+  `image-sources/nosServices`, afin de ne publier que les variantes optimisées.
+- Ajout des variantes WebP responsives pour les familles de services :
+  décoration, créations florales, célébrations, attentions et hommages.
+- Remplacement des icônes des cartes d'accueil par des photos.
+- Réutilisation de la photo de chaque famille sur les prestations détaillées
+  de la page `/services`, en attendant des photos propres à chaque prestation.
+- Vérifications : `npm run build`, `npm run lint` et `git diff --check`.

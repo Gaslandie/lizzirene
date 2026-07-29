@@ -84,6 +84,45 @@ export const PHOTOS = {
   }),
 }
 
+export const SERVICE_THEME_PHOTOS = {
+  decoration: responsivePhoto({
+    nom: 'service-decoration-espaces',
+    largeurs: [480, 800, 1280],
+    alt: 'Intérieur décoré avec une composition florale et une ambiance élégante',
+    width: 1280,
+    height: 853,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  creations: responsivePhoto({
+    nom: 'service-creations-florales',
+    largeurs: [480, 800, 1280],
+    alt: 'Création florale artisanale composée pour offrir',
+    width: 1280,
+    height: 919,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  celebrations: responsivePhoto({
+    nom: 'service-celebrations',
+    largeurs: [480, 800, 1280],
+    alt: 'Décoration florale de célébration avec table festive',
+    width: 1280,
+    height: 853,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  attentions: responsivePhoto({
+    nom: 'service-attentions-hommages',
+    largeurs: [480, 800, 1280],
+    alt: 'Bouquet doux pour une attention ou un hommage',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+}
+
 export const HERO_IMAGES = [
   {
     src: asset('optimized/hero-image3-1920.webp'),
