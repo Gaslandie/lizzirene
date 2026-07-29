@@ -18,7 +18,7 @@ function Accueil({ onCategorie, onTheme, onAller }) {
       <Quote />
       <Events />
       <Gallery />
-      <About />
+      <About onAller={onAller} />
       <Testimonials />
       <Partenaires />
       <ContactCta onAller={onAller} />

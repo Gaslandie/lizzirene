@@ -17,6 +17,8 @@ export const urlServices = (theme = 'tous') =>
     theme && theme !== 'tous' ? `?theme=${encodeURIComponent(theme)}` : ''
   }`
 
+export const urlAPropos = () => `${BASE}a-propos`
+
 export const urlContact = () => `${BASE}contact`
 
 // N'intercepte que le clic principal simple. Les clics avec Ctrl/Cmd,

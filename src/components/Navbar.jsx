@@ -11,6 +11,7 @@ import {
   urlContact,
   urlProduits,
   urlServices,
+  urlAPropos,
 } from '../utils/navigation.js'
 
 // Entrées des deux panneaux déroulants, construites depuis la source de
@@ -33,10 +34,7 @@ const ENTREES_SERVICES = [
   })),
 ]
 
-const LIENS_APRES_PRODUITS = [
-  { ancre: 'apropos', label: 'À propos' },
-  { page: 'contact', label: 'Contact' },
-]
+const LIENS_FIN = [{ page: 'contact', label: 'Contact' }]
 
 function Navbar({
   page = 'accueil',
@@ -121,7 +119,7 @@ function Navbar({
             />
             <span className="brand-block">
               <span className="brand-name">
-                LIZZIRENE <span>DECO</span>
+                LIZZIRENE <span>DÉCO</span>
               </span>
               <span className="brand-tagline">{CONTACT.tagline}</span>
             </span>
@@ -138,6 +136,13 @@ function Navbar({
               onClick={(event) => allerPage(event, 'accueil')}
             >
               Accueil
+            </a>
+            <a
+              href={urlAPropos()}
+              aria-current={page === 'apropos' ? 'page' : undefined}
+              onClick={(event) => allerPage(event, 'apropos')}
+            >
+              À propos
             </a>
             <MenuDeroulant
               id="sous-menu-produits"
@@ -157,12 +162,10 @@ function Navbar({
               onChoisir={(id) => onTheme?.(id, { ajouterHistorique: true })}
               onNaviguer={() => setOpen(false)}
             />
-            {LIENS_APRES_PRODUITS.map((lien) => (
+            {LIENS_FIN.map((lien) => (
               <a
                 key={lien.label}
-                href={
-                  lien.page ? urlContact() : urlAccueil(lien.ancre)
-                }
+                href={lien.page ? urlContact() : urlAccueil(lien.ancre)}
                 aria-current={
                   lien.page && page === lien.page ? 'page' : undefined
                 }

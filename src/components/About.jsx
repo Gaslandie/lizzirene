@@ -2,6 +2,7 @@ import Media from './Media.jsx'
 import Reveal from './Reveal.jsx'
 import Icon from './Icon.jsx'
 import { CONTACT } from '../config.js'
+import { intercepterNavigation, urlAPropos } from '../utils/navigation.js'
 
 const POINTS = [
   'Bouquets personnalisés selon votre budget',
@@ -10,7 +11,7 @@ const POINTS = [
   'Livraison partout à Conakry, paiement à la réception',
 ]
 
-function About() {
+function About({ onAller }) {
   return (
     <section className="about" id="apropos">
       <div className="container">
@@ -46,8 +47,16 @@ function About() {
                 </li>
               ))}
             </ul>
-            <a href="#contact" className="btn btn-primary">
-              Venir à la boutique
+            <a
+              href={urlAPropos()}
+              className="btn btn-primary"
+              onClick={(event) => {
+                if (!intercepterNavigation(event)) return
+                onAller?.('apropos')
+              }}
+            >
+              Notre histoire
+              <Icon name="arrow" size={18} />
             </a>
           </div>
         </Reveal>

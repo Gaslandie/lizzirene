@@ -8,6 +8,7 @@ import {
   urlProduit,
   urlProduits,
   urlServices,
+  urlAPropos,
 } from '../utils/navigation.js'
 
 const cheminRelatif = () => {
@@ -96,6 +97,16 @@ const lireEtat = () => {
     }
   }
 
+  if (segments.length === 1 && segments[0] === 'a-propos') {
+    return {
+      page: 'apropos',
+      categorie: 'tous',
+      theme: 'tous',
+      produitId: null,
+      ancienneUrl: false,
+    }
+  }
+
   if (segments.length === 1 && segments[0] === 'services') {
     return {
       page: 'services',
@@ -180,6 +191,7 @@ export function useRouter() {
       let href = urlAccueil(ancre)
       if (page === 'produits') href = urlProduits()
       if (page === 'services') href = urlServices()
+      if (page === 'apropos') href = urlAPropos()
       if (page === 'contact') href = urlContact()
 
       window.history.pushState({}, '', href)

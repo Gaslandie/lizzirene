@@ -8,6 +8,7 @@ import {
   urlContact,
   urlProduits,
   urlServices,
+  urlAPropos,
 } from '../utils/navigation.js'
 
 // Les colonnes de liens passent par le routeur (pas de rechargement de
@@ -35,7 +36,7 @@ function Footer({ onAller, onCategorie, onTheme }) {
           <div>
             <div className="brand">
               <span className="brand-name">
-                LIZZIRENE <span>DECO</span>
+                LIZZIRENE <span>DÉCO</span>
               </span>
             </div>
             <p className="footer-tagline">{CONTACT.tagline}</p>
@@ -110,8 +111,11 @@ function Footer({ onAller, onCategorie, onTheme }) {
               </li>
               <li>
                 <a
-                  href={urlAccueil('apropos')}
-                  onClick={(e) => versAncre(e, 'apropos')}
+                  href={urlAPropos()}
+                  onClick={(e) => {
+                    if (!intercepterNavigation(e)) return
+                    onAller?.('apropos')
+                  }}
                 >
                   À propos
                 </a>

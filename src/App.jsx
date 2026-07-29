@@ -8,6 +8,7 @@ import Accueil from './pages/Accueil.jsx'
 import PageContact from './pages/Contact.jsx'
 import Produits from './pages/Produits.jsx'
 import Services from './pages/Services.jsx'
+import APropos from './pages/APropos.jsx'
 import Produit from './pages/Produit.jsx'
 import Introuvable from './pages/Introuvable.jsx'
 import { useRouter } from './hooks/useRouter.js'
@@ -28,6 +29,11 @@ const METADONNEES = {
     title: 'Nos services — Lizzirene Déco · Conakry',
     description:
       "Décoration d'intérieur, bouquets sur mesure, mariages, baptêmes, événements professionnels et hommages floraux à Conakry.",
+  },
+  apropos: {
+    title: 'À propos — Lizzirene Déco by Irma · Kipé, Conakry',
+    description:
+      "L'histoire de Lizzirene Déco, sa fondatrice Irma, ses engagements et sa boutique de fleurs à Kipé, Conakry.",
   },
   contact: {
     title: 'Contact — Lizzirene Déco · Kipé, Conakry',
@@ -101,6 +107,14 @@ function App() {
     )
   } else if (page === 'services') {
     contenu = <Services theme={theme} onTheme={choisirTheme} />
+  } else if (page === 'apropos') {
+    contenu = (
+      <APropos
+        onAller={aller}
+        onCategorie={choisirCategorie}
+        onTheme={choisirTheme}
+      />
+    )
   } else if (page === 'contact') {
     contenu = <PageContact />
   } else {
