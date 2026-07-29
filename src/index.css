@@ -4120,3 +4120,52 @@ a.service-card {
     font-size: 21px;
   }
 }
+
+/* --- Cartes Événements illustrées --- */
+.event-card {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.event-media {
+  position: relative;
+}
+
+.event-media .media {
+  border-radius: 0;
+  aspect-ratio: 16 / 10;
+}
+
+.event-card:hover .media img {
+  transform: scale(1.05);
+}
+
+/* La pastille chevauche la photo, comme sur les tuiles de services */
+.event-card .event-icon {
+  position: absolute;
+  left: 22px;
+  bottom: -24px;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 0;
+  border-radius: 16px;
+  background: var(--white);
+  color: var(--primary-dark);
+  box-shadow: var(--shadow-soft);
+}
+
+.event-body {
+  padding: 40px 28px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+@media (max-width: 720px) {
+  .event-body {
+    padding: 38px 22px 26px;
+  }
+}

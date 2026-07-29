@@ -96,7 +96,7 @@ const images = [
     qualite: 78,
   },
   {
-    source: 'comite-miss-guinee.jpeg',
+    source: 'comite-miss-guinee.png',
     nom: 'comite-miss-guinee',
     largeurs: [640, 1080],
     qualite: 80,
@@ -114,9 +114,10 @@ const images = [
     qualite: 78,
   },
   {
-    source: 'evenements/anniversaire.jpg',
+    source: 'evenements/anniversaire.jpeg',
     nom: 'prestation-anniversaire',
-    largeurs: [480, 800, 1280],
+    // Photo en portrait (810 × 1080) : pas de variante 1280.
+    largeurs: [480, 810],
     qualite: 78,
   },
   {

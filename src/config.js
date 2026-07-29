@@ -67,9 +67,9 @@ export const PHOTOS = {
   comiteMissGuinee: responsivePhoto({
     nom: 'comite-miss-guinee',
     largeurs: [640, 1080],
-    alt: 'Les lauréates de Miss Guinée avec leurs bouquets Lizzirene Déco',
+    alt: 'Les lauréates de Miss Guinée 2025 avec leurs bouquets Lizzirene Déco',
     width: 1080,
-    height: 838,
+    height: 864,
     sizes: '(max-width: 900px) calc(100vw - 40px), 620px',
   }),
   clienteComblee: responsivePhoto({
@@ -149,34 +149,42 @@ export const SERVICE_THEME_PHOTOS = {
   }),
 }
 
-// Photos rattachées à une prestation précise, et à elle seule : chacune
-// n'illustre qu'un seul service, jamais un thème entier.
-const PHOTO_PRESTATION = (nom, alt, height) =>
+// Photos de la section Événements de l'accueil : une par carte, jamais
+// réutilisée ailleurs. Les cartes recadrent en 16/10, d'où des rapports
+// d'origine différents sans conséquence.
+const PHOTO_EVENEMENT = ({ nom, largeurs, alt, width, height }) =>
   responsivePhoto({
     nom,
-    largeurs: [480, 800, 1280],
+    largeurs,
     alt,
-    width: 1280,
+    width,
     height,
-    sizes: '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 33vw',
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 980px) 50vw, 33vw',
   })
 
-export const PHOTOS_PRESTATIONS = {
-  mariage: PHOTO_PRESTATION(
-    'prestation-mariage',
-    'Salle de réception de mariage dressée, tables fleuries et compositions pastel',
-    844,
-  ),
-  anniversaire: PHOTO_PRESTATION(
-    'prestation-anniversaire',
-    'Table d’anniversaire décorée avec gâteau, ballons et guirlande de fête',
-    853,
-  ),
-  conseilAmenagement: PHOTO_PRESTATION(
-    'prestation-conseil-amenagement',
-    'Bureau aménagé avec des compositions florales blanches et des plantes vertes',
-    720,
-  ),
+export const PHOTOS_EVENEMENTS = {
+  mariages: PHOTO_EVENEMENT({
+    nom: 'prestation-mariage',
+    largeurs: [480, 800, 1280],
+    alt: 'Salle de réception de mariage dressée, tables fleuries et compositions pastel',
+    width: 1280,
+    height: 844,
+  }),
+  anniversaires: PHOTO_EVENEMENT({
+    nom: 'prestation-anniversaire',
+    largeurs: [480, 810],
+    alt: "Bouquet d'anniversaire Lizzirene Déco : roses rouges, gypsophile, chocolats et coffret cadeau",
+    width: 810,
+    height: 1080,
+  }),
+  entreprises: PHOTO_EVENEMENT({
+    nom: 'prestation-conseil-amenagement',
+    largeurs: [480, 800, 1280],
+    alt: 'Bureau aménagé avec des compositions florales blanches et des plantes vertes',
+    width: 1280,
+    height: 720,
+  }),
 }
 
 export const HERO_IMAGES = [
