@@ -17,8 +17,11 @@ function Emplacement() {
   )
 }
 
-function Logo({ partenaire }) {
-  const contenu = (
+// Deux rendus possibles : le logo quand il est fourni, sinon le nom en
+// toutes lettres. La bascule se fait sans toucher au composant — il suffit
+// d'ajouter `logo` à l'entrée dans src/data/partenaires.js.
+function Partenaire({ partenaire }) {
+  const contenu = partenaire.logo ? (
     <>
       <img
         src={`${BASE}${partenaire.logo}`}
@@ -28,10 +31,12 @@ function Logo({ partenaire }) {
       />
       {partenaire.type && <span>{partenaire.type}</span>}
     </>
+  ) : (
+    <span className="partenaire-nom">{partenaire.nom}</span>
   )
 
   return (
-    <li className="partenaire">
+    <li className={`partenaire ${partenaire.logo ? '' : 'partenaire-texte'}`}>
       {partenaire.url ? (
         <a href={partenaire.url} target="_blank" rel="noreferrer">
           {contenu}
@@ -63,7 +68,7 @@ function Partenaires() {
             <p>
               {vide
                 ? "Hôtels, agences événementielles, restaurants, entreprises : nous fleurissons vos espaces et vos événements tout au long de l'année, avec un interlocuteur dédié."
-                : "Ils nous confient la décoration florale de leurs espaces et de leurs événements, tout au long de l'année."}
+                : 'Institutions, entreprises et événements : ils nous ont fait confiance pour leurs fleurs et leur décoration.'}
             </p>
           </div>
         </Reveal>
@@ -72,7 +77,9 @@ function Partenaires() {
           <ul className="partenaires-grille">
             {vide
               ? emplacements.map((_, i) => <Emplacement key={i} />)
-              : PARTENAIRES.map((p) => <Logo key={p.id} partenaire={p} />)}
+              : PARTENAIRES.map((p) => (
+                  <Partenaire key={p.id} partenaire={p} />
+                ))}
           </ul>
         </Reveal>
 

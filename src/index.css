@@ -1445,65 +1445,6 @@ section[id] {
   flex-shrink: 0;
 }
 
-/* ============ TÉMOIGNAGES ============ */
-.testimonials-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
-}
-
-.testimonial-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 38px 34px;
-  box-shadow: var(--shadow-soft);
-  height: 100%;
-}
-
-.stars {
-  display: flex;
-  gap: 4px;
-  color: var(--accent);
-  margin-bottom: 16px;
-}
-
-.testimonial-card blockquote {
-  font-style: italic;
-  color: var(--muted);
-  margin-bottom: 26px;
-  font-size: 17px;
-}
-
-.testimonial-author {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.avatar {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-heading);
-  font-size: 19px;
-  color: var(--white);
-  background: var(--primary);
-  flex-shrink: 0;
-}
-
-.testimonial-author strong {
-  display: block;
-  font-size: 16px;
-}
-
-.testimonial-author span {
-  font-size: 14px;
-  color: var(--muted);
-}
-
 /* ============ CONTACT ============ */
 .contact {
   background: var(--bg-soft);
@@ -2259,8 +2200,7 @@ section[id] {
     padding: 84px 0;
   }
 
-  .events-grid,
-  .testimonials-grid {
+  .events-grid {
     grid-template-columns: 1fr;
   }
 
@@ -2560,7 +2500,7 @@ section[id] {
     letter-spacing: 1.4px;
   }
 
-  /* À propos, témoignages, contact */
+  /* À propos et contact */
   .about-quote {
     font-size: 19px;
     padding-left: 16px;
@@ -2569,10 +2509,6 @@ section[id] {
   .about-points li {
     font-size: 16px;
     align-items: flex-start;
-  }
-
-  .testimonial-card {
-    padding: 30px 26px;
   }
 
   .contact-form {
@@ -2687,8 +2623,7 @@ section[id] {
   }
 
   .service-card,
-  .event-card,
-  .testimonial-card {
+  .event-card {
     padding: 26px 20px;
   }
 
@@ -3429,16 +3364,22 @@ a.service-card {
   background: var(--bg);
 }
 
+/* Flex plutôt que grid : le nombre de références est impair et les noms
+   ont des longueurs très inégales — la dernière ligne doit se centrer. */
 .partenaires-grille {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px;
 }
 
 .partenaire {
   display: flex;
   align-items: center;
   justify-content: center;
+  text-align: center;
+  flex: 1 1 220px;
+  max-width: 320px;
   min-height: 116px;
   padding: 20px;
   border-radius: 18px;
@@ -3484,6 +3425,21 @@ a.service-card {
   color: var(--muted);
 }
 
+/* Référence affichée en toutes lettres, tant que le logo n'est pas fourni */
+.partenaire-nom {
+  font-family: var(--font-heading);
+  font-size: 17px !important;
+  font-weight: 600;
+  letter-spacing: 0.3px !important;
+  text-transform: none !important;
+  color: var(--primary-dark) !important;
+  line-height: 1.35;
+}
+
+.partenaire-texte:hover .partenaire-nom {
+  color: var(--primary) !important;
+}
+
 /* Emplacement neutre en attendant les vrais logos */
 .partenaire-vide {
   flex-direction: column;
@@ -3497,6 +3453,14 @@ a.service-card {
 .partenaire-vide span {
   font-size: 11.5px;
   letter-spacing: 1.4px;
+}
+
+/* Grand écran : base plus large pour obtenir 4 + 3 plutôt que 5 + 2,
+   plus équilibré avec un nombre impair de références. */
+@media (min-width: 1101px) {
+  .partenaire {
+    flex-basis: 280px;
+  }
 }
 
 .partenaires-cta {
@@ -3523,21 +3487,19 @@ a.service-card {
   color: var(--primary-dark);
 }
 
-@media (max-width: 1100px) {
-  .partenaires-grille {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
 @media (max-width: 720px) {
   .partenaires-grille {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    gap: 12px;
   }
 
   .partenaire {
+    flex-basis: 140px;
     min-height: 96px;
-    padding: 16px;
+    padding: 16px 12px;
+  }
+
+  .partenaire-nom {
+    font-size: 15px !important;
   }
 
   .partenaires-cta {
