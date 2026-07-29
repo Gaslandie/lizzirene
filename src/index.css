@@ -1337,7 +1337,22 @@ section[id] {
 .quote {
   background: var(--bg);
   padding: 96px 0;
-  text-align: center;
+}
+
+.quote .container {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 72px;
+  align-items: center;
+}
+
+.quote-visuel .media {
+  aspect-ratio: 3 / 4;
+  box-shadow: var(--shadow);
+}
+
+.quote-texte {
+  text-align: left;
 }
 
 .quote-mark {
@@ -1346,16 +1361,15 @@ section[id] {
   line-height: 1;
   color: var(--primary);
   opacity: 0.5;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .quote blockquote {
   font-family: var(--font-heading);
-  font-size: clamp(25px, 3.6vw, 42px);
+  font-size: clamp(25px, 3.4vw, 40px);
   line-height: 1.3;
   color: var(--primary-dark);
-  max-width: 900px;
-  margin: 0 auto 22px;
+  margin-bottom: 20px;
 }
 
 .quote-sign {
@@ -3588,11 +3602,12 @@ a.service-card {
   letter-spacing: 1.4px;
 }
 
-/* Grand écran : base plus large pour obtenir 4 + 3 plutôt que 5 + 2,
-   plus équilibré avec un nombre impair de références. */
+/* Grand écran : trois références par ligne. Une base large force le retour
+   à la ligne, la largeur maximale évite des vignettes démesurées. */
 @media (min-width: 1101px) {
   .partenaire {
-    flex-basis: 280px;
+    flex-basis: 340px;
+    max-width: 400px;
   }
 }
 
@@ -4024,5 +4039,84 @@ a.service-card {
 
   .apropos-suite-actions .btn {
     width: 100%;
+  }
+}
+
+/* --- Référence mise en avant sous la grille de partenaires --- */
+.reference-vedette {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: center;
+  gap: 0;
+  margin-top: 40px;
+  background: var(--bg-soft);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+
+.reference-vedette .media {
+  border-radius: 0;
+  aspect-ratio: 16 / 11;
+}
+
+.reference-vedette figcaption {
+  padding: 40px 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reference-vedette-nom {
+  font-size: 12px;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.reference-vedette strong {
+  font-family: var(--font-heading);
+  font-size: 25px;
+  color: var(--primary-dark);
+  line-height: 1.25;
+}
+
+.reference-vedette figcaption > span:last-child {
+  color: var(--muted);
+  font-size: 16px;
+}
+
+@media (max-width: 980px) {
+  .quote .container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .quote-visuel .media {
+    max-width: 380px;
+    margin: 0 auto;
+  }
+
+  .quote-texte {
+    text-align: center;
+  }
+
+  .reference-vedette {
+    grid-template-columns: 1fr;
+  }
+
+  .reference-vedette figcaption {
+    padding: 30px 26px;
+  }
+}
+
+@media (max-width: 720px) {
+  .reference-vedette {
+    margin-top: 30px;
+  }
+
+  .reference-vedette strong {
+    font-size: 21px;
   }
 }

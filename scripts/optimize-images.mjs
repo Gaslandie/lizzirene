@@ -95,6 +95,18 @@ const images = [
     largeurs: [480, 800, 1280],
     qualite: 78,
   },
+  {
+    source: 'comite-miss-guinee.jpeg',
+    nom: 'comite-miss-guinee',
+    largeurs: [640, 1080],
+    qualite: 80,
+  },
+  {
+    source: 'cliente-comblee.jpeg',
+    nom: 'cliente-comblee',
+    largeurs: [480, 960],
+    qualite: 80,
+  },
 ]
 
 const taille = async (fichier) => (await stat(fichier)).size

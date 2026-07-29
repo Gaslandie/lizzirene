@@ -33,7 +33,7 @@ const METADONNEES = {
   apropos: {
     title: 'À propos — Lizzirene Déco · Kipé, Conakry',
     description:
-      "L'histoire de Lizzirene Déco, sa fondatrice Madame Sandouno Irene Mayer, ses engagements et sa boutique de fleurs à Kipé, Conakry.",
+      "L'histoire de Lizzirene Déco, sa fondatrice Sandouno Irene Mayer, ses engagements et sa boutique de fleurs à Kipé, Conakry.",
   },
   contact: {
     title: 'Contact — Lizzirene Déco · Kipé, Conakry',

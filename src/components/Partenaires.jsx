@@ -1,7 +1,12 @@
 import Reveal from './Reveal.jsx'
 import Icon from './Icon.jsx'
-import { waLink } from '../config.js'
-import { EMPLACEMENTS_VIDES, PARTENAIRES } from '../data/partenaires.js'
+import Media from './Media.jsx'
+import { PHOTOS, waLink } from '../config.js'
+import {
+  EMPLACEMENTS_VIDES,
+  PARTENAIRES,
+  REFERENCE_VEDETTE,
+} from '../data/partenaires.js'
 
 const BASE = import.meta.env.BASE_URL
 
@@ -51,6 +56,9 @@ function Partenaire({ partenaire }) {
 function Partenaires() {
   const vide = PARTENAIRES.length === 0
   const emplacements = Array.from({ length: EMPLACEMENTS_VIDES })
+  const vedette = PARTENAIRES.find(
+    (p) => p.id === REFERENCE_VEDETTE.partenaireId,
+  )
 
   return (
     <section className="partenaires" id="partenaires">
@@ -82,6 +90,28 @@ function Partenaires() {
                 ))}
           </ul>
         </Reveal>
+
+        {/* Une photo du travail réel en dit plus qu'un logo : elle sort donc
+            de la grille pour occuper toute la largeur qu'elle mérite. */}
+        {!vide && vedette && (
+          <Reveal variant="zoom">
+            <figure className="reference-vedette">
+              <Media
+                src={PHOTOS.comiteMissGuinee.src}
+                srcSet={PHOTOS.comiteMissGuinee.srcSet}
+                sizes={PHOTOS.comiteMissGuinee.sizes}
+                width={PHOTOS.comiteMissGuinee.width}
+                height={PHOTOS.comiteMissGuinee.height}
+                alt={PHOTOS.comiteMissGuinee.alt}
+              />
+              <figcaption>
+                <span className="reference-vedette-nom">{vedette.nom}</span>
+                <strong>{REFERENCE_VEDETTE.titre}</strong>
+                <span>{REFERENCE_VEDETTE.texte}</span>
+              </figcaption>
+            </figure>
+          </Reveal>
+        )}
 
         <Reveal variant="fade">
           <div className="partenaires-cta">

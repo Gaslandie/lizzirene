@@ -86,7 +86,7 @@ function APropos({ onAller, onCategorie, onTheme }) {
                 height={PHOTOS.fondatrice.height}
                 alt={PHOTOS.fondatrice.alt}
                 variant="soft"
-                label={`${CONTACT.founder}, fondatrice`}
+                label={`${CONTACT.founderFullName}, fondatrice`}
                 icone="flower"
                 labelMasque
               />
@@ -100,7 +100,7 @@ function APropos({ onAller, onCategorie, onTheme }) {
           <Reveal variant="right" delay={120}>
             <div className="fondatrice-texte">
               <span className="eyebrow">La fondatrice</span>
-              <h2>{CONTACT.founder}</h2>
+              <h2>{CONTACT.founderFullName}</h2>
               <p>
                 À la tête de Lizzirene Déco, elle imagine des compositions
                 pensées une à une, cultive un accueil chaleureux en boutique

@@ -2,7 +2,10 @@
 export const CONTACT = {
   tagline: 'Des fleurs pour chaque émotion',
   heroTitle: "L'amour se dit en fleur et chaque fleur a une histoire ...",
-  founder: 'Madame Sandouno Irene Mayer',
+  // Forme d'usage, celle de l'enseigne « by Irma » : boutons, messages,
+  // métadonnées. Le nom complet ne sert qu'à la présentation de la fondatrice.
+  founder: 'Irma',
+  founderFullName: 'Sandouno Irene Mayer',
   phone: '+224 610 81 17 17',
   phoneDisplay: '610 81 17 17',
   whatsapp: '224664327554',
@@ -57,9 +60,25 @@ export const PHOTOS = {
   fondatrice: responsivePhoto({
     nom: 'la-fondatrice',
     largeurs: [480, 810],
-    alt: 'Madame Sandouno Irene Mayer, fondatrice de Lizzirene Déco',
+    alt: 'Sandouno Irene Mayer, fondatrice de Lizzirene Déco',
     width: 810,
     height: 1080,
+  }),
+  comiteMissGuinee: responsivePhoto({
+    nom: 'comite-miss-guinee',
+    largeurs: [640, 1080],
+    alt: 'Les lauréates de Miss Guinée avec leurs bouquets Lizzirene Déco',
+    width: 1080,
+    height: 838,
+    sizes: '(max-width: 900px) calc(100vw - 40px), 620px',
+  }),
+  clienteComblee: responsivePhoto({
+    nom: 'cliente-comblee',
+    largeurs: [480, 960],
+    alt: "Cliente émue à la réception d'un bouquet de roses et d'un coffret cadeau Lizzirene Déco",
+    width: 960,
+    height: 1280,
+    sizes: '(max-width: 900px) calc(100vw - 40px), 480px',
   }),
   bouquet: responsivePhoto({
     nom: 'bouquet-fleurs',

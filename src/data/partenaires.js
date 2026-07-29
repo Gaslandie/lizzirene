@@ -23,13 +23,22 @@ export const PARTENAIRES = [
   { id: 'prima', nom: 'Prima' },
   // « Guinée Fashion » lu comme un seul nom — à confirmer.
   { id: 'guinee-fashion', nom: 'Guinée Fashion' },
-  // Orthographe à confirmer.
-  { id: 'comisgui', nom: 'Comisgui' },
-  // À confirmer : client ou fournisseur ? Rungis est le marché de gros
-  // parisien ; s'il s'agit d'un approvisionnement, cette entrée devra
-  // rejoindre une rubrique « Nos fournisseurs ».
-  { id: 'rungis-paris', nom: 'Rungis Paris' },
+  // « Comisgui » = Comité Miss Guinée, confirmé par la cliente.
+  { id: 'comite-miss-guinee', nom: 'Comité Miss Guinée' },
 ]
+
+// Rungis Paris a été retiré de cette liste : c'est le marché de gros où la
+// cliente s'approvisionne, donc un fournisseur et non une référence cliente.
+// À valoriser plus tard dans une rubrique dédiée si elle le souhaite.
+
+// Référence mise en avant sous la grille : une photo vaut mieux qu'un logo
+// quand on peut montrer le travail lui-même.
+export const REFERENCE_VEDETTE = {
+  partenaireId: 'comite-miss-guinee',
+  titre: 'Élection Miss Guinée',
+  texte:
+    'Les bouquets remis aux lauréates de l’élection Miss Guinée, réalisés par Lizzirene Déco.',
+}
 
 // Nombre d'emplacements affichés tant qu'aucun partenaire n'est renseigné.
 export const EMPLACEMENTS_VIDES = 6
