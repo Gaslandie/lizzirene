@@ -1,7 +1,7 @@
 import Media from './Media.jsx'
 import Reveal from './Reveal.jsx'
 import Icon from './Icon.jsx'
-import { CONTACT } from '../config.js'
+import { CONTACT, PHOTOS } from '../config.js'
 import { intercepterNavigation, urlAPropos } from '../utils/navigation.js'
 
 const POINTS = [
@@ -17,7 +17,16 @@ function About({ onAller }) {
       <div className="container">
         <Reveal variant="left">
           <div className="about-visual">
-            <Media variant="soft" label="Photo de la boutique" />
+            <Media
+              src={PHOTOS.fondatrice.src}
+              srcSet={PHOTOS.fondatrice.srcSet}
+              sizes={PHOTOS.fondatrice.sizes}
+              width={PHOTOS.fondatrice.width}
+              height={PHOTOS.fondatrice.height}
+              alt={PHOTOS.fondatrice.alt}
+              variant="soft"
+              label={`${CONTACT.founder}, fondatrice`}
+            />
           </div>
         </Reveal>
         <Reveal variant="right" delay={120}>

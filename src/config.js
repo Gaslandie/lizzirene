@@ -54,6 +54,13 @@ export const PHOTOS = {
     width: 960,
     height: 1280,
   }),
+  fondatrice: responsivePhoto({
+    nom: 'la-fondatrice',
+    largeurs: [480, 810],
+    alt: 'Irma, fondatrice de Lizzirene Déco',
+    width: 810,
+    height: 1080,
+  }),
   bouquet: responsivePhoto({
     nom: 'bouquet-fleurs',
     largeurs: [480, 720],

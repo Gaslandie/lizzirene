@@ -87,3 +87,13 @@
 - Réutilisation de la photo de chaque famille sur les prestations détaillées
   de la page `/services`, en attendant des photos propres à chaque prestation.
 - Vérifications : `npm run build`, `npm run lint` et `git diff --check`.
+
+## 2026-07-29 — Photo fondatrice et ajustement services
+
+- Ajout de la photo de la fondatrice dans le pipeline d'optimisation.
+- Affichage de la photo sur l'accueil, section `À propos`, et sur la page
+  détaillée `À propos`.
+- Correction de la page `/services` : les images disponibles ne sont plus
+  répétées sur toutes les prestations d'une même famille. Elles sont utilisées
+  uniquement sur les prestations qui correspondent au titre disponible.
+- Vérifications : `npm run build`, `npm run lint` et `git diff --check`.

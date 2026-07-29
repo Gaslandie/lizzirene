@@ -27,6 +27,12 @@ const images = [
     qualite: 82,
   },
   {
+    source: 'la-fondatrice.jpeg',
+    nom: 'la-fondatrice',
+    largeurs: [480, 810],
+    qualite: 82,
+  },
+  {
     source: 'paquet-emballé.jpeg',
     nom: 'paquet-emballe',
     largeurs: [480, 810],

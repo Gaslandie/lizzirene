@@ -85,6 +85,12 @@ function APropos({ onAller, onCategorie, onTheme }) {
           <Reveal variant="left">
             <div className="fondatrice-visuel">
               <Media
+                src={PHOTOS.fondatrice.src}
+                srcSet={PHOTOS.fondatrice.srcSet}
+                sizes={PHOTOS.fondatrice.sizes}
+                width={PHOTOS.fondatrice.width}
+                height={PHOTOS.fondatrice.height}
+                alt={PHOTOS.fondatrice.alt}
                 variant="soft"
                 label={`${CONTACT.founder}, fondatrice`}
                 icone="flower"
