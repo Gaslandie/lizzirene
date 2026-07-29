@@ -58,3 +58,21 @@
 - Vérifications : `git diff --check`, lint (seul avertissement historique de
   `CartContext.jsx`), build de production, types MIME et empreintes HTTP, absence
   des anciens JPEG dans `dist`, captures Chrome à 1440 px et 390 px.
+
+## 2026-07-29 — Domaine et déploiement continu
+
+- Création de la discussion `discussionsIA/2026-07-29-domaine-et-deploiement-continu.md`.
+- Audit du dépôt, du workflow GitHub Pages actuel et des anciennes URL `/lizzirene/`.
+- Avis Codex ajouté : conserver GitHub comme source et déclencheur, et retenir
+  Bluehost comme hébergement public confirmé par l'utilisateur, en raison aussi de
+  la restriction de GitHub Pages pour les sites commerciaux.
+- Plan DNS, HTTPS, déploiement automatique, SEO, routes React et vérifications de
+  production documenté à partir des documentations officielles.
+- En attente de l'avis de Claude Code sur la méthode Bluehost exacte ;
+  aucune configuration externe ni implémentation n'a encore été effectuée.
+
+## 2026-07-29 — Correction du nom de marque
+
+- Harmonisation du nom visible en `Lizzirene Déco`, avec accent sur `Déco`.
+- Conservation volontaire des identifiants techniques sans accent : domaine,
+  email, handles sociaux, noms de fichiers et nom de package.
