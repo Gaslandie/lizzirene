@@ -2,7 +2,7 @@
 export const CONTACT = {
   tagline: 'Des fleurs pour chaque émotion',
   heroTitle: "L'amour se dit en fleur et chaque fleur a une histoire ...",
-  founder: 'Irma',
+  founder: 'Madame Sandouno Irene Mayer',
   phone: '+224 610 81 17 17',
   phoneDisplay: '610 81 17 17',
   whatsapp: '224664327554',
@@ -57,7 +57,7 @@ export const PHOTOS = {
   fondatrice: responsivePhoto({
     nom: 'la-fondatrice',
     largeurs: [480, 810],
-    alt: 'Irma, fondatrice de Lizzirene Déco',
+    alt: 'Madame Sandouno Irene Mayer, fondatrice de Lizzirene Déco',
     width: 810,
     height: 1080,
   }),

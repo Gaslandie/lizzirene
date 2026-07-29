@@ -93,6 +93,7 @@
 - Ajout de la photo de la fondatrice dans le pipeline d'optimisation.
 - Affichage de la photo sur l'accueil, section `À propos`, et sur la page
   détaillée `À propos`.
+- Correction du nom de la fondatrice : `Madame Sandouno Irene Mayer`.
 - Correction de la page `/services` : les images disponibles ne sont plus
   répétées sur toutes les prestations d'une même famille. Elles sont utilisées
   uniquement sur les prestations qui correspondent au titre disponible.

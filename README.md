@@ -1,6 +1,6 @@
 # Lizzirene Déco — site vitrine & boutique
 
-Site de **Lizzirene Déco by Irma** — fleuriste et décoration d'intérieur à Kipé, Conakry (Guinée).
+Site de **Lizzirene Déco by Madame Sandouno Irene Mayer** — fleuriste et décoration d'intérieur à Kipé, Conakry (Guinée).
 _« Des fleurs pour chaque émotion »_
 
 Bouquets personnalisés, compositions florales, terrariums faits main, box cadeaux, plantes

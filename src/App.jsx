@@ -31,9 +31,10 @@ const METADONNEES = {
       "Décoration d'intérieur, bouquets sur mesure, mariages, baptêmes, événements professionnels et hommages floraux à Conakry.",
   },
   apropos: {
-    title: 'À propos — Lizzirene Déco by Irma · Kipé, Conakry',
+    title:
+      'À propos — Lizzirene Déco by Madame Sandouno Irene Mayer · Kipé, Conakry',
     description:
-      "L'histoire de Lizzirene Déco, sa fondatrice Irma, ses engagements et sa boutique de fleurs à Kipé, Conakry.",
+      "L'histoire de Lizzirene Déco, sa fondatrice Madame Sandouno Irene Mayer, ses engagements et sa boutique de fleurs à Kipé, Conakry.",
   },
   contact: {
     title: 'Contact — Lizzirene Déco · Kipé, Conakry',
