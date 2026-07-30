@@ -4649,3 +4649,51 @@ a.service-card {
     width: 100%;
   }
 }
+
+/* ============ PARTENAIRES — MUR TYPOGRAPHIQUE ============ */
+/* Les références sont écrites, pas affichées en logos : même traitement
+   pour toutes, séparées par la fleur de la marque. */
+.partenaires-mur {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  column-gap: 18px;
+  row-gap: 22px;
+  max-width: 980px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.partenaires-mur li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 18px;
+  font-family: var(--font-heading);
+  font-size: clamp(19px, 2.2vw, 26px);
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: var(--primary-dark);
+  white-space: nowrap;
+}
+
+/* La fleur du bandeau défilant sert de séparateur — sauf après le dernier */
+.partenaires-mur li:not(:last-child)::after {
+  content: '✿';
+  font-size: 0.62em;
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 720px) {
+  .partenaires-mur {
+    column-gap: 14px;
+    row-gap: 16px;
+  }
+
+  .partenaires-mur li {
+    gap: 14px;
+    white-space: normal;
+    text-align: center;
+  }
+}

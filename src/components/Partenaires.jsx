@@ -8,8 +8,6 @@ import {
   REFERENCE_VEDETTE,
 } from '../data/partenaires.js'
 
-const BASE = import.meta.env.BASE_URL
-
 // Tant que la liste réelle est vide, on affiche des emplacements neutres :
 // la section garde sa place dans la maquette sans annoncer de faux
 // partenariat. Voir src/data/partenaires.js.
@@ -22,36 +20,12 @@ function Emplacement() {
   )
 }
 
-// Deux rendus possibles : le logo quand il est fourni, sinon le nom en
-// toutes lettres. La bascule se fait sans toucher au composant — il suffit
-// d'ajouter `logo` à l'entrée dans src/data/partenaires.js.
-function Partenaire({ partenaire }) {
-  const contenu = partenaire.logo ? (
-    <>
-      <img
-        src={`${BASE}${partenaire.logo}`}
-        alt={partenaire.nom}
-        loading="lazy"
-        decoding="async"
-      />
-      {partenaire.type && <span>{partenaire.type}</span>}
-    </>
-  ) : (
-    <span className="partenaire-nom">{partenaire.nom}</span>
-  )
-
-  return (
-    <li className={`partenaire ${partenaire.logo ? '' : 'partenaire-texte'}`}>
-      {partenaire.url ? (
-        <a href={partenaire.url} target="_blank" rel="noreferrer">
-          {contenu}
-        </a>
-      ) : (
-        contenu
-      )}
-    </li>
-  )
-}
+// Choix éditorial : les références sont écrites, pas affichées en logos.
+// Un mur typographique traite chaque nom avec la même dignité, évite le
+// patchwork de logos hétérogènes — et ne pose aucune question de droit
+// d'usage des emblèmes officiels, là où afficher un blason d'ambassade
+// exigerait une autorisation écrite. Les logos restent déclarés dans les
+// données si ce choix devait être réévalué.
 
 function Partenaires() {
   const vide = PARTENAIRES.length === 0
@@ -82,13 +56,19 @@ function Partenaires() {
         </Reveal>
 
         <Reveal variant="fade">
-          <ul className="partenaires-grille">
-            {vide
-              ? emplacements.map((_, i) => <Emplacement key={i} />)
-              : PARTENAIRES.map((p) => (
-                  <Partenaire key={p.id} partenaire={p} />
-                ))}
-          </ul>
+          {vide ? (
+            <ul className="partenaires-grille">
+              {emplacements.map((_, i) => (
+                <Emplacement key={i} />
+              ))}
+            </ul>
+          ) : (
+            <ul className="partenaires-mur">
+              {PARTENAIRES.map((p) => (
+                <li key={p.id}>{p.nom}</li>
+              ))}
+            </ul>
+          )}
         </Reveal>
 
         {/* Une photo du travail réel en dit plus qu'un logo : elle sort donc
