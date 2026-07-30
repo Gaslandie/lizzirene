@@ -360,19 +360,19 @@ export const SERVICE_THEME_PHOTOS = {
     sizes:
       '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
   }),
-  celebrations: responsivePhoto({
+  evenements: responsivePhoto({
     nom: 'service-celebrations',
     largeurs: [480, 800, 1280],
-    alt: 'Décoration florale de célébration avec table festive',
+    alt: 'Décoration florale d’événement avec table festive',
     width: 1280,
     height: 853,
     sizes:
       '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
   }),
-  attentions: responsivePhoto({
+  hommages: responsivePhoto({
     nom: 'service-attentions-hommages',
     largeurs: [480, 800, 1280],
-    alt: 'Bouquet doux pour une attention ou un hommage',
+    alt: 'Composition sobre pour un hommage floral',
     width: 1280,
     height: 720,
     sizes:

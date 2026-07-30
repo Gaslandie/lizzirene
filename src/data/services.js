@@ -22,18 +22,20 @@ export const THEMES = [
       'Bouquets, coffrets et attentions composés à la main, selon votre occasion et votre budget.',
   },
   {
-    id: 'celebrations',
-    label: 'Célébrations',
-    photo: SERVICE_THEME_PHOTOS.celebrations,
+    id: 'evenements',
+    label: 'Événements',
+    photo: SERVICE_THEME_PHOTOS.evenements,
     intro:
-      'Mariages, baptêmes, anniversaires : nous mettons vos grands jours en fleurs.',
+      'Mariages, baptêmes, anniversaires, naissances : nous mettons vos moments importants en fleurs.',
   },
+  // Thème volontairement isolé : personne ne doit parcourir des décors
+  // d'anniversaire en cherchant une gerbe de deuil.
   {
-    id: 'attentions',
-    label: 'Attentions & hommages',
-    photo: SERVICE_THEME_PHOTOS.attentions,
+    id: 'hommages',
+    label: 'Hommages',
+    photo: SERVICE_THEME_PHOTOS.hommages,
     intro:
-      'Les moments qui comptent méritent un geste juste — une naissance, un rétablissement, un adieu.',
+      'Couronnes, gerbes et compositions de deuil, préparées avec discrétion et livrées dans les délais.',
   },
 ]
 
@@ -127,10 +129,10 @@ const SERVICES_BASE = [
     desc: "Des solutions d'emballage anti-humidité et ventilées, conçues pour favoriser une meilleure conservation des fleurs.",
   },
 
-  // ---- Célébrations ----
+  // ---- Événements ----
   {
     id: 'mariage',
-    theme: 'celebrations',
+    theme: 'evenements',
     icon: 'gem',
     name: 'Mariage',
     desc: 'Bouquet de la mariée, décor de cérémonie, centres de table et arche florale pour un jour unique.',
@@ -138,7 +140,7 @@ const SERVICES_BASE = [
   },
   {
     id: 'bapteme',
-    theme: 'celebrations',
+    theme: 'evenements',
     icon: 'flower',
     name: 'Baptême',
     desc: 'Compositions douces et lumineuses pour accueillir l’enfant et décorer la table de fête.',
@@ -146,7 +148,7 @@ const SERVICES_BASE = [
   },
   {
     id: 'anniversaire',
-    theme: 'celebrations',
+    theme: 'evenements',
     icon: 'cake',
     name: 'Anniversaire',
     desc: 'Bouquets d’anniversaire et mises en scène florales qui font briller les yeux le jour J.',
@@ -154,17 +156,17 @@ const SERVICES_BASE = [
   },
   {
     id: 'remise-diplome',
-    theme: 'celebrations',
+    theme: 'evenements',
     icon: 'diplome',
     name: 'Remise de diplôme',
     desc: 'Un bouquet de félicitations pour saluer des années d’efforts, remis le jour de la cérémonie.',
     image: 'services/remise-diplome.jpg',
   },
 
-  // ---- Attentions & hommages ----
+  // ---- Hommages ----
   {
     id: 'naissance',
-    theme: 'attentions',
+    theme: 'evenements',
     icon: 'etoile',
     name: 'Visite surprise — naissance',
     desc: 'Fleurs et douceurs livrées à la maternité ou à la maison pour féliciter les jeunes parents.',
@@ -172,7 +174,7 @@ const SERVICES_BASE = [
   },
   {
     id: 'convalescence',
-    theme: 'attentions',
+    theme: 'evenements',
     icon: 'leaf',
     name: 'Visite de convalescence',
     desc: 'Un bouquet qui fait du bien, livré à l’hôpital ou au domicile pour souhaiter un prompt rétablissement.',
@@ -180,7 +182,7 @@ const SERVICES_BASE = [
   },
   {
     id: 'hommage',
-    theme: 'attentions',
+    theme: 'hommages',
     icon: 'heart',
     name: 'Hommages & condoléances',
     desc: 'Couronnes, gerbes et compositions de deuil, préparées avec discrétion et livrées dans les délais.',
@@ -191,7 +193,7 @@ const SERVICES_BASE = [
 const PHOTOS_PAR_PRESTATION = {
   'decoration-interieur': SERVICE_THEME_PHOTOS.decoration,
   'confection-bouquet': SERVICE_THEME_PHOTOS.creations,
-  mariage: SERVICE_THEME_PHOTOS.celebrations,
+  mariage: SERVICE_THEME_PHOTOS.evenements,
   anniversaire: SERVICE_THEME_PHOTOS.anniversaire,
   'remise-diplome': SERVICE_THEME_PHOTOS.remiseDiplome,
   naissance: SERVICE_THEME_PHOTOS.naissance,

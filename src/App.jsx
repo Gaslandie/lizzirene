@@ -86,6 +86,7 @@ function App() {
         onCategorie={choisirCategorie}
         onTheme={choisirTheme}
         onAller={aller}
+        onProduit={allerProduit}
       />
     )
   } else if (page === 'produits') {

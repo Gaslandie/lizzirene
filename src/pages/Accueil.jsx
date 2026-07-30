@@ -1,5 +1,6 @@
 import Hero from '../components/Hero.jsx'
 import Ticker from '../components/Ticker.jsx'
+import BoutiqueAccueil from '../components/BoutiqueAccueil.jsx'
 import Services from '../components/Services.jsx'
 import Quote from '../components/Quote.jsx'
 import Events from '../components/Events.jsx'
@@ -8,10 +9,11 @@ import About from '../components/About.jsx'
 import Partenaires from '../components/Partenaires.jsx'
 import ContactCta from '../components/ContactCta.jsx'
 
-function Accueil({ onCategorie, onTheme, onAller }) {
+function Accueil({ onCategorie, onTheme, onAller, onProduit }) {
   return (
     <>
       <Hero onCategorie={onCategorie} />
+      <BoutiqueAccueil onCategorie={onCategorie} onProduit={onProduit} />
       <Ticker />
       <Services onTheme={onTheme} />
       <Quote />
