@@ -256,6 +256,19 @@ section[id] {
   color: var(--white);
 }
 
+/* Sur photo sombre : contour discret, fond au survol seulement */
+.btn-ghost {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.55);
+  color: var(--white);
+  backdrop-filter: blur(3px);
+}
+
+.btn-ghost:hover {
+  background: var(--white);
+  color: var(--primary-dark);
+}
+
 /* --- Photos réelles --- */
 .media {
   position: relative;
@@ -694,25 +707,41 @@ section[id] {
   color: var(--primary-dark);
 }
 
-.hero-stats {
+/* Repères : une ligne discrète sous les actions, séparée par des filets.
+   Trois gros chiffres jaunes criaient plus qu'ils n'informaient. */
+.hero-reperes {
   display: flex;
   flex-wrap: wrap;
-  gap: 24px 56px;
+  gap: 14px 0;
+  margin-top: 44px;
+  padding-top: 26px;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
 }
 
-.hero-stats strong {
+.hero-reperes li {
+  padding-right: 28px;
+  margin-right: 28px;
+  border-right: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.hero-reperes li:last-child {
+  border-right: 0;
+  margin-right: 0;
+  padding-right: 0;
+}
+
+.hero-reperes strong {
   display: block;
   font-family: var(--font-heading);
-  font-size: 32px;
-  color: var(--accent);
-  line-height: 1.1;
-  white-space: nowrap;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--white);
+  letter-spacing: 0.3px;
 }
 
-.hero-stats span {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.78);
-  letter-spacing: 0.5px;
+.hero-reperes span {
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.68);
 }
 
 .hero-slider-controls {
@@ -846,10 +875,11 @@ section[id] {
 
 /* ============ BANDEAU DÉFILANT ============ */
 .ticker {
-  background: var(--primary);
-  color: var(--white);
+  background: var(--primary-darker);
+  color: rgba(255, 255, 255, 0.85);
   overflow: hidden;
-  padding: 20px 0;
+  padding: 13px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .ticker-track {
@@ -864,15 +894,16 @@ section[id] {
   align-items: center;
   gap: 56px;
   font-family: var(--font-heading);
-  font-size: 17px;
-  letter-spacing: 3px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 2.6px;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
 .ticker .sep {
-  color: var(--accent);
-  font-size: 20px;
+  color: var(--primary);
+  font-size: 15px;
 }
 
 @keyframes ticker {
@@ -4331,5 +4362,133 @@ a.service-card {
   .famille-carte,
   .famille-icone {
     transition: none;
+  }
+}
+
+/* ============ ACCUEIL — RAYONS DE LA BOUTIQUE ============ */
+/* Têtes de rayon alignées à gauche, action à droite : le rythme « tout
+   centré » des maquettes génériques est cassé volontairement. */
+.rayon {
+  margin-bottom: 72px;
+}
+
+.rayon:last-of-type {
+  margin-bottom: 0;
+}
+
+.rayon-tete {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.rayon-tete .eyebrow {
+  display: block;
+  font-size: 12.5px;
+  letter-spacing: 2.6px;
+  text-transform: uppercase;
+  color: var(--primary);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.rayon-tete h2 {
+  font-size: clamp(24px, 3vw, 33px);
+  color: var(--primary-dark);
+}
+
+.rayon-lien {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 9px 2px;
+  margin-bottom: 3px;
+  font-weight: 500;
+  font-size: 15.5px;
+  color: var(--primary-dark);
+  border-bottom: 2px solid var(--accent);
+  transition: color 0.2s ease, gap 0.2s ease;
+}
+
+.rayon-lien:hover {
+  color: var(--primary);
+  gap: 12px;
+}
+
+/* Renvoi vers le reste du catalogue : une phrase, pas une grille */
+.boutique-accueil-suite {
+  margin-top: 64px;
+  padding-top: 40px;
+  border-top: 1px solid rgba(42, 88, 92, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 36px;
+}
+
+.boutique-accueil-suite p {
+  color: var(--muted);
+  font-size: 16.5px;
+  max-width: 560px;
+}
+
+.boutique-accueil-suite p a {
+  color: var(--primary-dark);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: rgba(54, 192, 192, 0.5);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.boutique-accueil-suite p a:hover {
+  text-decoration-color: var(--primary);
+}
+
+.boutique-accueil-suite .btn {
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .rayon {
+    margin-bottom: 56px;
+  }
+
+  .boutique-accueil-suite {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 48px;
+    padding-top: 32px;
+  }
+}
+
+@media (max-width: 720px) {
+  .rayon-tete {
+    margin-bottom: 22px;
+  }
+
+  .hero-reperes {
+    margin-top: 32px;
+    padding-top: 20px;
+  }
+
+  .hero-reperes li {
+    padding-right: 18px;
+    margin-right: 18px;
+  }
+
+  .hero-reperes strong {
+    font-size: 15px;
+  }
+
+  .hero-reperes span {
+    font-size: 12.5px;
+  }
+
+  .boutique-accueil-suite .btn {
+    width: 100%;
   }
 }

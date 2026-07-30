@@ -4,34 +4,40 @@ import ProductCard from './ProductCard.jsx'
 import { FAMILLES, PRODUCTS } from '../data/products.js'
 import { intercepterNavigation, urlProduits } from '../utils/navigation.js'
 
-// Une icône par famille, pour que la grille reste lisible tant que les
-// photos produit ne sont pas toutes disponibles.
-const ICONES = {
-  fleurs: 'bouquet',
-  plantes: 'leaf',
-  vases: 'flower',
-  peluches: 'heart',
-  'box-cadeaux': 'gift',
-  tableaux: 'ecran',
-  'materiel-decoratif': 'sparkles',
-  luminaire: 'etoile',
-  'cache-pots': 'maison',
-}
+// L'accueil ne montre pas tout le catalogue : deux familles suffisent à
+// donner envie, la boutique fait le reste. Chaque rangée n'aligne que des
+// produits photographiés, et des photos différentes les unes des autres —
+// pas de visuel provisoire ici, c'est la vitrine.
+const RANGEES = [
+  {
+    id: 'fleurs',
+    eyebrow: 'Fleurs fraîches',
+    titre: 'Des bouquets faits main',
+    produits: [
+      'bouquet-roses-naturelles',
+      'bouquet-roses-colorees',
+      'bouquet-seoul',
+      'bouquet-de-fleurs-jaune-blanc',
+    ],
+  },
+  {
+    id: 'plantes',
+    eyebrow: 'Plantes d’intérieur',
+    titre: 'Du vert pour la maison et le bureau',
+    produits: ['palmier-cuillere', 'terrarium', 'pachira-arbre-argent', 'bambou'],
+  },
+]
 
-const compterProduits = (famille) =>
-  PRODUCTS.filter((produit) => famille.categories.includes(produit.category))
-    .length
+// Les autres familles ne sont citées qu'en liens texte : l'exploration
+// complète se fait dans la boutique.
+const AUTRES_FAMILLES = FAMILLES.filter(
+  (famille) => !['fleurs', 'plantes'].includes(famille.id),
+)
 
-// Articles mis en avant : un par famille, pour montrer l'étendue de la
-// boutique plutôt que quatre bouquets d'affilée. Seuls les produits dont le
-// prix est connu sont retenus — l'accueil doit mener à un panier possible.
-const PHARES = FAMILLES.reduce((choisis, famille) => {
-  if (choisis.length >= 4) return choisis
-  const produit = PRODUCTS.find(
-    (article) => article.price && famille.categories.includes(article.category),
-  )
-  return produit ? [...choisis, produit] : choisis
-}, [])
+const produitsDe = (ids) =>
+  ids
+    .map((id) => PRODUCTS.find((produit) => produit.id === id))
+    .filter((produit) => produit && produit.src)
 
 function BoutiqueAccueil({ onCategorie, onProduit }) {
   const ouvrir = (event, id) => {
@@ -42,69 +48,66 @@ function BoutiqueAccueil({ onCategorie, onProduit }) {
   return (
     <section className="boutique-accueil" id="boutique">
       <div className="container">
-        <Reveal>
-          <div className="section-head">
-            <span className="eyebrow">La boutique en ligne</span>
-            <h2>Commandez dès maintenant</h2>
-            <p>
-              Fleurs fraîches et artificielles, plantes, cadeaux et
-              décoration — livrés partout à Conakry, payés à la réception.
-            </p>
-          </div>
-        </Reveal>
-
-        {/* Entrée principale : on choisit sa famille et on arrive au
-            catalogue déjà filtré. */}
-        <ul className="familles-grille">
-          {FAMILLES.map((famille, i) => {
-            const nombre = compterProduits(famille)
-            return (
-              <Reveal key={famille.id} variant="zoom" delay={(i % 5) * 70}>
-                <li>
+        {RANGEES.map((rangee, r) => {
+          const produits = produitsDe(rangee.produits)
+          if (produits.length === 0) return null
+          return (
+            <div className="rayon" key={rangee.id}>
+              <Reveal>
+                <header className="rayon-tete">
+                  <div>
+                    <span className="eyebrow">{rangee.eyebrow}</span>
+                    <h2>{rangee.titre}</h2>
+                  </div>
                   <a
-                    className="famille-carte"
+                    className="rayon-lien"
+                    href={urlProduits(rangee.id)}
+                    onClick={(event) => ouvrir(event, rangee.id)}
+                  >
+                    Voir tout
+                    <Icon name="arrow" size={17} />
+                  </a>
+                </header>
+              </Reveal>
+              <div className="boutique-grid">
+                {produits.map((produit, i) => (
+                  <Reveal
+                    key={produit.id}
+                    variant="zoom"
+                    delay={(i % 4) * 80 + (r ? 60 : 0)}
+                  >
+                    <ProductCard produit={produit} onProduit={onProduit} />
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          )
+        })}
+
+        <Reveal variant="fade">
+          <div className="boutique-accueil-suite">
+            <p>
+              Et aussi{' '}
+              {AUTRES_FAMILLES.map((famille, i) => (
+                <span key={famille.id}>
+                  <a
                     href={urlProduits(famille.id)}
                     onClick={(event) => ouvrir(event, famille.id)}
                   >
-                    <span className="famille-icone">
-                      <Icon name={ICONES[famille.id] || 'flower'} size={26} />
-                    </span>
-                    <span className="famille-nom">{famille.label}</span>
-                    <span className="famille-compte">
-                      {nombre} article{nombre > 1 ? 's' : ''}
-                    </span>
+                    {famille.label.toLowerCase()}
                   </a>
-                </li>
-              </Reveal>
-            )
-          })}
-        </ul>
-
-        {PHARES.length > 0 && (
-          <>
-            <Reveal>
-              <div className="section-head boutique-accueil-sous-titre">
-                <h3>Nos créations du moment</h3>
-              </div>
-            </Reveal>
-            <div className="boutique-grid">
-              {PHARES.map((produit, i) => (
-                <Reveal key={produit.id} variant="zoom" delay={(i % 4) * 80}>
-                  <ProductCard produit={produit} onProduit={onProduit} />
-                </Reveal>
+                  {i < AUTRES_FAMILLES.length - 2 && ', '}
+                  {i === AUTRES_FAMILLES.length - 2 && ' et '}
+                </span>
               ))}
-            </div>
-          </>
-        )}
-
-        <Reveal variant="fade">
-          <div className="boutique-accueil-cta">
+              .
+            </p>
             <a
               className="btn btn-primary"
               href={urlProduits()}
               onClick={(event) => ouvrir(event, 'tous')}
             >
-              Voir tout le catalogue
+              Découvrir toute la boutique
               <Icon name="arrow" size={18} />
             </a>
           </div>
