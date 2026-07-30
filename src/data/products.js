@@ -33,9 +33,9 @@ export const FAMILLES = [
     categories: ['luminaire'],
   },
   {
-    id: 'caches-postes',
-    label: 'Caches postes',
-    categories: ['caches-postes'],
+    id: 'cache-pots',
+    label: 'Cache-pots',
+    categories: ['cache-pots'],
   },
 ]
 
@@ -210,13 +210,13 @@ export const PRODUCTS = [
     desc: 'Solutions lumineuses pour boutiques, stands, cérémonies et décors professionnels.',
   },
   {
-    id: 'caches-postes-selection',
-    name: 'Caches postes',
-    category: 'caches-postes',
+    id: 'cache-pots-selection',
+    name: 'Cache-pots',
+    category: 'cache-pots',
     price: null,
     tag: 'Sur devis',
     variant: 'soft',
-    desc: 'Housses décoratives pour protéger et habiller les postes TV avec élégance.',
+    desc: 'Cache-pots décoratifs pour habiller vos plantes d’intérieur — matières, tailles et coloris variés.',
   },
 ]
 

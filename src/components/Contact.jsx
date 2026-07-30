@@ -131,7 +131,7 @@ function Contact() {
               </option>
               <option>Bouquet personnalisé</option>
               <option>Fleurs artificielles</option>
-              <option>Plantes, vases ou caches postes</option>
+              <option>Plantes, vases ou cache-pots</option>
               <option>Box cadeau</option>
               <option>Peluches</option>
               <option>Tableaux ou matériel décoratif</option>

@@ -5,7 +5,7 @@ const ITEMS = [
   'Bouquets personnalisés',
   'Fleurs fraîches de qualité',
   'Box cadeaux',
-  'Vases & caches postes',
+  'Vases & cache-pots',
   'Luminaires professionnels',
   'Décoration florale d’événements',
   'Livraison à Conakry',

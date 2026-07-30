@@ -195,6 +195,13 @@ contenu a changé plus bas.
 « Lun – Sam : 8h30 – 21h30 » et « Dim : 10h – 18h », passer à un tableau de deux lignes
 rendra mieux que tout concaténer, surtout sur mobile.
 
+> ⚠ **CORRECTION DU 2026-07-29 — ce point g) est erroné.**
+> La cliente a tranche : il s'agit de **cache-pots**, les cache-pots
+> decoratifs qui habillent les plantes d'interieur, et non de housses pour
+> postes TV. Le libelle public est **Cache-pots** et l'id d'URL `cache-pots`.
+> Le paragraphe ci-dessous est conserve tel quel comme trace de l'echange,
+> mais ne doit plus servir de reference.
+
 **g) « Caches postes » est confirme par l'utilisateur.**
 La cliente vend bien des caches postes, c'est-a-dire des housses decoratives
 pour postes TV. Le libelle public retenu est donc **Caches postes**, avec l'id
