@@ -154,6 +154,12 @@ const images = [
     qualite: 88,
   },
   {
+    source: 'partenaires/ambassade-emirats-arabes-unis.png',
+    nom: 'partenaire-ambassade-emirats-arabes-unis',
+    largeurs: [256, 400],
+    qualite: 88,
+  },
+  {
     source: 'evenements/mariage.jpg',
     nom: 'prestation-mariage',
     largeurs: [480, 800, 1280],

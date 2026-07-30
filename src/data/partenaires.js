@@ -43,9 +43,16 @@ export const PARTENAIRES = [
     nom: 'Ambassade de Russie',
     logo: 'optimized/partenaire-ambassade-russie-256.webp',
   },
-  // Intitulé exact à confirmer avec la cliente.
-  { id: 'ambassade-eau', nom: 'Ambassade des Émirats arabes unis' },
-  { id: 'prima', nom: 'Prima' },
+  {
+    id: 'ambassade-eau',
+    nom: 'Ambassade des Émirats arabes unis',
+    logo: 'optimized/partenaire-ambassade-emirats-arabes-unis-400.webp',
+  },
+  {
+    id: 'prima',
+    nom: 'Prima Center',
+    logo: 'partenaires/prima-center.webp',
+  },
   // « Guinée Fashion » lu comme un seul nom — à confirmer.
   { id: 'guinee-fashion', nom: 'Guinée Fashion' },
   // « Comisgui » = Comité Miss Guinée, confirmé par la cliente.

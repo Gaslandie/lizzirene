@@ -205,8 +205,7 @@ function Footer({ onAller, onCategorie, onTheme }) {
           </div>
         </div>
         <div className="footer-bottom">
-          © {new Date().getFullYear()} Lizzirene Déco by {CONTACT.founder} —
-          Tous droits réservés.
+          © 2026 Lizzirène Déco. Site conçu par GassTech Solutions.
         </div>
       </div>
     </footer>
