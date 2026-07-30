@@ -10,10 +10,27 @@
 // d'une ambassade suppose une autorisation écrite, citer son nom comme
 // référence commerciale ne l'exige pas de la même manière.
 //
-// Pour ajouter un logo plus tard :
-//   1. déposer le fichier dans public/partenaires/ (PNG ou SVG, fond
-//      transparent, hauteur utile ~120 px) ;
-//   2. ajouter `logo: 'partenaires/<fichier>'` à l'entrée concernée ;
+// AJOUTER UN LOGO
+//
+// Format : SVG de préférence (net à toute taille, quelques Ko). Sinon PNG
+// avec fond transparent — un fond blanc formerait un rectangle visible sur
+// la vignette claire.
+//
+// Dimensions : le logo s'affiche sur 64 px de haut au maximum. Prévoir le
+// double pour les écrans à forte densité, soit :
+//   · logo en bandeau (3:1)  → environ 400 × 130 px
+//   · logo carré ou écusson  → environ 256 × 256 px
+// Inutile de fournir plus grand : au-delà, c'est du poids sans gain visible.
+//
+// Poids : un SVG passe directement dans public/partenaires/. Un PNG lourd
+// doit passer par le pipeline (scripts/optimize-images.mjs) et être
+// référencé depuis public/optimized/ — l'emblème russe fourni en
+// 1280 × 1280 pesait 953 Ko, il en fait 41 après optimisation.
+//
+// Étapes :
+//   1. SVG → public/partenaires/. PNG → image-sources/partenaires/ puis
+//      déclaré dans scripts/optimize-images.mjs ;
+//   2. ajouter `logo: '<chemin>'` à l'entrée concernée ;
 //   3. s'assurer que l'organisation a autorisé cet usage.
 export const PARTENAIRES = [
   {
@@ -24,7 +41,7 @@ export const PARTENAIRES = [
   {
     id: 'ambassade-russie',
     nom: 'Ambassade de Russie',
-    logo: 'partenaires/ambassade-russie.png',
+    logo: 'optimized/partenaire-ambassade-russie-256.webp',
   },
   // Intitulé exact à confirmer avec la cliente.
   { id: 'ambassade-eau', nom: 'Ambassade des Émirats arabes unis' },

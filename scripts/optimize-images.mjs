@@ -120,6 +120,15 @@ const images = [
     largeurs: [480, 810],
     qualite: 80,
   },
+  // Logos partenaires : affichés en 64 px de haut, on prévoit le double
+  // pour les écrans à forte densité. Un emblème d'État en PNG source pèse
+  // près d'un mégaoctet, sans aucune raison.
+  {
+    source: 'partenaires/ambassade-russie.png',
+    nom: 'partenaire-ambassade-russie',
+    largeurs: [128, 256],
+    qualite: 88,
+  },
   {
     source: 'evenements/mariage.jpg',
     nom: 'prestation-mariage',
