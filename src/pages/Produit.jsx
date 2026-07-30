@@ -84,6 +84,9 @@ function Produit({ produitId, onAller, onCategorie, onProduit }) {
                 <div className="product-detail-price">
                   {produit.price != null ? (
                     <>
+                      {produit.prixPrefixe && (
+                        <small>{produit.prixPrefixe}</small>
+                      )}
                       <span>{formatPrice(produit.price)}</span>
                       {produit.prixProvisoire && (
                         <small>Prix provisoire — à confirmer</small>

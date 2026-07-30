@@ -1082,6 +1082,7 @@ section[id] {
   gap: 2px;
 }
 
+.price-prefix,
 .price-provisional {
   color: var(--muted);
   font-size: 12px;

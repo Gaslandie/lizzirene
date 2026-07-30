@@ -51,6 +51,9 @@ function ProductCard({ produit, onProduit, headingLevel = 'h3' }) {
         {produit.price != null ? (
           <>
             <div className="price-stack">
+              {produit.prixPrefixe && (
+                <small className="price-prefix">{produit.prixPrefixe}</small>
+              )}
               <span className="price">{formatPrice(produit.price)}</span>
               {produit.prixProvisoire && (
                 <small className="price-provisional">Prix provisoire</small>

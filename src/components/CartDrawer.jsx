@@ -14,6 +14,7 @@ function CartDrawer() {
     setOpen,
     count,
     total,
+    totalMinimum,
     totalProvisoire,
   } = useCart()
   const [step, setStep] = useState('panier') // panier | commande | confirme
@@ -35,6 +36,8 @@ function CartDrawer() {
       .map(
         (i) =>
           `• ${i.name} × ${i.qty} — ${formatPrice(i.price * i.qty)}${
+            i.prixPrefixe ? ' minimum' : ''
+          }${
             i.prixProvisoire ? ' (prix provisoire)' : ''
           }`,
       )
@@ -45,9 +48,13 @@ function CartDrawer() {
       '',
       lignes,
       '',
-      `TOTAL${totalProvisoire ? ' PROVISOIRE' : ''} : ${formatPrice(total)}`,
+      `TOTAL${
+        totalProvisoire ? ' PROVISOIRE' : totalMinimum ? ' MINIMUM' : ''
+      } : ${formatPrice(total)}`,
       totalProvisoire
         ? 'Les prix provisoires sont indicatifs et seront confirmés avec vous avant validation.'
+        : totalMinimum
+          ? 'Les produits marqués “à partir de” peuvent varier selon la composition finale.'
         : null,
       'Paiement à la livraison',
       '',
@@ -120,6 +127,11 @@ function CartDrawer() {
                       <div className="cart-item-info">
                         <strong>{i.name}</strong>
                         <div className="price-stack">
+                          {i.prixPrefixe && (
+                            <small className="price-prefix">
+                              {i.prixPrefixe}
+                            </small>
+                          )}
                           <span className="price">{formatPrice(i.price)}</span>
                           {i.prixProvisoire && (
                             <small className="price-provisional">
@@ -159,13 +171,21 @@ function CartDrawer() {
             {items.length > 0 && (
               <footer className="drawer-foot">
                 <div className="cart-total">
-                  <span>{totalProvisoire ? 'Total provisoire' : 'Total'}</span>
+                  <span>
+                    {totalProvisoire
+                      ? 'Total provisoire'
+                      : totalMinimum
+                        ? 'Total minimum'
+                        : 'Total'}
+                  </span>
                   <strong>{formatPrice(total)}</strong>
                 </div>
                 <p className="cart-note">
                   <Icon name="cash" size={17} />
                   {totalProvisoire
                     ? 'Prix indicatifs à confirmer avec Lizzirene Déco avant validation.'
+                    : totalMinimum
+                      ? 'Certains produits sont affichés à partir de ce montant.'
                     : "Paiement à la livraison · frais de livraison confirmés avec vous avant l'envoi."}
                 </p>
                 <button
@@ -241,14 +261,17 @@ function CartDrawer() {
               <span>
                 {totalProvisoire
                   ? 'Total provisoire à confirmer'
+                  : totalMinimum
+                    ? 'Total minimum à payer à la livraison'
                   : 'Total à payer à la livraison'}
               </span>
               <strong>{formatPrice(total)}</strong>
             </div>
-            {totalProvisoire && (
+            {(totalProvisoire || totalMinimum) && (
               <p className="checkout-price-note">
-                Ces prix sont indicatifs en attendant la confirmation de
-                Lizzirene Déco.
+                {totalProvisoire
+                  ? 'Ces prix sont indicatifs en attendant la confirmation de Lizzirene Déco.'
+                  : 'Les produits marqués “à partir de” peuvent varier selon la composition finale.'}
               </p>
             )}
 
