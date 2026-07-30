@@ -97,6 +97,12 @@ const images = [
     qualite: 78,
   },
   {
+    source: 'nosServices/hommage-condoleances.png',
+    nom: 'service-hommage-condoleances',
+    largeurs: [480, 800, 1280],
+    qualite: 78,
+  },
+  {
     source: 'comite-miss-guinee.png',
     nom: 'comite-miss-guinee',
     largeurs: [640, 1080],

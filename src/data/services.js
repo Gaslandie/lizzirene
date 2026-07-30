@@ -192,7 +192,7 @@ const PHOTOS_PAR_PRESTATION = {
   'decoration-interieur': SERVICE_THEME_PHOTOS.decoration,
   'confection-bouquet': SERVICE_THEME_PHOTOS.creations,
   mariage: SERVICE_THEME_PHOTOS.celebrations,
-  hommage: SERVICE_THEME_PHOTOS.attentions,
+  hommage: SERVICE_THEME_PHOTOS.hommageCondoleances,
 }
 
 export const SERVICES = SERVICES_BASE.map((service) => ({

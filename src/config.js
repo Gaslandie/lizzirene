@@ -154,6 +154,15 @@ export const SERVICE_THEME_PHOTOS = {
     sizes:
       '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
   }),
+  hommageCondoleances: responsivePhoto({
+    nom: 'service-hommage-condoleances',
+    largeurs: [480, 800, 1280],
+    alt: 'Composition florale de deuil pour hommages et condoléances',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
 }
 
 // Photos de la section Événements de l'accueil : une par carte, jamais
