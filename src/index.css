@@ -1113,8 +1113,7 @@ section[id] {
   gap: 2px;
 }
 
-.price-prefix,
-.price-provisional {
+.price-prefix {
   color: var(--muted);
   font-size: 12px;
   font-weight: 500;
@@ -4616,5 +4615,37 @@ a.service-card {
 
   .reassurance-ligne li {
     font-size: 13.5px;
+  }
+}
+
+/* En-tête contact : les deux actions empilées à droite du titre */
+.contact-entete-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-bottom: 4px;
+}
+
+@media (max-width: 980px) {
+  .contact-entete-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .catalogue-entete > .btn {
+    margin-bottom: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .contact-entete-actions {
+    flex-direction: column;
+  }
+
+  .contact-entete-actions .btn,
+  .catalogue-entete > .btn {
+    width: 100%;
   }
 }

@@ -24,7 +24,7 @@ const QUESTIONS = [
   },
   {
     q: 'Peut-on personnaliser un bouquet ?',
-    r: 'Bien sûr — c’est notre spécialité. Dites-nous l’occasion, vos couleurs et votre budget : nos tarifs provisoires démarrent à 300 000 GNF et sont confirmés avec vous avant la préparation.',
+    r: 'Bien sûr — c’est notre spécialité. Dites-nous l’occasion, vos couleurs et votre budget : nos bouquets démarrent à 300 000 GNF et sont composés selon vos envies.',
   },
   {
     q: 'Décorez-vous les événements ?',
@@ -35,32 +35,36 @@ const QUESTIONS = [
 function PageContact() {
   return (
     <>
-      <header className="page-hero">
+      <header className="page-hero page-hero--catalogue">
         <div className="container">
-          <span className="eyebrow">Contact</span>
-          <h1 tabIndex={-1}>Parlons de votre projet</h1>
-          <p>
-            Un bouquet à offrir, un intérieur à fleurir, un événement à
-            décorer ? Nous vous répondons 7j/7 — et la boutique de Kipé vous
-            accueille toute la semaine.
-          </p>
-          <div className="page-hero-actions">
-            <a
-              href={waLink('Bonjour Lizzirene Déco !')}
-              target="_blank"
-              rel="noreferrer"
-              className="btn btn-whatsapp"
-            >
-              <Icon name="whatsapp" size={19} />
-              {CONTACT.whatsappDisplay}
-            </a>
-            <a
-              href={`tel:${CONTACT.phone.replace(/\s/g, '')}`}
-              className="btn btn-outline"
-            >
-              <Icon name="phone" size={18} />
-              {CONTACT.phoneDisplay}
-            </a>
+          <div className="catalogue-entete">
+            <div>
+              <span className="eyebrow">Contact</span>
+              <h1 tabIndex={-1}>Parlons de votre projet</h1>
+              <p>
+                Un bouquet à offrir, un intérieur à fleurir, un événement à
+                décorer ? Nous vous répondons 7j/7 — et la boutique de Kipé
+                vous accueille toute la semaine.
+              </p>
+            </div>
+            <div className="contact-entete-actions">
+              <a
+                href={waLink('Bonjour Lizzirene Déco !')}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-whatsapp"
+              >
+                <Icon name="whatsapp" size={19} />
+                {CONTACT.whatsappDisplay}
+              </a>
+              <a
+                href={`tel:${CONTACT.phone.replace(/\s/g, '')}`}
+                className="btn btn-outline"
+              >
+                <Icon name="phone" size={18} />
+                {CONTACT.phoneDisplay}
+              </a>
+            </div>
           </div>
         </div>
       </header>

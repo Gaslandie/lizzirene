@@ -61,15 +61,28 @@ function APropos({ onAller, onCategorie, onTheme }) {
 
   return (
     <>
-      <header className="page-hero">
+      <header className="page-hero page-hero--catalogue">
         <div className="container">
-          <span className="eyebrow">À propos</span>
-          <h1 tabIndex={-1}>L'histoire de Lizzirene Déco</h1>
-          <p>
-            Fondée par {CONTACT.founder}, notre boutique de fleurs à Kipé est
-            née d'une passion : créer des instants de beauté au quotidien et
-            donner à chaque émotion la fleur qui lui ressemble.
-          </p>
+          <div className="catalogue-entete">
+            <div>
+              <span className="eyebrow">À propos</span>
+              <h1 tabIndex={-1}>L'histoire de Lizzirene Déco</h1>
+              <p>
+                Fondée par {CONTACT.founder}, notre boutique de fleurs à Kipé
+                est née d'une passion : créer des instants de beauté au
+                quotidien et donner à chaque émotion la fleur qui lui
+                ressemble.
+              </p>
+            </div>
+            <a
+              className="btn btn-primary"
+              href={urlContact()}
+              onClick={versContact}
+            >
+              Nous contacter
+              <Icon name="arrow" size={18} />
+            </a>
+          </div>
         </div>
       </header>
 
