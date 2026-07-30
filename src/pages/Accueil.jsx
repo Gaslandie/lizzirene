@@ -13,8 +13,8 @@ function Accueil({ onCategorie, onTheme, onAller, onProduit }) {
   return (
     <>
       <Hero onCategorie={onCategorie} />
-      <BoutiqueAccueil onCategorie={onCategorie} onProduit={onProduit} />
       <Ticker />
+      <BoutiqueAccueil onCategorie={onCategorie} onProduit={onProduit} />
       <Services onTheme={onTheme} />
       <Quote />
       <Events />
