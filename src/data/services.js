@@ -33,7 +33,7 @@ export const THEMES = [
   {
     id: 'hommages',
     label: 'Hommages',
-    photo: SERVICE_THEME_PHOTOS.hommages,
+    photo: SERVICE_THEME_PHOTOS.hommageCondoleances,
     intro:
       'Couronnes, gerbes et compositions de deuil, préparées avec discrétion et livrées dans les délais.',
   },
