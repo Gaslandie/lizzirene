@@ -53,10 +53,16 @@ export const PARTENAIRES = [
     nom: 'Prima Center',
     logo: 'partenaires/prima-center.webp',
   },
-  // « Guinée Fashion » lu comme un seul nom — à confirmer.
-  { id: 'guinee-fashion', nom: 'Guinée Fashion' },
-  // « Comisgui » = Comité Miss Guinée, confirmé par la cliente.
-  { id: 'comite-miss-guinee', nom: 'Comité Miss Guinée' },
+  {
+    id: 'guinee-fashion',
+    nom: 'Guinée Fashion',
+    logo: 'optimized/partenaire-guinee-fashion-400.webp',
+  },
+  {
+    id: 'comite-miss-guinee',
+    nom: 'Comité Miss Guinée',
+    logo: 'optimized/partenaire-comite-miss-guinee-400.webp',
+  },
 ]
 
 // Rungis Paris a été retiré de cette liste : c'est le marché de gros où la

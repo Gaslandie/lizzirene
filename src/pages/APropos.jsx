@@ -250,12 +250,12 @@ function APropos({ onAller, onCategorie, onTheme }) {
           <Reveal variant="right" delay={120}>
             <div className="boutique-presentation-visuel">
               <Media
-                src={PHOTOS.vedette?.src}
-                srcSet={PHOTOS.vedette?.srcSet}
-                sizes={PHOTOS.vedette?.sizes}
-                width={PHOTOS.vedette?.width}
-                height={PHOTOS.vedette?.height}
-                alt="Composition florale réalisée par Lizzirene Déco"
+                src={PHOTOS.fondatriceBoutique?.src}
+                srcSet={PHOTOS.fondatriceBoutique?.srcSet}
+                sizes={PHOTOS.fondatriceBoutique?.sizes}
+                width={PHOTOS.fondatriceBoutique?.width}
+                height={PHOTOS.fondatriceBoutique?.height}
+                alt={PHOTOS.fondatriceBoutique?.alt}
                 variant="teal"
                 label="Photo de la boutique"
               />

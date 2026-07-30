@@ -33,6 +33,12 @@ const images = [
     qualite: 82,
   },
   {
+    source: 'fondatrice-boutique.jpeg',
+    nom: 'fondatrice-boutique',
+    largeurs: [480, 810],
+    qualite: 82,
+  },
+  {
     source: 'paquet-emballé.jpeg',
     nom: 'paquet-emballe',
     largeurs: [480, 810],
@@ -156,6 +162,18 @@ const images = [
   {
     source: 'partenaires/ambassade-emirats-arabes-unis.png',
     nom: 'partenaire-ambassade-emirats-arabes-unis',
+    largeurs: [256, 400],
+    qualite: 88,
+  },
+  {
+    source: 'partenaires/guinee-fashion.png',
+    nom: 'partenaire-guinee-fashion',
+    largeurs: [256, 400],
+    qualite: 88,
+  },
+  {
+    source: 'partenaires/comite-miss-guinee-logo.png',
+    nom: 'partenaire-comite-miss-guinee',
     largeurs: [256, 400],
     qualite: 88,
   },

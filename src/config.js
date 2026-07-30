@@ -64,6 +64,13 @@ export const PHOTOS = {
     width: 810,
     height: 1080,
   }),
+  fondatriceBoutique: responsivePhoto({
+    nom: 'fondatrice-boutique',
+    largeurs: [480, 810],
+    alt: 'Fondatrice de Lizzirene Déco entourée de fleurs en boutique',
+    width: 810,
+    height: 1080,
+  }),
   comiteMissGuinee: responsivePhoto({
     nom: 'comite-miss-guinee',
     largeurs: [640, 1080],
