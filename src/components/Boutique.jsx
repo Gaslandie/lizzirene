@@ -1,5 +1,4 @@
 import Icon from './Icon.jsx'
-import FlowerAvailability from './FlowerAvailability.jsx'
 import ProductCard from './ProductCard.jsx'
 import Reveal from './Reveal.jsx'
 import {
@@ -11,38 +10,22 @@ import {
 } from '../data/products.js'
 import { waLink } from '../config.js'
 
-const ARGUMENTS = [
-  {
-    icon: 'cash',
-    title: 'Paiement à la livraison',
-    text: 'Vous payez en espèces à la réception.',
-  },
-  {
-    icon: 'truck',
-    title: 'Livraison à Conakry',
-    text: 'Toutes communes, 7j/7.',
-  },
-  {
-    icon: 'leaf',
-    title: 'Sélection soignée',
-    text: 'Des créations choisies et préparées avec attention.',
-  },
-  {
-    icon: 'whatsapp',
-    title: 'Catalogue sur WhatsApp',
-    text: 'Le catalogue complet en un message.',
-  },
-]
+// Ordre d'affichage : produits photographiés d'abord — les visuels
+// provisoires ne font jamais la première impression. Au sein des
+// photographiés, les compositions de deuil passent après les autres :
+// elles ont leur place au catalogue, pas en tête de gondole entre un
+// bouquet cadeau et un bouquet de mariée.
+const rang = (produit) =>
+  (produit.src ? 0 : 2) + (produit.tag === 'Hommage' ? 1 : 0)
+
+const photosDAbord = (produits) =>
+  [...produits].sort((a, b) => rang(a) - rang(b))
 
 function GrilleProduits({ produits, onProduit, headingLevel = 'h3' }) {
   return (
     <div className="boutique-grid">
       {produits.map((produit, index) => (
-        <Reveal
-          key={produit.id}
-          variant="zoom"
-          delay={(index % 4) * 90}
-        >
+        <Reveal key={produit.id} variant="zoom" delay={(index % 4) * 90}>
           <ProductCard
             produit={produit}
             onProduit={onProduit}
@@ -57,55 +40,42 @@ function GrilleProduits({ produits, onProduit, headingLevel = 'h3' }) {
 function Boutique({ categorie = 'tous', onCategorie, onProduit }) {
   const categorieActive = normaliserCategorie(categorie)
   const familleActive = CATEGORIES.find(({ id }) => id === categorieActive)
-  const produitsVisibles = produitsPourCategorie(categorieActive)
+  const produitsVisibles = photosDAbord(produitsPourCategorie(categorieActive))
   const groupesFleurs = SOUS_CATEGORIES_FLEURS.map((groupe) => ({
     ...groupe,
-    produits: PRODUCTS.filter((produit) => produit.category === groupe.id),
+    produits: photosDAbord(
+      PRODUCTS.filter((produit) => produit.category === groupe.id),
+    ),
   }))
+
+  const nombreVisible =
+    categorieActive === 'fleurs'
+      ? groupesFleurs.reduce((total, groupe) => total + groupe.produits.length, 0)
+      : produitsVisibles.length
 
   return (
     <section className="boutique catalogue" id="catalogue" tabIndex={-1}>
       <div className="container">
-        <Reveal>
-          <ul className="assurances">
-            {ARGUMENTS.map((argument) => (
-              <li key={argument.title}>
-                <span className="assurance-icon">
-                  <Icon name={argument.icon} size={22} />
-                </span>
-                <div>
-                  <strong>{argument.title}</strong>
-                  <span>{argument.text}</span>
-                </div>
-              </li>
+        {/* Filtres à gauche, compteur à droite : une barre d'outils,
+            pas une section de plus. */}
+        <div className="catalogue-barre">
+          <div className="filters" aria-label="Filtrer les produits">
+            {CATEGORIES.map((item) => (
+              <button
+                key={item.id}
+                className={`filter ${
+                  categorieActive === item.id ? 'active' : ''
+                }`}
+                aria-pressed={categorieActive === item.id}
+                onClick={() => onCategorie?.(item.id)}
+              >
+                {item.label}
+              </button>
             ))}
-          </ul>
-        </Reveal>
-
-        <Reveal>
-          <div className="section-head catalogue-head">
-            <span className="eyebrow">Toutes nos familles</span>
-            <h2>Explorez le catalogue</h2>
-            <p>
-              Choisissez une famille, découvrez chaque fiche puis ajoutez vos
-              coups de cœur au panier ou demandez un devis personnalisé.
-            </p>
           </div>
-        </Reveal>
-
-        <div className="filters" aria-label="Filtrer les produits">
-          {CATEGORIES.map((item) => (
-            <button
-              key={item.id}
-              className={`filter ${
-                categorieActive === item.id ? 'active' : ''
-              }`}
-              aria-pressed={categorieActive === item.id}
-              onClick={() => onCategorie?.(item.id)}
-            >
-              {item.label}
-            </button>
-          ))}
+          <p className="catalogue-compte" aria-live="polite">
+            {nombreVisible} article{nombreVisible > 1 ? 's' : ''}
+          </p>
         </div>
 
         {categorieActive === 'fleurs' ? (
@@ -130,7 +100,6 @@ function Boutique({ categorie = 'tous', onCategorie, onProduit }) {
                     Cette sélection sera enrichie prochainement.
                   </p>
                 )}
-                {groupe.id === 'fleurs-naturelles' && <FlowerAvailability />}
               </div>
             ))}
           </div>

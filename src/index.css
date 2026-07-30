@@ -4492,3 +4492,125 @@ a.service-card {
     width: 100%;
   }
 }
+
+/* ============ PAGE PRODUITS — EN-TÊTE COMPACT ============ */
+/* Un seul titre, aligné à gauche, et on arrive aux produits : les deux
+   grands blocs centrés empilés retardaient le catalogue d'un écran. */
+.page-hero--catalogue {
+  text-align: left;
+  padding: 64px 0 48px;
+}
+
+.catalogue-entete {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.page-hero--catalogue .eyebrow {
+  font-size: 12.5px;
+  letter-spacing: 2.6px;
+  margin-bottom: 10px;
+}
+
+.page-hero--catalogue h1 {
+  font-size: clamp(32px, 4vw, 46px);
+  margin-bottom: 12px;
+}
+
+.page-hero--catalogue p {
+  margin: 0;
+  max-width: 560px;
+  font-size: 17px;
+}
+
+/* Réassurance en ligne : petits repères séparés par des filets */
+.reassurance-ligne {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+  padding-left: 28px;
+  border-left: 1px solid rgba(42, 88, 92, 0.14);
+}
+
+.reassurance-ligne li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--primary-dark);
+  white-space: nowrap;
+}
+
+.reassurance-ligne .icon {
+  color: var(--primary);
+}
+
+/* Barre d'outils du catalogue : filtres à gauche, compteur à droite */
+.catalogue-barre {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 40px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid rgba(42, 88, 92, 0.1);
+}
+
+.catalogue-barre .filters {
+  justify-content: flex-start;
+  margin-bottom: 0;
+}
+
+.catalogue-compte {
+  flex-shrink: 0;
+  font-size: 14.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.boutique.catalogue {
+  padding-top: 48px;
+}
+
+@media (max-width: 980px) {
+  .catalogue-entete {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 26px;
+  }
+
+  .reassurance-ligne {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .page-hero--catalogue {
+    padding: 44px 0 34px;
+  }
+
+  .catalogue-barre {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 30px;
+    padding-bottom: 16px;
+  }
+
+  .catalogue-compte {
+    text-align: right;
+    font-size: 13.5px;
+  }
+
+  .reassurance-ligne li {
+    font-size: 13.5px;
+  }
+}
