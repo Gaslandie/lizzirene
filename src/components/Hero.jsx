@@ -109,9 +109,15 @@ function Hero({ onCategorie }) {
             {apres}
           </h1>
           <p className="hero-sub">
-            Bouquets personnalisés, compositions florales, plantes et box
-            cadeaux. Notre nouvelle boutique vous accueille à Kipé — et nous
-            livrons partout à Conakry.
+            Bienvenue chez Lizzirène Déco.
+            <br />
+            Depuis 2023, la passion des roses et des plantes nous anime.
+            <br />
+            Notre mission : semer l'espoir, la joie et la beauté dans vos vies
+            avec élégance.
+            <br />
+            Nous mettons notre savoir-faire au service de votre joie, des
+            décors qui vous ressemblent et nous rassemblent.
           </p>
           <div className="hero-actions">
             <a

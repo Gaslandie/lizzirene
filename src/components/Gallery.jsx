@@ -27,7 +27,10 @@ const ITEMS = [
     ...PHOTOS.paquetEmballe,
     label: 'Coffret cadeau',
   },
-  { variant: 'teal', label: 'Vitrine boutique' },
+  {
+    ...PHOTOS.inspirationFlorale,
+    label: 'Inspiration florale',
+  },
 ]
 
 function Gallery() {

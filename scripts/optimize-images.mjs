@@ -65,10 +65,11 @@ const images = [
     mobile: { largeur: 608, hauteur: 810, qualite: 78 },
   },
   {
-    source: 'hero-images/hero-image3.jpg',
-    nom: 'hero-image3',
-    largeurs: [1920],
+    source: 'hero-pc.png',
+    nom: 'hero-nouveau',
+    largeurs: [1672],
     qualite: 76,
+    mobileSource: 'hero-mobile.png',
     mobile: { largeur: 900, hauteur: 1200, qualite: 78 },
   },
   {
@@ -105,6 +106,12 @@ const images = [
     source: 'cliente-comblee.jpeg',
     nom: 'cliente-comblee',
     largeurs: [480, 960],
+    qualite: 80,
+  },
+  {
+    source: 'inspiration-florale.jpeg',
+    nom: 'inspiration-florale',
+    largeurs: [480, 810],
     qualite: 80,
   },
   {
@@ -167,8 +174,15 @@ for (const image of images) {
 
   if (image.mobile) {
     const sortieMobile = path.join(sortieDir, `${image.nom}-mobile.webp`)
+    const sourceMobile = image.mobileSource
+      ? path.join(sourcesDir, image.mobileSource)
+      : source
 
-    await sharp(source)
+    if (sourceMobile !== source) {
+      poidsSources += await taille(sourceMobile)
+    }
+
+    await sharp(sourceMobile)
       .rotate()
       .resize({
         width: image.mobile.largeur,

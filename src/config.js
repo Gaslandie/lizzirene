@@ -108,6 +108,13 @@ export const PHOTOS = {
     width: 1200,
     height: 799,
   }),
+  inspirationFlorale: responsivePhoto({
+    nom: 'inspiration-florale',
+    largeurs: [480, 810],
+    alt: 'Inspiration florale Lizzirene Déco',
+    width: 810,
+    height: 1080,
+  }),
 }
 
 export const SERVICE_THEME_PHOTOS = {
@@ -189,9 +196,9 @@ export const PHOTOS_EVENEMENTS = {
 
 export const HERO_IMAGES = [
   {
-    src: asset('optimized/hero-image3-1920.webp'),
-    mobileSrc: asset('optimized/hero-image3-mobile.webp'),
-    label: 'Ambiance florale lumineuse',
+    src: asset('optimized/hero-nouveau-1672.webp'),
+    mobileSrc: asset('optimized/hero-nouveau-mobile.webp'),
+    label: 'Nouvelle ambiance florale Lizzirène Déco',
     position: 'center center',
   },
   {
