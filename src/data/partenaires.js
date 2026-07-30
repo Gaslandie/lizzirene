@@ -16,8 +16,16 @@
 //   2. ajouter `logo: 'partenaires/<fichier>'` à l'entrée concernée ;
 //   3. s'assurer que l'organisation a autorisé cet usage.
 export const PARTENAIRES = [
-  { id: 'ambassade-france', nom: 'Ambassade de France' },
-  { id: 'ambassade-russie', nom: 'Ambassade de Russie' },
+  {
+    id: 'ambassade-france',
+    nom: 'Ambassade de France',
+    logo: 'partenaires/ambassade-france.svg',
+  },
+  {
+    id: 'ambassade-russie',
+    nom: 'Ambassade de Russie',
+    logo: 'partenaires/ambassade-russie.png',
+  },
   // Intitulé exact à confirmer avec la cliente.
   { id: 'ambassade-eau', nom: 'Ambassade des Émirats arabes unis' },
   { id: 'prima', nom: 'Prima' },

@@ -46,8 +46,14 @@ body {
   font-size: 17px;
   overflow-wrap: break-word;
   -webkit-text-size-adjust: 100%;
-  /* `clip` (et non `hidden`) : empêche les animations latérales d'élargir
-     la page sans casser le `position: sticky` de la navbar. */
+}
+
+/* Les entrées latérales (`reveal-left` / `reveal-right`) débordent de 48 px
+   avant d'être révélées. Le clip doit porter sur `main` : posé sur `body`,
+   il est propagé au viewport quand `html` est en `visible` — et ne clippe
+   donc rien. `main` ne contient ni la navbar collante ni les éléments
+   fixes (panier, bouton WhatsApp), qui restent intacts. */
+main {
   overflow-x: clip;
 }
 
@@ -3526,6 +3532,9 @@ a.service-card {
   justify-content: center;
   text-align: center;
   flex: 1 1 220px;
+  /* `min-width: 0` autorise la vignette à se réduire : sans lui, un logo
+     en bandeau large impose sa largeur intrinsèque et fait déborder la page. */
+  min-width: 0;
   max-width: 320px;
   min-height: 116px;
   padding: 20px;
@@ -3541,28 +3550,38 @@ a.service-card {
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  max-width: 100%;
 }
 
 /* Logos en niveaux de gris au repos : la grille reste calme et les
    couleurs de la marque gardent la vedette. */
+/* Les logos arrivent dans tous les formats : bandeau large, carré, écusson.
+   Bornés en hauteur ET en largeur, ils s'inscrivent sans jamais déformer la
+   grille — voir README pour les dimensions à fournir. */
+/* Pas de désaturation au repos : plusieurs de ces références sont des
+   emblèmes d'État dont l'identité EST la couleur — le tricolore français,
+   l'aigle d'or russe. Les passer en gris les rendrait méconnaissables.
+   64 px de haut plutôt que 56 : un écusson carré a besoin de place pour
+   rester lisible, là où un logo en bandeau s'en contente. */
 .partenaire img {
-  max-height: 56px;
+  max-height: 64px;
+  max-width: 100%;
   width: auto;
+  height: auto;
   object-fit: contain;
-  filter: grayscale(1);
-  opacity: 0.75;
-  transition: filter 0.25s ease, opacity 0.25s ease;
+  opacity: 0.9;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.partenaire:hover img {
+  opacity: 1;
+  transform: scale(1.04);
 }
 
 .partenaire:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-soft);
   border-color: rgba(54, 192, 192, 0.35);
-}
-
-.partenaire:hover img {
-  filter: none;
-  opacity: 1;
 }
 
 .partenaire span {
