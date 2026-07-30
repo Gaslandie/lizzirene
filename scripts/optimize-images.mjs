@@ -103,6 +103,30 @@ const images = [
     qualite: 78,
   },
   {
+    source: 'nosServices/convalescence.png',
+    nom: 'service-convalescence',
+    largeurs: [480, 800, 1280],
+    qualite: 78,
+  },
+  {
+    source: 'nosServices/visite-naissance.png',
+    nom: 'service-visite-naissance',
+    largeurs: [480, 800, 1280],
+    qualite: 78,
+  },
+  {
+    source: 'nosServices/anniversaire.png',
+    nom: 'service-anniversaire',
+    largeurs: [480, 800, 1280],
+    qualite: 78,
+  },
+  {
+    source: 'nosServices/diplome.png',
+    nom: 'service-remise-diplome',
+    largeurs: [480, 800, 1280],
+    qualite: 78,
+  },
+  {
     source: 'comite-miss-guinee.png',
     nom: 'comite-miss-guinee',
     largeurs: [640, 1080],

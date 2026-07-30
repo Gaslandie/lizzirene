@@ -192,6 +192,10 @@ const PHOTOS_PAR_PRESTATION = {
   'decoration-interieur': SERVICE_THEME_PHOTOS.decoration,
   'confection-bouquet': SERVICE_THEME_PHOTOS.creations,
   mariage: SERVICE_THEME_PHOTOS.celebrations,
+  anniversaire: SERVICE_THEME_PHOTOS.anniversaire,
+  'remise-diplome': SERVICE_THEME_PHOTOS.remiseDiplome,
+  naissance: SERVICE_THEME_PHOTOS.naissance,
+  convalescence: SERVICE_THEME_PHOTOS.convalescence,
   hommage: SERVICE_THEME_PHOTOS.hommageCondoleances,
 }
 

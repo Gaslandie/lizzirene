@@ -163,6 +163,42 @@ export const SERVICE_THEME_PHOTOS = {
     sizes:
       '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
   }),
+  convalescence: responsivePhoto({
+    nom: 'service-convalescence',
+    largeurs: [480, 800, 1280],
+    alt: 'Bouquet de convalescence pour souhaiter un prompt rétablissement',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  naissance: responsivePhoto({
+    nom: 'service-visite-naissance',
+    largeurs: [480, 800, 1280],
+    alt: 'Bouquet et douceurs pour féliciter de jeunes parents après une naissance',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  anniversaire: responsivePhoto({
+    nom: 'service-anniversaire',
+    largeurs: [480, 800, 1280],
+    alt: "Mise en scène florale pour célébrer un anniversaire",
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  remiseDiplome: responsivePhoto({
+    nom: 'service-remise-diplome',
+    largeurs: [480, 800, 1280],
+    alt: 'Bouquet de félicitations pour une remise de diplôme',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
 }
 
 // Photos de la section Événements de l'accueil : une par carte, jamais
