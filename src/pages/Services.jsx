@@ -5,12 +5,18 @@ import { SERVICES, THEMES, normaliserTheme } from '../data/services.js'
 import { waLink } from '../config.js'
 import { urlServices, intercepterNavigation } from '../utils/navigation.js'
 
+// Les prestations photographiées ouvrent la grille : les vignettes à icône
+// restent lisibles, mais ne font pas la première impression.
+const photosDAbord = (services) =>
+  [...services].sort((a, b) => (b.photo ? 1 : 0) - (a.photo ? 1 : 0))
+
 function Services({ theme = 'tous', onTheme }) {
   const themeActif = normaliserTheme(theme)
-  const visibles =
+  const visibles = photosDAbord(
     themeActif === 'tous'
       ? SERVICES
-      : SERVICES.filter((service) => service.theme === themeActif)
+      : SERVICES.filter((service) => service.theme === themeActif),
+  )
 
   const descriptionTheme = THEMES.find((t) => t.id === themeActif)?.intro
 
@@ -21,31 +27,54 @@ function Services({ theme = 'tous', onTheme }) {
 
   return (
     <>
-      <header className="page-hero services-hero">
+      <header className="page-hero page-hero--catalogue">
         <div className="container">
-          <span className="eyebrow">Nos prestations</span>
-          <h1 tabIndex={-1}>Nos services</h1>
-          <p>
-            De la décoration d'intérieur aux grands moments de la vie, nous
-            créons, installons et livrons — à Kipé et partout à Conakry.
-          </p>
+          <div className="catalogue-entete">
+            <div>
+              <span className="eyebrow">Nos prestations</span>
+              <h1 tabIndex={-1}>Nos services</h1>
+              <p>
+                De la décoration d'intérieur aux grands moments de la vie,
+                nous créons, installons et livrons — à Kipé et partout à
+                Conakry.
+              </p>
+            </div>
+            {/* L'action de cette page, c'est le devis : il vit dans
+                l'en-tête, pas au fond de la grille. */}
+            <a
+              className="btn btn-whatsapp"
+              href={waLink(
+                'Bonjour Lizzirene Déco ! Je souhaite un devis pour une prestation.',
+              )}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Icon name="whatsapp" size={18} />
+              Demander un devis
+            </a>
+          </div>
         </div>
       </header>
 
       <section className="services-page" id="services-liste" tabIndex={-1}>
         <div className="container">
-          <div className="filters" role="group" aria-label="Filtrer par thème">
-            {THEMES.map((t) => (
-              <a
-                key={t.id}
-                href={urlServices(t.id)}
-                className={`filter ${themeActif === t.id ? 'active' : ''}`}
-                aria-current={themeActif === t.id ? 'page' : undefined}
-                onClick={(event) => choisir(event, t.id)}
-              >
-                {t.label}
-              </a>
-            ))}
+          <div className="catalogue-barre">
+            <div className="filters" role="group" aria-label="Filtrer par thème">
+              {THEMES.map((t) => (
+                <a
+                  key={t.id}
+                  href={urlServices(t.id)}
+                  className={`filter ${themeActif === t.id ? 'active' : ''}`}
+                  aria-current={themeActif === t.id ? 'page' : undefined}
+                  onClick={(event) => choisir(event, t.id)}
+                >
+                  {t.label}
+                </a>
+              ))}
+            </div>
+            <p className="catalogue-compte" aria-live="polite">
+              {visibles.length} prestation{visibles.length > 1 ? 's' : ''}
+            </p>
           </div>
 
           {descriptionTheme && (
