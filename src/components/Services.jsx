@@ -40,7 +40,7 @@ function Services({ onTheme }) {
                     alt={theme.photo.alt}
                     width={theme.photo.width}
                     height={theme.photo.height}
-                    loading="lazy"
+                    loading="eager"
                     decoding="async"
                   />
                 </span>

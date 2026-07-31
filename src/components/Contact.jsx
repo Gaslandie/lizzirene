@@ -57,7 +57,7 @@ function Contact() {
                   <Icon name="whatsapp" size={21} />
                 </span>
                 <div>
-                  <strong>WhatsApp & catalogue</strong>
+                  <strong>WhatsApp & commandes</strong>
                   <a
                     href={waLink('Bonjour Lizzirene Déco !')}
                     target="_blank"

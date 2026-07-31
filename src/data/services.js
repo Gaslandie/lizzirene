@@ -95,7 +95,7 @@ const SERVICES_BASE = [
     theme: 'creations',
     icon: 'bouquet',
     name: 'Confection de bouquets',
-    desc: 'Bouquets composés à la main selon vos couleurs, votre occasion et votre budget — tarif provisoire à partir de 300 000 GNF.',
+    desc: 'Bouquets composés à la main selon vos couleurs, votre occasion et votre budget — à partir de 300 000 GNF.',
     image: 'services/confection-bouquet.jpg',
   },
   {

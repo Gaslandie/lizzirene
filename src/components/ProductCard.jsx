@@ -55,9 +55,6 @@ function ProductCard({ produit, onProduit, headingLevel = 'h3' }) {
                 <small className="price-prefix">{produit.prixPrefixe}</small>
               )}
               <span className="price">{formatPrice(produit.price)}</span>
-              {produit.prixProvisoire && (
-                <small className="price-provisional">Prix provisoire</small>
-              )}
             </div>
             <button
               className="btn btn-primary add-btn"

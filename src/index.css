@@ -186,7 +186,7 @@ section[id] {
   font-size: 14px;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: var(--primary);
+  color: var(--primary-dark);
   margin-bottom: 14px;
   font-weight: 600;
 }
@@ -253,7 +253,7 @@ section[id] {
 
 .btn-whatsapp {
   background: #25d366;
-  color: var(--white);
+  color: var(--ink);
 }
 
 /* Sur photo sombre : contour discret, fond au survol seulement */
@@ -400,7 +400,7 @@ section[id] {
 }
 
 .brand-name span {
-  color: var(--primary);
+  color: var(--primary-dark);
   font-size: 15px;
   letter-spacing: 4px;
   font-weight: 600;
@@ -1064,7 +1064,7 @@ section[id] {
 }
 
 .product-category {
-  color: var(--primary);
+  color: var(--primary-dark);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 1.5px;
@@ -1089,7 +1089,7 @@ section[id] {
 }
 
 .product-detail-link:hover .product-discover {
-  color: var(--primary);
+  color: var(--primary-dark);
 }
 
 .product-foot {
@@ -1149,7 +1149,7 @@ section[id] {
   align-items: center;
   gap: 8px;
   margin-top: 8px;
-  color: var(--primary);
+  color: var(--primary-dark);
   font-weight: 500;
 }
 
@@ -1538,7 +1538,7 @@ section[id] {
   font-size: 14px;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: var(--primary);
+  color: var(--primary-dark);
   font-weight: 600;
   margin-bottom: 14px;
 }
@@ -1652,7 +1652,7 @@ section[id] {
 }
 
 .contact-list a:hover {
-  color: var(--primary);
+  color: var(--primary-dark);
 }
 
 .contact-form {
@@ -2162,7 +2162,7 @@ section[id] {
 }
 
 .link-back:hover {
-  color: var(--primary);
+  color: var(--primary-dark);
 }
 
 /* --- Confirmation --- */
@@ -2204,7 +2204,7 @@ section[id] {
 }
 
 .confirm-alt a {
-  color: var(--primary);
+  color: var(--primary-dark);
   font-weight: 500;
 }
 
@@ -2817,7 +2817,7 @@ section[id] {
   font-size: 14px;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: var(--primary);
+  color: var(--primary-dark);
   font-weight: 600;
   margin-bottom: 14px;
 }
@@ -3115,7 +3115,7 @@ section[id] {
 }
 
 .breadcrumbs a:hover {
-  color: var(--primary);
+  color: var(--primary-dark);
 }
 
 .breadcrumbs .icon {
@@ -3154,7 +3154,7 @@ section[id] {
 
 .product-detail-category {
   display: inline-block;
-  color: var(--primary);
+  color: var(--primary-dark);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 2.5px;
@@ -3237,7 +3237,7 @@ section[id] {
 }
 
 .back-to-products:hover {
-  color: var(--primary);
+  color: var(--primary-dark);
 }
 
 .related-products {
@@ -3276,7 +3276,7 @@ section[id] {
 
 .not-found .eyebrow {
   display: block;
-  color: var(--primary);
+  color: var(--primary-dark);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 3px;
@@ -3500,7 +3500,7 @@ a.service-card {
   align-items: center;
   gap: 8px;
   margin-top: 18px;
-  color: var(--primary);
+  color: var(--primary-dark);
   font-weight: 500;
   font-size: 15px;
 }
@@ -3633,7 +3633,7 @@ a.service-card {
 }
 
 .partenaire-texte:hover .partenaire-nom {
-  color: var(--primary) !important;
+  color: var(--primary-darker) !important;
 }
 
 /* Emplacement neutre en attendant les vrais logos */
@@ -3649,6 +3649,7 @@ a.service-card {
 .partenaire-vide span {
   font-size: 11.5px;
   letter-spacing: 1.4px;
+  color: var(--primary-dark);
 }
 
 /* Grand écran : trois références par ligne. Une base large force le retour
@@ -3675,7 +3676,7 @@ a.service-card {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--primary);
+  color: var(--primary-dark);
   font-weight: 500;
   padding: 8px 0;
 }
@@ -3759,7 +3760,7 @@ a.service-card {
   font-size: 14px;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: var(--primary);
+  color: var(--primary-dark);
   font-weight: 600;
   margin-bottom: 12px;
 }
@@ -3780,7 +3781,7 @@ a.service-card {
   font-family: var(--font-heading);
   font-size: 21px;
   font-style: italic;
-  color: var(--primary);
+  color: var(--primary-dark);
   border-left: 3px solid var(--accent);
   padding-left: 20px;
   margin: 26px 0;
@@ -3939,7 +3940,7 @@ a.service-card {
   font-size: 14px;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: var(--primary);
+  color: var(--primary-dark);
   font-weight: 600;
   margin-bottom: 12px;
 }
@@ -4120,7 +4121,7 @@ a.service-card {
   font-size: 12px;
   letter-spacing: 2.4px;
   text-transform: uppercase;
-  color: var(--primary);
+  color: var(--primary-dark);
   font-weight: 600;
 }
 
@@ -4387,7 +4388,7 @@ a.service-card {
   font-size: 12.5px;
   letter-spacing: 2.6px;
   text-transform: uppercase;
-  color: var(--primary);
+  color: var(--primary-dark);
   font-weight: 600;
   margin-bottom: 8px;
 }
@@ -4412,7 +4413,7 @@ a.service-card {
 }
 
 .rayon-lien:hover {
-  color: var(--primary);
+  color: var(--primary-darker);
   gap: 12px;
 }
 

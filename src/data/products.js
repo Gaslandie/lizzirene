@@ -2,7 +2,6 @@ import { PHOTOS, SERVICE_THEME_PHOTOS } from '../config.js'
 
 // Catalogue de la boutique. Prix en GNF (nombres bruts, formatés à l'affichage).
 // `price: null` = article sur devis : le client passe par WhatsApp.
-// `prixProvisoire: true` = montant indicatif à confirmer avec la cliente.
 // À terme ces données viendront de l'API NestJS / MongoDB.
 export const SOUS_CATEGORIES_FLEURS = [
   { id: 'fleurs-naturelles', label: 'Fleurs naturelles' },
@@ -69,7 +68,6 @@ export const PRODUCTS = [
     name: 'Poussa',
     category: 'fleurs-naturelles',
     price: 500000,
-    prixProvisoire: true,
     tag: 'Bouquet du catalogue',
     variant: 'slate',
     desc: 'Dôme serré de roses rouges présenté dans un contenant noir.',
@@ -79,7 +77,6 @@ export const PRODUCTS = [
     name: 'Simoda',
     category: 'fleurs-naturelles',
     price: 300000,
-    prixProvisoire: true,
     tag: 'Bouquet du catalogue',
     variant: 'soft',
     desc: 'Bouquet de roses rouges et de petites fleurs blanches, enveloppé de papier bordeaux bordé d’or.',
@@ -89,7 +86,6 @@ export const PRODUCTS = [
     name: 'Lill Skate',
     category: 'fleurs-naturelles',
     price: 500000,
-    prixProvisoire: true,
     tag: 'Bouquet du catalogue',
     variant: 'teal',
     desc: 'Composition de fleurs turquoise et blanches, accompagnée d’un petit ours blanc et enveloppée de papier bleu clair.',
@@ -99,7 +95,6 @@ export const PRODUCTS = [
     name: 'Miss Fati',
     category: 'fleurs-naturelles',
     price: 300000,
-    prixProvisoire: true,
     tag: 'Bouquet du catalogue',
     variant: 'soft',
     desc: 'Bouquet de roses rouges présenté dans un emballage blanc imprimé et noué d’un ruban bordeaux.',
@@ -251,7 +246,6 @@ export const PRODUCTS = [
     name: 'Carino',
     category: 'box-cadeaux',
     price: 500000,
-    prixProvisoire: true,
     tag: 'Création cadeau',
     variant: 'teal',
     desc: 'Composition cadeau enveloppée de cellophane transparent et ornée de rubans colorés.',
@@ -261,7 +255,6 @@ export const PRODUCTS = [
     name: 'La vida',
     category: 'box-cadeaux',
     price: 800000,
-    prixProvisoire: true,
     tag: 'Création cadeau',
     variant: 'soft',
     desc: 'Ensemble cadeau réunissant un ours en peluche blanc, une rose rouge et plusieurs articles emballés.',
@@ -271,7 +264,6 @@ export const PRODUCTS = [
     name: 'Maritou',
     category: 'box-cadeaux',
     price: 500000,
-    prixProvisoire: true,
     tag: 'Création cadeau',
     ...PHOTOS.paquetEmballe,
     alt: 'Coffret Maritou en forme de cœur fermé par un ruban rouge',
@@ -282,7 +274,6 @@ export const PRODUCTS = [
     name: 'Choco Coeur',
     category: 'box-cadeaux',
     price: 800000,
-    prixProvisoire: true,
     tag: 'Création cadeau',
     variant: 'sun',
     desc: 'Composition en forme de cœur associant des chocolats emballés et des roses rouges, sous cellophane.',
@@ -321,7 +312,7 @@ export const PRODUCTS = [
     category: 'plantes',
     price: null,
     tag: 'Boutique',
-    variant: 'slate',
+    ...PHOTOS.planteInterieur,
     desc: 'Une sélection de jolies plantes pour habiller la maison ou le bureau.',
   },
   {

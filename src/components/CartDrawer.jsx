@@ -1,8 +1,17 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Media from './Media.jsx'
 import Icon from './Icon.jsx'
 import { useCart } from '../context/CartContext.jsx'
 import { CONTACT, ZONES, formatPrice, waLink } from '../config.js'
+
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',')
 
 function CartDrawer() {
   const {
@@ -15,16 +24,94 @@ function CartDrawer() {
     count,
     total,
     totalMinimum,
-    totalProvisoire,
   } = useCart()
   const [step, setStep] = useState('panier') // panier | commande | confirme
   const [order, setOrder] = useState(null)
+  const drawerRef = useRef(null)
+  const closeButtonRef = useRef(null)
+  const triggerRef = useRef(null)
+  const closeTimerRef = useRef(null)
 
-  const close = () => {
+  const close = useCallback(() => {
     setOpen(false)
     // Laisse l'animation se terminer avant de revenir au panier.
-    setTimeout(() => setStep('panier'), 300)
-  }
+    clearTimeout(closeTimerRef.current)
+    closeTimerRef.current = setTimeout(() => setStep('panier'), 300)
+  }, [setOpen])
+
+  useEffect(() => () => clearTimeout(closeTimerRef.current), [])
+
+  useEffect(() => {
+    if (!open) return undefined
+
+    clearTimeout(closeTimerRef.current)
+    triggerRef.current = document.querySelector('.cart-btn')
+    const focusFrame = window.requestAnimationFrame(() => {
+      closeButtonRef.current?.focus()
+    })
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        close()
+        triggerRef.current?.focus()
+        return
+      }
+
+      if (event.key !== 'Tab') return
+
+      const drawer = drawerRef.current
+      const focusables = Array.from(
+        drawer?.querySelectorAll(FOCUSABLE_SELECTOR) || [],
+      ).filter((element) => element.getClientRects().length > 0)
+
+      if (focusables.length === 0) {
+        event.preventDefault()
+        drawer?.focus()
+        return
+      }
+
+      const first = focusables[0]
+      const last = focusables.at(-1)
+      const focusDansTiroir = drawer?.contains(document.activeElement)
+
+      if (
+        event.shiftKey &&
+        (!focusDansTiroir || document.activeElement === first)
+      ) {
+        event.preventDefault()
+        last.focus()
+      } else if (
+        !event.shiftKey &&
+        (!focusDansTiroir || document.activeElement === last)
+      ) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame)
+      document.removeEventListener('keydown', handleKeyDown)
+      window.requestAnimationFrame(() => triggerRef.current?.focus())
+    }
+  }, [close, open])
+
+  // Le bouton actif disparaît lors des transitions panier → formulaire →
+  // confirmation. Le focus revient alors au premier contrôle du tiroir.
+  useEffect(() => {
+    if (!open) return undefined
+
+    const focusFrame = window.requestAnimationFrame(() => {
+      if (!drawerRef.current?.contains(document.activeElement)) {
+        closeButtonRef.current?.focus()
+      }
+    })
+
+    return () => window.cancelAnimationFrame(focusFrame)
+  }, [open, step])
 
   const handleOrder = (e) => {
     e.preventDefault()
@@ -37,8 +124,6 @@ function CartDrawer() {
         (i) =>
           `• ${i.name} × ${i.qty} — ${formatPrice(i.price * i.qty)}${
             i.prixPrefixe ? ' minimum' : ''
-          }${
-            i.prixProvisoire ? ' (prix provisoire)' : ''
           }`,
       )
       .join('\n')
@@ -48,13 +133,9 @@ function CartDrawer() {
       '',
       lignes,
       '',
-      `TOTAL${
-        totalProvisoire ? ' PROVISOIRE' : totalMinimum ? ' MINIMUM' : ''
-      } : ${formatPrice(total)}`,
-      totalProvisoire
-        ? 'Les prix provisoires sont indicatifs et seront confirmés avec vous avant validation.'
-        : totalMinimum
-          ? 'Les produits marqués “à partir de” peuvent varier selon la composition finale.'
+      `TOTAL${totalMinimum ? ' MINIMUM' : ''} : ${formatPrice(total)}`,
+      totalMinimum
+        ? 'Les produits marqués “à partir de” peuvent varier selon la composition finale.'
         : null,
       'Paiement à la livraison',
       '',
@@ -70,7 +151,6 @@ function CartDrawer() {
 
     setOrder({ nom: data.nom, link: waLink(message) })
     setStep('confirme')
-    clear()
   }
 
   return (
@@ -81,17 +161,26 @@ function CartDrawer() {
         aria-hidden="true"
       />
       <aside
+        ref={drawerRef}
         className={`drawer ${open ? 'open' : ''}`}
+        role="dialog"
+        aria-modal="true"
         aria-label="Panier"
         aria-hidden={!open}
+        tabIndex={-1}
       >
         <header className="drawer-head">
           <h3>
             {step === 'panier' && `Mon panier${count ? ` (${count})` : ''}`}
-            {step === 'commande' && 'Finaliser la commande'}
-            {step === 'confirme' && 'Commande enregistrée'}
+            {step === 'commande' && 'Préparer la commande'}
+            {step === 'confirme' && 'Commande prête à envoyer'}
           </h3>
-          <button onClick={close} className="drawer-close" aria-label="Fermer">
+          <button
+            ref={closeButtonRef}
+            onClick={close}
+            className="drawer-close"
+            aria-label="Fermer"
+          >
             <Icon name="close" size={22} />
           </button>
         </header>
@@ -133,11 +222,6 @@ function CartDrawer() {
                             </small>
                           )}
                           <span className="price">{formatPrice(i.price)}</span>
-                          {i.prixProvisoire && (
-                            <small className="price-provisional">
-                              Prix provisoire
-                            </small>
-                          )}
                         </div>
                         <div className="qty">
                           <button
@@ -172,20 +256,14 @@ function CartDrawer() {
               <footer className="drawer-foot">
                 <div className="cart-total">
                   <span>
-                    {totalProvisoire
-                      ? 'Total provisoire'
-                      : totalMinimum
-                        ? 'Total minimum'
-                        : 'Total'}
+                    {totalMinimum ? 'Total minimum' : 'Total'}
                   </span>
                   <strong>{formatPrice(total)}</strong>
                 </div>
                 <p className="cart-note">
                   <Icon name="cash" size={17} />
-                  {totalProvisoire
-                    ? 'Prix indicatifs à confirmer avec Lizzirene Déco avant validation.'
-                    : totalMinimum
-                      ? 'Certains produits sont affichés à partir de ce montant.'
+                  {totalMinimum
+                    ? 'Certains produits sont affichés à partir de ce montant.'
                     : "Paiement à la livraison · frais de livraison confirmés avec vous avant l'envoi."}
                 </p>
                 <button
@@ -259,24 +337,21 @@ function CartDrawer() {
 
             <div className="cart-total">
               <span>
-                {totalProvisoire
-                  ? 'Total provisoire à confirmer'
-                  : totalMinimum
-                    ? 'Total minimum à payer à la livraison'
+                {totalMinimum
+                  ? 'Total minimum à payer à la livraison'
                   : 'Total à payer à la livraison'}
               </span>
               <strong>{formatPrice(total)}</strong>
             </div>
-            {(totalProvisoire || totalMinimum) && (
+            {totalMinimum && (
               <p className="checkout-price-note">
-                {totalProvisoire
-                  ? 'Ces prix sont indicatifs en attendant la confirmation de Lizzirene Déco.'
-                  : 'Les produits marqués “à partir de” peuvent varier selon la composition finale.'}
+                Les produits marqués “à partir de” peuvent varier selon la
+                composition finale.
               </p>
             )}
 
             <button type="submit" className="btn btn-primary">
-              Valider ma commande
+              Préparer l’envoi
             </button>
             <button
               type="button"
@@ -288,7 +363,7 @@ function CartDrawer() {
           </form>
         )}
 
-        {/* --- Étape 3 : confirmation --- */}
+        {/* --- Étape 3 : envoi vers WhatsApp --- */}
         {step === 'confirme' && order && (
           <div className="drawer-body confirm">
             <div className="confirm-icon">
@@ -296,15 +371,15 @@ function CartDrawer() {
             </div>
             <h4>Merci {order.nom} !</h4>
             <p>
-              Votre commande est enregistrée. Envoyez-la maintenant sur
-              WhatsApp pour que nous confirmions la livraison et le montant
-              final.
+              Votre récapitulatif est prêt. Envoyez-le maintenant sur WhatsApp
+              pour transmettre la commande et confirmer la livraison.
             </p>
             <a
               className="btn btn-whatsapp"
               href={order.link}
               target="_blank"
               rel="noreferrer"
+              onClick={clear}
             >
               <Icon name="whatsapp" size={19} />
               Envoyer ma commande sur WhatsApp

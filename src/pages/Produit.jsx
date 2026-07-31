@@ -88,9 +88,6 @@ function Produit({ produitId, onAller, onCategorie, onProduit }) {
                         <small>{produit.prixPrefixe}</small>
                       )}
                       <span>{formatPrice(produit.price)}</span>
-                      {produit.prixProvisoire && (
-                        <small>Prix provisoire — à confirmer</small>
-                      )}
                     </>
                   ) : (
                     'Prix sur devis'

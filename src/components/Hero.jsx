@@ -1,4 +1,4 @@
-import { CONTACT, HERO_IMAGES, waLink } from '../config.js'
+import { CONTACT, HERO_IMAGES } from '../config.js'
 import Icon from './Icon.jsx'
 import { intercepterNavigation, urlProduits } from '../utils/navigation.js'
 
@@ -13,6 +13,11 @@ function Hero({ onCategorie }) {
   const ouvrirFleurs = (event) => {
     if (!intercepterNavigation(event)) return
     onCategorie?.('fleurs', { ajouterHistorique: true })
+  }
+
+  const ouvrirCatalogue = (event) => {
+    if (!intercepterNavigation(event)) return
+    onCategorie?.('tous', { ajouterHistorique: true })
   }
 
   return (
@@ -53,21 +58,18 @@ function Hero({ onCategorie }) {
               Commander un bouquet
             </a>
             <a
-              href={waLink(
-                'Bonjour Lizzirene Déco ! Je souhaite recevoir votre catalogue.',
-              )}
-              target="_blank"
-              rel="noreferrer"
+              href={urlProduits()}
               className="btn btn-ghost"
+              onClick={ouvrirCatalogue}
             >
-              <Icon name="whatsapp" size={18} />
-              Recevoir le catalogue
+              Voir tous les produits
+              <Icon name="arrow" size={18} />
             </a>
           </div>
           <ul className="hero-reperes">
             <li>
               <strong>Dès 300 000 GNF</strong>
-              <span>prix provisoire</span>
+              <span>bouquets composés à la main</span>
             </li>
             <li>
               <strong>Livraison 7j/7</strong>
