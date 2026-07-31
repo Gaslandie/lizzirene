@@ -69,6 +69,11 @@ function Produit({ produitId, onAller, onCategorie, onProduit }) {
                   fetchPriority="high"
                   variant={produit.variant}
                   label={produit.name}
+                  style={
+                    produit.imagePosition
+                      ? { '--media-position': produit.imagePosition }
+                      : undefined
+                  }
                 />
                 <span className="product-badge">{produit.tag}</span>
               </div>

@@ -670,6 +670,7 @@ export const PRODUCTS = [
     price: null,
     tag: 'Sur commande',
     ...PHOTOS.vasesCylindriquesTransparents,
+    imagePosition: 'center top',
     desc: 'Vases cylindriques transparents disponibles en plusieurs formats pour compositions et décorations de table.',
   },
   {
@@ -679,6 +680,7 @@ export const PRODUCTS = [
     price: 100000,
     tag: 'Vase décoratif',
     ...PHOTOS.vasesDecoratifs100,
+    imagePosition: 'center 18%',
     desc: 'Petits vases décoratifs en plusieurs formes et coloris, vendus à l’unité.',
   },
   {
@@ -688,6 +690,7 @@ export const PRODUCTS = [
     price: 120000,
     tag: 'Vase en verre',
     ...PHOTOS.vasesSablier,
+    imagePosition: 'center top',
     desc: 'Vases en verre coloré à silhouette sablier, proposés en bleu ou en vert.',
   },
   {
@@ -697,6 +700,7 @@ export const PRODUCTS = [
     price: 120000,
     tag: 'Vase en verre',
     ...PHOTOS.vasesBouteilleColores,
+    imagePosition: 'center 8%',
     desc: 'Vases bouteille en verre coloré, disponibles dans plusieurs formes et teintes.',
   },
   {
@@ -706,6 +710,7 @@ export const PRODUCTS = [
     price: 130000,
     tag: 'Vase en verre',
     ...PHOTOS.vasesGrisTorsades,
+    imagePosition: 'center 10%',
     desc: 'Vases élancés en verre gris avec un relief torsadé, vendus à l’unité.',
   },
   {
