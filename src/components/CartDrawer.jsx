@@ -1,8 +1,17 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Media from './Media.jsx'
 import Icon from './Icon.jsx'
 import { useCart } from '../context/CartContext.jsx'
 import { CONTACT, ZONES, formatPrice, waLink } from '../config.js'
+
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',')
 
 function CartDrawer() {
   const {
@@ -18,12 +27,91 @@ function CartDrawer() {
   } = useCart()
   const [step, setStep] = useState('panier') // panier | commande | confirme
   const [order, setOrder] = useState(null)
+  const drawerRef = useRef(null)
+  const closeButtonRef = useRef(null)
+  const triggerRef = useRef(null)
+  const closeTimerRef = useRef(null)
 
-  const close = () => {
+  const close = useCallback(() => {
     setOpen(false)
     // Laisse l'animation se terminer avant de revenir au panier.
-    setTimeout(() => setStep('panier'), 300)
-  }
+    clearTimeout(closeTimerRef.current)
+    closeTimerRef.current = setTimeout(() => setStep('panier'), 300)
+  }, [setOpen])
+
+  useEffect(() => () => clearTimeout(closeTimerRef.current), [])
+
+  useEffect(() => {
+    if (!open) return undefined
+
+    clearTimeout(closeTimerRef.current)
+    triggerRef.current = document.querySelector('.cart-btn')
+    const focusFrame = window.requestAnimationFrame(() => {
+      closeButtonRef.current?.focus()
+    })
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        close()
+        triggerRef.current?.focus()
+        return
+      }
+
+      if (event.key !== 'Tab') return
+
+      const drawer = drawerRef.current
+      const focusables = Array.from(
+        drawer?.querySelectorAll(FOCUSABLE_SELECTOR) || [],
+      ).filter((element) => element.getClientRects().length > 0)
+
+      if (focusables.length === 0) {
+        event.preventDefault()
+        drawer?.focus()
+        return
+      }
+
+      const first = focusables[0]
+      const last = focusables.at(-1)
+      const focusDansTiroir = drawer?.contains(document.activeElement)
+
+      if (
+        event.shiftKey &&
+        (!focusDansTiroir || document.activeElement === first)
+      ) {
+        event.preventDefault()
+        last.focus()
+      } else if (
+        !event.shiftKey &&
+        (!focusDansTiroir || document.activeElement === last)
+      ) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame)
+      document.removeEventListener('keydown', handleKeyDown)
+      window.requestAnimationFrame(() => triggerRef.current?.focus())
+    }
+  }, [close, open])
+
+  // Le bouton actif disparaît lors des transitions panier → formulaire →
+  // confirmation. Le focus revient alors au premier contrôle du tiroir.
+  useEffect(() => {
+    if (!open) return undefined
+
+    const focusFrame = window.requestAnimationFrame(() => {
+      if (!drawerRef.current?.contains(document.activeElement)) {
+        closeButtonRef.current?.focus()
+      }
+    })
+
+    return () => window.cancelAnimationFrame(focusFrame)
+  }, [open, step])
 
   const handleOrder = (e) => {
     e.preventDefault()
@@ -73,9 +161,13 @@ function CartDrawer() {
         aria-hidden="true"
       />
       <aside
+        ref={drawerRef}
         className={`drawer ${open ? 'open' : ''}`}
+        role="dialog"
+        aria-modal="true"
         aria-label="Panier"
         aria-hidden={!open}
+        tabIndex={-1}
       >
         <header className="drawer-head">
           <h3>
@@ -83,7 +175,12 @@ function CartDrawer() {
             {step === 'commande' && 'Préparer la commande'}
             {step === 'confirme' && 'Commande prête à envoyer'}
           </h3>
-          <button onClick={close} className="drawer-close" aria-label="Fermer">
+          <button
+            ref={closeButtonRef}
+            onClick={close}
+            className="drawer-close"
+            aria-label="Fermer"
+          >
             <Icon name="close" size={22} />
           </button>
         </header>
