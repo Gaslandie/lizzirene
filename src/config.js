@@ -115,6 +115,13 @@ export const PHOTOS = {
     width: 1200,
     height: 799,
   }),
+  planteInterieur: responsivePhoto({
+    nom: 'produit-plante-interieur',
+    largeurs: [360, 554],
+    alt: 'Dracaena vert en pot pour décorer un intérieur',
+    width: 554,
+    height: 554,
+  }),
   palmierCuillere: responsivePhoto({
     nom: 'produit-palmier-cuillere',
     largeurs: [480, 720],

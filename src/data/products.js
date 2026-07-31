@@ -312,7 +312,7 @@ export const PRODUCTS = [
     category: 'plantes',
     price: null,
     tag: 'Boutique',
-    variant: 'slate',
+    ...PHOTOS.planteInterieur,
     desc: 'Une sélection de jolies plantes pour habiller la maison ou le bureau.',
   },
   {

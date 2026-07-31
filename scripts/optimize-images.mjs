@@ -57,6 +57,12 @@ const images = [
     qualite: 80,
   },
   {
+    source: 'produits/plante-dinterieure-verte.jpeg',
+    nom: 'produit-plante-interieur',
+    largeurs: [360, 554],
+    qualite: 82,
+  },
+  {
     source: 'produits/palmier-cuillere.png',
     nom: 'produit-palmier-cuillere',
     largeurs: [480, 720],
