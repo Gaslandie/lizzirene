@@ -28,7 +28,7 @@ const ETAPES = [
     icon: 'truck',
     titre: 'Partout à Conakry',
     texte:
-      'Livraison dans toutes les communes, 7j/7, avec paiement à la réception. Le catalogue complet se partage en un message WhatsApp.',
+      'Livraison dans toutes les communes, 7j/7, avec paiement à la réception. Notre équipe vous accompagne du choix des fleurs à la livraison.',
   },
 ]
 

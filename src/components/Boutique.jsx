@@ -115,8 +115,9 @@ function Boutique({ categorie = 'tous', onCategorie, onProduit }) {
               <Icon name="flower" size={32} />
               <h3>{familleActive?.label || 'Cette famille'} arrive bientôt</h3>
               <p>
-                Cette famille sera enrichie prochainement. Demandez le catalogue
-                complet sur WhatsApp pour voir les disponibilités du moment.
+                Cette famille sera enrichie prochainement. Écrivez-nous pour
+                connaître les disponibilités ou demander une création sur
+                mesure.
               </p>
               <a
                 className="btn btn-whatsapp"
@@ -127,7 +128,7 @@ function Boutique({ categorie = 'tous', onCategorie, onProduit }) {
                 rel="noreferrer"
               >
                 <Icon name="whatsapp" size={18} />
-                Demander le catalogue
+                Demander conseil
               </a>
             </div>
           </Reveal>
@@ -147,18 +148,18 @@ function Boutique({ categorie = 'tous', onCategorie, onProduit }) {
               </>
             ) : (
               <>
-                Les prix et disponibilités du catalogue sont confirmés avec
+                Les prix et disponibilités des produits sont confirmés avec
                 vous avant chaque commande.
               </>
             )}
             <a
               href={waLink(
-                'Bonjour Lizzirene Déco ! Je souhaite recevoir votre catalogue complet.',
+                'Bonjour Lizzirene Déco ! J’aimerais être conseillé(e) pour choisir un produit.',
               )}
               target="_blank"
               rel="noreferrer"
             >
-              Recevoir le catalogue complet sur WhatsApp
+              Demander conseil sur WhatsApp
               <Icon name="arrow" size={17} />
             </a>
           </p>

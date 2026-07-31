@@ -6,7 +6,7 @@ import Icon from '../components/Icon.jsx'
 const REPERES = [
   { icon: 'cash', texte: 'Paiement à la livraison' },
   { icon: 'truck', texte: 'Livraison 7j/7 à Conakry' },
-  { icon: 'whatsapp', texte: 'Catalogue complet sur WhatsApp' },
+  { icon: 'whatsapp', texte: 'Commande rapide sur WhatsApp' },
 ]
 
 function Produits({ categorie, onCategorie, onProduit }) {
