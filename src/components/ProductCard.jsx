@@ -52,7 +52,9 @@ function ProductCard({ produit, onProduit, headingLevel = 'h3' }) {
         </div>
       </a>
 
-      <div className="product-foot">
+      <div
+        className={`product-foot ${produit.price == null ? 'product-foot-devis' : ''}`}
+      >
         {produit.price != null ? (
           <>
             <div className="price-stack">
@@ -72,7 +74,9 @@ function ProductCard({ produit, onProduit, headingLevel = 'h3' }) {
           </>
         ) : (
           <>
-            <span className="price price-devis">Sur devis</span>
+            <span className="price price-devis">
+              {produit.priceLabel || 'Sur devis'}
+            </span>
             <a
               className="btn btn-whatsapp add-btn"
               href={waLink(
@@ -83,7 +87,7 @@ function ProductCard({ produit, onProduit, headingLevel = 'h3' }) {
               aria-label={`Demander un devis pour ${produit.name} sur WhatsApp`}
             >
               <Icon name="whatsapp" size={17} />
-              Demander
+              {produit.priceLabel ? 'Demander le prix' : 'Demander'}
             </a>
           </>
         )}

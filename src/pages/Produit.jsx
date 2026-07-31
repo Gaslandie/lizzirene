@@ -95,7 +95,7 @@ function Produit({ produitId, onAller, onCategorie, onProduit }) {
                       <span>{formatPrice(produit.price)}</span>
                     </>
                   ) : (
-                    'Prix sur devis'
+                    produit.priceLabel || 'Prix sur devis'
                   )}
                 </div>
 
@@ -118,7 +118,9 @@ function Produit({ produitId, onAller, onCategorie, onProduit }) {
                       rel="noreferrer"
                     >
                       <Icon name="whatsapp" size={19} />
-                      Demander un devis
+                      {produit.priceLabel
+                        ? 'Demander le prix'
+                        : 'Demander un devis'}
                     </a>
                   )}
                   <a
