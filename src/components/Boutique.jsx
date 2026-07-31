@@ -137,15 +137,13 @@ function Boutique({ categorie = 'tous', onCategorie, onProduit }) {
           <p className="boutique-note">
             {categorieActive === 'fleurs' ? (
               <>
-                Prix provisoires : les bouquets démarrent à{' '}
-                <strong>300 000 GNF</strong>. Le montant final est confirmé
-                avec vous avant la préparation.
+                Les bouquets démarrent à <strong>300 000 GNF</strong> et sont
+                composés selon l’occasion, les couleurs et le volume souhaité.
               </>
             ) : categorieActive === 'box-cadeaux' ? (
               <>
-                Les prix des créations cadeaux sont provisoires. Leur contenu
-                et leur montant final sont confirmés avec vous avant la
-                préparation.
+                Les créations cadeaux démarrent à <strong>500 000 GNF</strong>.
+                Leur contenu est adapté à l’occasion et à vos envies.
               </>
             ) : (
               <>

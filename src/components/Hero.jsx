@@ -67,7 +67,7 @@ function Hero({ onCategorie }) {
           <ul className="hero-reperes">
             <li>
               <strong>Dès 300 000 GNF</strong>
-              <span>prix provisoire</span>
+              <span>bouquets du catalogue</span>
             </li>
             <li>
               <strong>Livraison 7j/7</strong>

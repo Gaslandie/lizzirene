@@ -15,7 +15,6 @@ function CartDrawer() {
     count,
     total,
     totalMinimum,
-    totalProvisoire,
   } = useCart()
   const [step, setStep] = useState('panier') // panier | commande | confirme
   const [order, setOrder] = useState(null)
@@ -37,8 +36,6 @@ function CartDrawer() {
         (i) =>
           `• ${i.name} × ${i.qty} — ${formatPrice(i.price * i.qty)}${
             i.prixPrefixe ? ' minimum' : ''
-          }${
-            i.prixProvisoire ? ' (prix provisoire)' : ''
           }`,
       )
       .join('\n')
@@ -48,13 +45,9 @@ function CartDrawer() {
       '',
       lignes,
       '',
-      `TOTAL${
-        totalProvisoire ? ' PROVISOIRE' : totalMinimum ? ' MINIMUM' : ''
-      } : ${formatPrice(total)}`,
-      totalProvisoire
-        ? 'Les prix provisoires sont indicatifs et seront confirmés avec vous avant validation.'
-        : totalMinimum
-          ? 'Les produits marqués “à partir de” peuvent varier selon la composition finale.'
+      `TOTAL${totalMinimum ? ' MINIMUM' : ''} : ${formatPrice(total)}`,
+      totalMinimum
+        ? 'Les produits marqués “à partir de” peuvent varier selon la composition finale.'
         : null,
       'Paiement à la livraison',
       '',
@@ -70,7 +63,6 @@ function CartDrawer() {
 
     setOrder({ nom: data.nom, link: waLink(message) })
     setStep('confirme')
-    clear()
   }
 
   return (
@@ -88,8 +80,8 @@ function CartDrawer() {
         <header className="drawer-head">
           <h3>
             {step === 'panier' && `Mon panier${count ? ` (${count})` : ''}`}
-            {step === 'commande' && 'Finaliser la commande'}
-            {step === 'confirme' && 'Commande enregistrée'}
+            {step === 'commande' && 'Préparer la commande'}
+            {step === 'confirme' && 'Commande prête à envoyer'}
           </h3>
           <button onClick={close} className="drawer-close" aria-label="Fermer">
             <Icon name="close" size={22} />
@@ -133,11 +125,6 @@ function CartDrawer() {
                             </small>
                           )}
                           <span className="price">{formatPrice(i.price)}</span>
-                          {i.prixProvisoire && (
-                            <small className="price-provisional">
-                              Prix provisoire
-                            </small>
-                          )}
                         </div>
                         <div className="qty">
                           <button
@@ -172,20 +159,14 @@ function CartDrawer() {
               <footer className="drawer-foot">
                 <div className="cart-total">
                   <span>
-                    {totalProvisoire
-                      ? 'Total provisoire'
-                      : totalMinimum
-                        ? 'Total minimum'
-                        : 'Total'}
+                    {totalMinimum ? 'Total minimum' : 'Total'}
                   </span>
                   <strong>{formatPrice(total)}</strong>
                 </div>
                 <p className="cart-note">
                   <Icon name="cash" size={17} />
-                  {totalProvisoire
-                    ? 'Prix indicatifs à confirmer avec Lizzirene Déco avant validation.'
-                    : totalMinimum
-                      ? 'Certains produits sont affichés à partir de ce montant.'
+                  {totalMinimum
+                    ? 'Certains produits sont affichés à partir de ce montant.'
                     : "Paiement à la livraison · frais de livraison confirmés avec vous avant l'envoi."}
                 </p>
                 <button
@@ -259,24 +240,21 @@ function CartDrawer() {
 
             <div className="cart-total">
               <span>
-                {totalProvisoire
-                  ? 'Total provisoire à confirmer'
-                  : totalMinimum
-                    ? 'Total minimum à payer à la livraison'
+                {totalMinimum
+                  ? 'Total minimum à payer à la livraison'
                   : 'Total à payer à la livraison'}
               </span>
               <strong>{formatPrice(total)}</strong>
             </div>
-            {(totalProvisoire || totalMinimum) && (
+            {totalMinimum && (
               <p className="checkout-price-note">
-                {totalProvisoire
-                  ? 'Ces prix sont indicatifs en attendant la confirmation de Lizzirene Déco.'
-                  : 'Les produits marqués “à partir de” peuvent varier selon la composition finale.'}
+                Les produits marqués “à partir de” peuvent varier selon la
+                composition finale.
               </p>
             )}
 
             <button type="submit" className="btn btn-primary">
-              Valider ma commande
+              Préparer l’envoi
             </button>
             <button
               type="button"
@@ -288,7 +266,7 @@ function CartDrawer() {
           </form>
         )}
 
-        {/* --- Étape 3 : confirmation --- */}
+        {/* --- Étape 3 : envoi vers WhatsApp --- */}
         {step === 'confirme' && order && (
           <div className="drawer-body confirm">
             <div className="confirm-icon">
@@ -296,15 +274,15 @@ function CartDrawer() {
             </div>
             <h4>Merci {order.nom} !</h4>
             <p>
-              Votre commande est enregistrée. Envoyez-la maintenant sur
-              WhatsApp pour que nous confirmions la livraison et le montant
-              final.
+              Votre récapitulatif est prêt. Envoyez-le maintenant sur WhatsApp
+              pour transmettre la commande et confirmer la livraison.
             </p>
             <a
               className="btn btn-whatsapp"
               href={order.link}
               target="_blank"
               rel="noreferrer"
+              onClick={clear}
             >
               <Icon name="whatsapp" size={19} />
               Envoyer ma commande sur WhatsApp

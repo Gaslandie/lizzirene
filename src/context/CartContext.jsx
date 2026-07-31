@@ -10,7 +10,6 @@ const creerLignePanier = (product, qty) => {
     name,
     price,
     prixPrefixe,
-    prixProvisoire,
     src,
     srcSet,
     sizes,
@@ -25,7 +24,6 @@ const creerLignePanier = (product, qty) => {
     name,
     price,
     prixPrefixe,
-    prixProvisoire,
     src,
     srcSet,
     sizes,
@@ -116,7 +114,6 @@ export function CartProvider({ children }) {
       count: items.reduce((n, i) => n + i.qty, 0),
       total: items.reduce((n, i) => n + i.price * i.qty, 0),
       totalMinimum: items.some((item) => item.prixPrefixe),
-      totalProvisoire: items.some((item) => item.prixProvisoire),
     }
   }, [items, open])
 
