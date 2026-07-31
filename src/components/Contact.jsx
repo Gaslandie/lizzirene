@@ -134,7 +134,7 @@ function Contact() {
               <option>Plantes, vases ou cache-pots</option>
               <option>Box cadeau</option>
               <option>Peluches</option>
-              <option>Tableaux ou matériel décoratif</option>
+              <option>Tableaux décoratifs</option>
               <option>Luminaire professionnel</option>
               <option>Événement (mariage, anniversaire…)</option>
             </select>
