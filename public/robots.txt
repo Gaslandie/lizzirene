@@ -1,0 +1,5 @@
+# Lizzirène Déco — tout le site est public.
+User-agent: *
+Allow: /
+
+Sitemap: https://gaslandie.github.io/lizzirene/sitemap.xml

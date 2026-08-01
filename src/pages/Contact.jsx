@@ -1,36 +1,14 @@
 import Contact from '../components/Contact.jsx'
 import Reveal from '../components/Reveal.jsx'
 import Icon from '../components/Icon.jsx'
+import Faq from '../components/Faq.jsx'
+import { QUESTIONS } from '../data/faq.js'
 import { CONTACT, waLink } from '../config.js'
 
 const CARTE_LIEN = `https://www.google.com/maps?q=${encodeURIComponent(
   'Kipé, Conakry, Guinée',
 )}`
 const CARTE_EMBED = `${CARTE_LIEN}&output=embed`
-
-// Réponses alignées sur ce que le site promet déjà — rien d'inventé.
-const QUESTIONS = [
-  {
-    q: 'Comment passer commande ?',
-    r: 'Ajoutez vos articles au panier depuis la boutique, indiquez votre adresse, puis envoyez le récapitulatif sur WhatsApp : nous confirmons la commande et la livraison. Vous pouvez aussi nous appeler ou passer directement à la boutique à Kipé.',
-  },
-  {
-    q: 'Comment se passe le paiement ?',
-    r: 'Le paiement se fait à la livraison, en espèces, à la réception de votre commande. Aucun paiement en ligne n’est demandé.',
-  },
-  {
-    q: 'Livrez-vous partout à Conakry ?',
-    r: 'Oui, nous livrons dans toutes les communes de Conakry, 7j/7. Les frais de livraison sont confirmés avec vous sur WhatsApp avant l’envoi.',
-  },
-  {
-    q: 'Peut-on personnaliser un bouquet ?',
-    r: 'Bien sûr — c’est notre spécialité. Dites-nous l’occasion, vos couleurs et votre budget : nos bouquets démarrent à 300 000 GNF et sont composés selon vos envies.',
-  },
-  {
-    q: 'Décorez-vous les événements ?',
-    r: 'Oui : mariages, anniversaires, réceptions et événements d’entreprise. Écrivez-nous sur WhatsApp pour un devis gratuit, nous imaginons le décor avec vous.',
-  },
-]
 
 function PageContact() {
   return (
@@ -123,19 +101,7 @@ function PageContact() {
               <h2>Questions fréquentes</h2>
             </div>
           </Reveal>
-          <div className="faq-list">
-            {QUESTIONS.map((item, i) => (
-              <Reveal key={item.q} delay={i * 70}>
-                <details className="faq-item" open={i === 0}>
-                  <summary>
-                    {item.q}
-                    <Icon name="chevron" size={18} />
-                  </summary>
-                  <p>{item.r}</p>
-                </details>
-              </Reveal>
-            ))}
-          </div>
+          <Faq questions={QUESTIONS} />
         </div>
       </section>
     </>

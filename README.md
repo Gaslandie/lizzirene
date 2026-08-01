@@ -31,14 +31,20 @@ npm run preview  # prévisualise le build
 ```
 image-sources/          originaux conservés hors du site publié
 public/optimized/       variantes légères générées pour le site
+public/robots.txt       ouvert à tous les moteurs, pointe vers le sitemap
+public/sitemap.xml      généré avant chaque build depuis le catalogue réel
 src/
   config.js             coordonnées, photos, zones de livraison, format des prix
   data/products.js      catalogue (nom, catégorie, prix, photo)
+  data/services.js      prestations, regroupées par thème
+  data/occasions.js     entrées par occasion (Saint-Valentin, Tabaski, mariages…)
+  data/faq.js           source unique des questions fréquentes
   context/CartContext   panier (état + persistance navigateur)
   components/           sections et composants réutilisables
   pages/                accueil, catalogue, fiche produit et contact
   hooks/useRouter.js    navigation entre les pages sans dépendance externe
   utils/navigation.js  construction centralisée des URL internes
+  utils/donneesStructurees.js  balisage schema.org injecté à chaque page
   index.css             toute la mise en forme (palette en haut du fichier)
 ```
 
@@ -50,6 +56,29 @@ src/
 - **Photos** → déposer les sources dans `image-sources/`, les ajouter au manifeste de
   `scripts/optimize-images.mjs`, puis référencer leurs variantes dans `PHOTOS`
   (`src/config.js`)
+- **Questions fréquentes** → `src/data/faq.js` (accueil, page contact et balisage
+  `FAQPage` lisent la même liste)
+- **Occasions** → `src/data/occasions.js`
+- **Adresse publique du site** → `SITE` dans `src/utils/donneesStructurees.js`,
+  `SITE` dans `scripts/generer-sitemap.mjs` et `base` dans `vite.config.js` :
+  ces trois valeurs changent ensemble le jour du nom de domaine définitif
+
+### Référencement
+
+Chaque page injecte un graphe [schema.org](https://schema.org) unique
+(`src/utils/donneesStructurees.js`) : la boutique (`Florist` / `LocalBusiness`
+avec adresse, horaires réels et zone desservie), le site, les questions
+fréquentes sur l'accueil et le contact, puis la fiche `Product` et le fil
+d'Ariane sur les pages produits. Un article « sur devis » ne publie aucun
+montant ; un prix « à partir de » est déclaré comme minimum, jamais comme prix
+ferme.
+
+```bash
+npm run sitemap   # régénère public/sitemap.xml depuis le catalogue
+```
+
+Le sitemap est reconstruit automatiquement avant chaque build : un produit
+ajouté à `src/data/products.js` s'y retrouve sans intervention.
 
 ### Optimisation des images
 

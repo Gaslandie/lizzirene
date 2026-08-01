@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "optimize:images": "node scripts/optimize-images.mjs",
-    "prebuild": "npm run optimize:images",
+    "sitemap": "node scripts/generer-sitemap.mjs",
+    "prebuild": "npm run optimize:images && npm run sitemap",
     "build": "vite build && cp dist/index.html dist/404.html",
     "lint": "oxlint",
     "preview": "vite preview"

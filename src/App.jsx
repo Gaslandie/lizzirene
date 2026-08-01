@@ -13,6 +13,7 @@ import Produit from './pages/Produit.jsx'
 import Introuvable from './pages/Introuvable.jsx'
 import { useRouter } from './hooks/useRouter.js'
 import { trouverProduit } from './data/products.js'
+import { appliquerDonneesStructurees } from './utils/donneesStructurees.js'
 
 const METADONNEES = {
   accueil: {
@@ -77,7 +78,11 @@ function App() {
     document
       .querySelector('meta[property="og:description"]')
       ?.setAttribute('content', meta.description)
-  }, [page, produitId])
+
+    // Ce que les moteurs lisent en plus du texte : boutique, horaires, zone
+    // desservie, questions fréquentes, fiche produit et fil d'Ariane.
+    appliquerDonneesStructurees({ page, produit, categorie })
+  }, [page, produitId, categorie])
 
   let contenu
   if (page === 'accueil') {

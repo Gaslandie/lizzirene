@@ -29,4 +29,4 @@ Voici 15 caractéristiques d’un site web **moyen** (ni excellent, ni catastrop
 
 ---
 
-Un site moyen, c'est finalement un site qui **ne provoque aucune émotion**. Il fonctionne, mais il ne convertit pas bien, ne fidélise pas, et ne donne pas envie de revenir.
+Un site moyen, c'est finalement un site qui **ne provoque aucune émotion**. Il fonctionne, mais il ne convertit pas bien, ne fidélise pas, et ne donne pas envie de revenir.rend anormalement plus de temps que les précédents, sans produire d’erreur ni demander d’entrée. Je vérifie le processus en cours avant de continuer, pour éviter de laisser une opération Git suspendue.

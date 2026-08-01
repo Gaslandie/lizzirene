@@ -4244,32 +4244,38 @@ a.service-card {
   padding-top: 84px;
 }
 
-/* --- Familles : l'entrée principale vers le catalogue --- */
-/* Flex plutôt que grid : neuf familles ne se répartissent pas en rangées
-   pleines, la dernière ligne doit se centrer plutôt que laisser un trou. */
-.familles-grille {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 18px;
-  margin-bottom: 76px;
+/* --- Tuiles de familles : les rayons qui n'ont pas leur rangée de produits --- */
+/* Une photo, une promesse, un compteur : un rayon ne doit jamais se réduire
+   à un mot dans une phrase de liens. */
+.familles-vitrine {
+  margin-top: 72px;
+  padding-top: 56px;
+  border-top: 1px solid rgba(42, 88, 92, 0.1);
 }
 
-.familles-grille > * {
-  flex: 1 1 200px;
-  max-width: 260px;
+.familles-vitrine .section-head {
+  margin-bottom: 40px;
 }
 
-.famille-carte {
+.familles-vitrine .section-head h2 {
+  font-size: clamp(24px, 3vw, 33px);
+}
+
+.familles-vitrine .section-head p {
+  font-size: 16.5px;
+}
+
+.familles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.famille-card {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
   height: 100%;
-  min-height: 148px;
-  padding: 26px 18px;
-  text-align: center;
+  overflow: hidden;
   border-radius: var(--radius);
   background: var(--bg-soft);
   border: 1px solid rgba(42, 88, 92, 0.08);
@@ -4277,61 +4283,77 @@ a.service-card {
     border-color 0.25s ease, background 0.25s ease;
 }
 
-.famille-carte:hover {
+.famille-card:hover {
   transform: translateY(-6px);
   box-shadow: var(--shadow);
   border-color: rgba(54, 192, 192, 0.4);
   background: var(--white);
 }
 
-.famille-icone {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
+.famille-media {
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
   background: var(--primary-soft);
-  color: var(--primary-dark);
+}
+
+.famille-media .media,
+.famille-media .placeholder {
+  width: 100%;
+  height: 100%;
+}
+
+.famille-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.famille-card:hover .famille-media img {
+  transform: scale(1.06);
+}
+
+.famille-body {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.25s ease, color 0.25s ease;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px 24px 24px;
 }
 
-.famille-carte:hover .famille-icone {
-  background: var(--primary-dark);
-  color: var(--white);
-}
-
-.famille-nom {
+.famille-body strong {
   font-family: var(--font-heading);
-  font-size: 17px;
+  font-size: 21px;
   font-weight: 600;
   color: var(--primary-dark);
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
-.famille-compte {
-  font-size: 13px;
+.famille-promesse {
+  flex: 1;
+  font-size: 15.5px;
   color: var(--muted);
 }
 
-/* --- Articles mis en avant --- */
-.boutique-accueil-sous-titre {
-  margin-bottom: 36px;
-}
-
-.boutique-accueil-sous-titre h3 {
-  font-size: clamp(24px, 3.2vw, 34px);
+.famille-lien {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font-size: 15px;
+  font-weight: 500;
   color: var(--primary-dark);
+  transition: gap 0.2s ease;
 }
 
-.boutique-accueil-cta {
-  text-align: center;
-  margin-top: 52px;
+.famille-card:hover .famille-lien {
+  gap: 12px;
 }
 
-@media (max-width: 1100px) {
-  .familles-grille {
-    margin-bottom: 60px;
+@media (max-width: 980px) {
+  .familles-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -4340,42 +4362,29 @@ a.service-card {
     padding-top: 56px;
   }
 
-  .familles-grille {
-    gap: 12px;
-    margin-bottom: 48px;
+  .familles-vitrine {
+    margin-top: 52px;
+    padding-top: 40px;
   }
 
-  .familles-grille > * {
-    flex-basis: 130px;
+  .familles-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
   }
 
-  .famille-carte {
-    min-height: 128px;
-    padding: 20px 12px;
-    gap: 8px;
+  .famille-body {
+    padding: 18px 20px 20px;
   }
 
-  .famille-icone {
-    width: 48px;
-    height: 48px;
-  }
-
-  .famille-nom {
-    font-size: 15px;
-  }
-
-  .boutique-accueil-cta {
-    margin-top: 36px;
-  }
-
-  .boutique-accueil-cta .btn {
-    width: 100%;
+  .famille-body strong {
+    font-size: 19px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .famille-carte,
-  .famille-icone {
+  .famille-card,
+  .famille-media img,
+  .famille-lien {
     transition: none;
   }
 }
@@ -4433,34 +4442,11 @@ a.service-card {
   gap: 12px;
 }
 
-/* Renvoi vers le reste du catalogue : une phrase, pas une grille */
+/* Sortie de la vitrine : un seul bouton, vers le catalogue complet */
 .boutique-accueil-suite {
-  margin-top: 64px;
-  padding-top: 40px;
-  border-top: 1px solid rgba(42, 88, 92, 0.1);
+  margin-top: 48px;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 36px;
-}
-
-.boutique-accueil-suite p {
-  color: var(--muted);
-  font-size: 16.5px;
-  max-width: 560px;
-}
-
-.boutique-accueil-suite p a {
-  color: var(--primary-dark);
-  font-weight: 500;
-  text-decoration: underline;
-  text-decoration-color: rgba(54, 192, 192, 0.5);
-  text-underline-offset: 3px;
-  transition: text-decoration-color 0.2s ease;
-}
-
-.boutique-accueil-suite p a:hover {
-  text-decoration-color: var(--primary);
+  justify-content: center;
 }
 
 .boutique-accueil-suite .btn {
@@ -4473,10 +4459,11 @@ a.service-card {
   }
 
   .boutique-accueil-suite {
-    flex-direction: column;
-    align-items: flex-start;
-    margin-top: 48px;
-    padding-top: 32px;
+    margin-top: 40px;
+  }
+
+  .boutique-accueil-suite .btn {
+    width: 100%;
   }
 }
 
@@ -4712,5 +4699,292 @@ a.service-card {
     gap: 14px;
     white-space: normal;
     text-align: center;
+  }
+}
+
+/* ============ ACCUEIL — OCCASIONS ============ */
+/* Entrée par l'intention. Volontairement plus sobre que les cartes produits :
+   ces raccourcis orientent, ils ne doivent pas voler la vedette à la vitrine. */
+.occasions {
+  background: var(--bg-soft);
+}
+
+.occasions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.occasion-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 100%;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: var(--white);
+  border: 1px solid rgba(42, 88, 92, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.occasion-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-soft);
+  border-color: rgba(54, 192, 192, 0.45);
+}
+
+.occasion-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.occasion-card:hover .occasion-icon {
+  background: var(--primary-dark);
+  color: var(--white);
+}
+
+.occasion-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.occasion-body strong {
+  font-family: var(--font-heading);
+  font-size: 17.5px;
+  font-weight: 600;
+  color: var(--primary-dark);
+  line-height: 1.2;
+}
+
+.occasion-periode {
+  font-size: 12.5px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  font-weight: 600;
+  /* --muted sur fond blanc : 4.6:1, suffisant pour ce texte de 12,5 px. */
+  color: var(--muted);
+}
+
+.occasion-texte {
+  margin-top: 4px;
+  font-size: 14.5px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.occasion-card > .icon {
+  flex-shrink: 0;
+  color: var(--primary-dark);
+  transition: transform 0.2s ease;
+}
+
+.occasion-card:hover > .icon {
+  transform: translateX(4px);
+}
+
+/* Sur mobile, dix cartes pleine largeur repousseraient la boutique de plus
+   d'un écran et demi. On garde l'icône, le nom et la période — la phrase
+   d'explication et la flèche disparaissent, la carte reste cliquable. */
+@media (max-width: 720px) {
+  .occasions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .occasion-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 14px;
+  }
+
+  .occasion-icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .occasion-body strong {
+    font-size: 16px;
+  }
+
+  .occasion-periode {
+    font-size: 11.5px;
+    letter-spacing: 1.2px;
+  }
+
+  .occasion-texte,
+  .occasion-card > .icon {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .occasion-card,
+  .occasion-icon,
+  .occasion-card > .icon {
+    transition: none;
+  }
+}
+
+/* ============ ACCUEIL — FLEURISTE LOCAL ============ */
+/* Dernier bloc avant le contact : il répond aux « oui mais » qui restent.
+   Le texte long y est replié — indexable, mais jamais imposé au lecteur. */
+.fleuriste-local {
+  background: var(--bg);
+}
+
+.fleuriste-local-corps {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 44px;
+  align-items: start;
+  margin-bottom: 72px;
+}
+
+.fleuriste-local-texte {
+  color: var(--muted);
+  font-size: 16.5px;
+}
+
+.fleuriste-local-chapeau {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.lire-la-suite > summary {
+  list-style: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--primary-dark);
+  border-bottom: 2px solid var(--accent);
+}
+
+.lire-la-suite > summary::-webkit-details-marker {
+  display: none;
+}
+
+.lire-la-suite > summary .icon {
+  transition: transform 0.25s ease;
+}
+
+.lire-la-suite[open] > summary .icon {
+  transform: rotate(180deg);
+}
+
+/* Un seul libellé visible à la fois, sans JavaScript. */
+.lire-la-suite .lire-moins,
+.lire-la-suite[open] .lire-plus {
+  display: none;
+}
+
+.lire-la-suite[open] .lire-moins {
+  display: inline;
+}
+
+.lire-la-suite p {
+  margin-top: 18px;
+}
+
+.promesses-liste {
+  display: grid;
+  gap: 12px;
+  padding: 28px 30px;
+  border-radius: var(--radius);
+  background: var(--bg-soft);
+  border: 1px solid rgba(42, 88, 92, 0.08);
+}
+
+.promesses-liste li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  font-size: 16px;
+  color: var(--primary-dark);
+}
+
+.promesse-icone {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--white);
+  color: var(--primary-dark);
+}
+
+.fleuriste-local-faq h3 {
+  text-align: center;
+  font-size: clamp(24px, 3vw, 33px);
+  color: var(--primary-dark);
+  margin-bottom: 32px;
+}
+
+.fleuriste-local-suite {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 32px;
+  margin-top: 28px;
+}
+
+.fleuriste-local-suite a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  font-weight: 500;
+  font-size: 15.5px;
+  color: var(--primary-dark);
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s ease, gap 0.2s ease;
+}
+
+.fleuriste-local-suite a:hover {
+  border-bottom-color: var(--accent);
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .fleuriste-local-corps {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    margin-bottom: 52px;
+  }
+}
+
+@media (max-width: 720px) {
+  .promesses-liste {
+    padding: 22px 20px;
+  }
+
+  .promesses-liste li {
+    font-size: 15.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lire-la-suite > summary .icon,
+  .fleuriste-local-suite a {
+    transition: none;
   }
 }

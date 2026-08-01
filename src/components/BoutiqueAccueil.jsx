@@ -1,6 +1,7 @@
 import Reveal from './Reveal.jsx'
 import Icon from './Icon.jsx'
 import ProductCard from './ProductCard.jsx'
+import FamillesVitrine from './FamillesVitrine.jsx'
 import { FAMILLES, PRODUCTS } from '../data/products.js'
 import { intercepterNavigation, urlProduits } from '../utils/navigation.js'
 
@@ -28,8 +29,9 @@ const RANGEES = [
   },
 ]
 
-// Les autres familles ne sont citées qu'en liens texte : l'exploration
-// complète se fait dans la boutique.
+// Les autres familles avaient été reléguées à une phrase de liens texte :
+// six rayons sur huit y devenaient invisibles. Elles ont maintenant chacune
+// leur tuile illustrée.
 const AUTRES_FAMILLES = FAMILLES.filter(
   (famille) => !['fleurs', 'plantes'].includes(famille.id),
 )
@@ -84,24 +86,15 @@ function BoutiqueAccueil({ onCategorie, onProduit }) {
           )
         })}
 
+        <FamillesVitrine
+          familles={AUTRES_FAMILLES}
+          titre="Et aussi, dans la boutique"
+          chapeau="Vases, cache-pots, coffrets, peluches, luminaires et pièces décoratives — de quoi accompagner un bouquet ou habiller un intérieur."
+          onCategorie={onCategorie}
+        />
+
         <Reveal variant="fade">
           <div className="boutique-accueil-suite">
-            <p>
-              Et aussi{' '}
-              {AUTRES_FAMILLES.map((famille, i) => (
-                <span key={famille.id}>
-                  <a
-                    href={urlProduits(famille.id)}
-                    onClick={(event) => ouvrir(event, famille.id)}
-                  >
-                    {famille.label.toLowerCase()}
-                  </a>
-                  {i < AUTRES_FAMILLES.length - 2 && ', '}
-                  {i === AUTRES_FAMILLES.length - 2 && ' et '}
-                </span>
-              ))}
-              .
-            </p>
             <a
               className="btn btn-primary"
               href={urlProduits()}
