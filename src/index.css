@@ -235,6 +235,53 @@ section[id] {
   background: var(--primary);
 }
 
+/* Remplissage progressif — essai limité au bouton « Commander » de la
+   navbar. Au lieu d'un fond qui bascule d'un bloc, une couche turquoise
+   balaie le bouton de gauche à droite.
+
+   La couche est un ::before en z-index négatif : dans le contexte
+   d'empilement créé par `isolation`, elle se peint après le fond du bouton
+   mais avant son texte — pas besoin d'envelopper le libellé dans un span.
+
+   Le texte passe au bleu-vert foncé pendant le balayage : blanc sur
+   turquoise ne tiendrait que 2,2:1, alors que --primary-darker sur
+   --primary tient 5,1:1 (WCAG AA). */
+.nav-shop {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  /* Le texte attend que le remplissage ait dépassé le libellé, puis bascule
+     d'un coup : un fondu long le laisserait gris sur turquoise — la seule
+     combinaison illisible des deux états. */
+  transition: transform 0.2s ease, box-shadow 0.2s ease,
+    color 0.09s linear 0.22s;
+}
+
+.nav-shop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--primary);
+  transform: scaleX(0);
+  transform-origin: left center;
+  /* ease-out plutôt qu'une courbe très abrupte : le balayage doit se
+     voir traverser le bouton, pas arriver déjà terminé. */
+  transition: transform 0.42s cubic-bezier(0, 0, 0.4, 1);
+}
+
+/* Le fond de base ne bouge plus : seule la couche entre en scène. */
+.nav-shop:hover,
+.nav-shop:focus-visible {
+  background: var(--primary-dark);
+  color: var(--primary-darker);
+}
+
+.nav-shop:hover::before,
+.nav-shop:focus-visible::before {
+  transform: scaleX(1);
+}
+
 .btn-accent {
   background: var(--accent);
   color: var(--ink);
@@ -2254,6 +2301,7 @@ section[id] {
 
   .media img,
   .btn,
+  .nav-shop::before,
   .hero-background-image,
   .hero-dots button,
   .product-card,
