@@ -1740,6 +1740,14 @@ section[id] {
   color: var(--white);
 }
 
+/* « DÉCO » hérite de --primary-dark, pensé pour le fond blanc de la navbar.
+   Sur le fond --primary-darker du pied de page, ce bleu-vert tombait à
+   1,4:1 et disparaissait. Le turquoise tient 5,1:1 (WCAG AA) et garde la
+   même hiérarchie que dans la navbar : le nom domine, le suffixe accompagne. */
+.footer .brand-name span {
+  color: var(--primary);
+}
+
 .footer .brand {
   margin-bottom: 16px;
 }
