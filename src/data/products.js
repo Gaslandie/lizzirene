@@ -317,6 +317,11 @@ export const PRODUCTS = [
     price: 900000,
     tag: 'Plante d’intérieur',
     ...PHOTOS.palmierCuillere,
+    entretien: {
+      lumiere: 'Lumière vive sans soleil direct, près d’une fenêtre.',
+      arrosage: 'Une à deux fois par semaine, quand la terre sèche en surface.',
+      difficulte: 'Facile',
+    },
     desc: 'Palmier décoratif en pot, idéal pour apporter une touche végétale élégante à la maison, au bureau ou à la boutique.',
   },
   {
@@ -326,6 +331,11 @@ export const PRODUCTS = [
     price: 250000,
     tag: 'Plante d’intérieur',
     ...PHOTOS.bambou,
+    entretien: {
+      lumiere: 'Lumière tamisée à vive, sans soleil direct.',
+      arrosage: 'Garder le substrat légèrement humide, sans eau stagnante.',
+      difficulte: 'Facile',
+    },
     desc: 'Bambou décoratif en pot, parfait pour apporter une touche naturelle et verticale à un intérieur.',
   },
   {
@@ -335,6 +345,12 @@ export const PRODUCTS = [
     price: 1600000,
     tag: 'Plante d’intérieur',
     ...PHOTOS.jatropha,
+    entretien: {
+      lumiere: 'Plein soleil ou lumière très vive.',
+      arrosage: 'Modéré : laisser sécher la terre entre deux arrosages.',
+      difficulte: 'Facile',
+      remarque: 'Sève irritante — à tenir hors de portée des enfants et des animaux.',
+    },
     desc: 'Jatropha en pot, une plante décorative au port élégant pour embellir un intérieur.',
   },
   {
@@ -345,6 +361,12 @@ export const PRODUCTS = [
     prixPrefixe: 'À partir de',
     tag: 'Plante d’intérieur',
     ...PHOTOS.dieffenbachia,
+    entretien: {
+      lumiere: 'Lumière tamisée, sans soleil direct sur le feuillage.',
+      arrosage: 'Une fois par semaine, quand la surface de la terre est sèche.',
+      difficulte: 'Facile',
+      remarque: 'Sève irritante — à tenir hors de portée des enfants et des animaux.',
+    },
     desc: 'Dieffenbachia en pot, proposé à partir de 900 000 GNF selon le cache-pot choisi.',
   },
   {
@@ -354,6 +376,11 @@ export const PRODUCTS = [
     price: 300000,
     tag: 'Plante d’intérieur',
     ...PHOTOS.aglaonema,
+    entretien: {
+      lumiere: 'Supporte l’ombre légère comme la lumière tamisée.',
+      arrosage: 'Une fois par semaine, moins si la pièce est climatisée.',
+      difficulte: 'Très facile',
+    },
     desc: 'Aglaonema en pot, une plante d’intérieur décorative au feuillage coloré.',
   },
   {
@@ -364,6 +391,12 @@ export const PRODUCTS = [
     prixPrefixe: 'À partir de',
     tag: 'Plante d’intérieur',
     ...PHOTOS.planteCrayonEuphorbia,
+    entretien: {
+      lumiere: 'Lumière vive, supporte le soleil direct.',
+      arrosage: 'Très espacé : c’est une succulente, l’excès d’eau lui nuit.',
+      difficulte: 'Facile',
+      remarque: 'Latex irritant à la coupe — à tenir hors de portée des enfants et des animaux.',
+    },
     desc: 'Plante crayon Euphorbia tirucalli, graphique et décorative — à partir de 1 000 000 GNF.',
   },
   {
@@ -373,6 +406,11 @@ export const PRODUCTS = [
     price: 1500000,
     tag: 'Plante d’intérieur',
     ...PHOTOS.pachiraArbreArgent,
+    entretien: {
+      lumiere: 'Lumière vive indirecte, sans soleil brûlant.',
+      arrosage: 'Laisser sécher la terre entre deux arrosages.',
+      difficulte: 'Facile',
+    },
     desc: 'Pachira en pot, aussi appelé arbre à argent, apprécié pour son feuillage décoratif.',
   },
   {
@@ -382,6 +420,11 @@ export const PRODUCTS = [
     price: 1000000,
     tag: 'Composition végétale',
     ...PHOTOS.terrarium,
+    entretien: {
+      lumiere: 'Lumière tamisée — jamais de soleil direct sur le verre.',
+      arrosage: 'Quelques gouttes seulement quand la mousse pâlit.',
+      difficulte: 'Très facile',
+    },
     desc: 'Terrarium décoratif pour apporter une touche végétale élégante à la maison ou au bureau.',
   },
   {
@@ -391,6 +434,11 @@ export const PRODUCTS = [
     price: 1000000,
     tag: 'Plante d’intérieur',
     ...PHOTOS.langueDeBelleMere,
+    entretien: {
+      lumiere: 'Tolère presque tout, de l’ombre à la lumière vive.',
+      arrosage: 'Tous les quinze jours, encore moins en saison des pluies.',
+      difficulte: 'Très facile',
+    },
     desc: 'Langue de belle-mère en pot, une plante graphique et résistante pour décorer un intérieur.',
   },
   {
@@ -400,6 +448,11 @@ export const PRODUCTS = [
     price: 1500000,
     tag: 'Plante d’intérieur',
     ...PHOTOS.langueDeBelleMereCachePot,
+    entretien: {
+      lumiere: 'Tolère presque tout, de l’ombre à la lumière vive.',
+      arrosage: 'Tous les quinze jours, encore moins en saison des pluies.',
+      difficulte: 'Très facile',
+    },
     desc: 'Langue de belle-mère présentée avec un cache-pot décoratif blanc.',
   },
   {

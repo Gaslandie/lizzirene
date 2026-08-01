@@ -2,6 +2,8 @@ import Icon from '../components/Icon.jsx'
 import Media from '../components/Media.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import Reveal from '../components/Reveal.jsx'
+import { SeMarieBienAvec } from '../components/SeMarieBienAvec.jsx'
+import FicheEntretien from '../components/FicheEntretien.jsx'
 import { useCart } from '../context/CartContext.jsx'
 import {
   LIBELLES_CATEGORIES_PRODUITS,
@@ -151,6 +153,8 @@ function Produit({ produitId, onAller, onCategorie, onProduit }) {
                   </li>
                 </ul>
 
+                <FicheEntretien entretien={produit.entretien} />
+
                 <a
                   className="back-to-products"
                   href={urlProduits(famille)}
@@ -164,6 +168,8 @@ function Produit({ produitId, onAller, onCategorie, onProduit }) {
           </div>
         </div>
       </section>
+
+      <SeMarieBienAvec produit={produit} onProduit={onProduit} />
 
       {produitsApparentes.length > 0 && (
         <section className="related-products">

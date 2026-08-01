@@ -27,6 +27,17 @@ export const QUESTIONS = [
     q: 'Décorez-vous les événements ?',
     r: 'Oui : mariages, anniversaires, réceptions et événements d’entreprise. Écrivez-nous sur WhatsApp pour un devis gratuit, nous imaginons le décor avec vous.',
   },
+  // Les deux questions suivantes lèvent les doutes d'après-commande — elles
+  // ne promettent que ce que le tunnel fait déjà, plus des conseils de
+  // fleuriste sans engagement de stock.
+  {
+    q: 'Que se passe-t-il après l’envoi de ma commande sur WhatsApp ?',
+    r: 'Nous vous répondons pour confirmer la disponibilité des articles, les frais de livraison et l’heure de passage — rien n’est préparé ni facturé avant cette confirmation. Vous payez ensuite en espèces, à la réception.',
+  },
+  {
+    q: 'Comment garder mon bouquet frais plus longtemps ?',
+    r: 'Changez l’eau du vase tous les deux jours, recoupez les tiges en biseau d’un centimètre, et tenez le bouquet à l’écart du soleil direct et de la climatisation. Retirez les fleurs fanées au fur et à mesure : le reste du bouquet durera plus longtemps.',
+  },
 ]
 
 // L'accueil n'affiche qu'un extrait : les quatre questions qui lèvent le plus

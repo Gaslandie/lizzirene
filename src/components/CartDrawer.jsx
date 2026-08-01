@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Media from './Media.jsx'
 import Icon from './Icon.jsx'
+import { SuggestionsPanier } from './SeMarieBienAvec.jsx'
 import { useCart } from '../context/CartContext.jsx'
 import { CONTACT, ZONES, formatPrice, waLink } from '../config.js'
 
@@ -27,6 +28,8 @@ function CartDrawer() {
   } = useCart()
   const [step, setStep] = useState('panier') // panier | commande | confirme
   const [order, setOrder] = useState(null)
+  const [copie, setCopie] = useState(false)
+  const copieTimerRef = useRef(null)
   const drawerRef = useRef(null)
   const closeButtonRef = useRef(null)
   const triggerRef = useRef(null)
@@ -39,7 +42,13 @@ function CartDrawer() {
     closeTimerRef.current = setTimeout(() => setStep('panier'), 300)
   }, [setOpen])
 
-  useEffect(() => () => clearTimeout(closeTimerRef.current), [])
+  useEffect(
+    () => () => {
+      clearTimeout(closeTimerRef.current)
+      clearTimeout(copieTimerRef.current)
+    },
+    [],
+  )
 
   useEffect(() => {
     if (!open) return undefined
@@ -149,8 +158,38 @@ function CartDrawer() {
       .filter(Boolean)
       .join('\n')
 
-    setOrder({ nom: data.nom, link: waLink(message) })
+    setOrder({ nom: data.nom, link: waLink(message), message })
+    setCopie(false)
     setStep('confirme')
+  }
+
+  // Secours quand wa.me ne s'ouvre pas (ordinateur sans WhatsApp, pop-up
+  // bloquée) : le client copie le récapitulatif et l'envoie lui-même.
+  const copierRecap = async () => {
+    try {
+      await navigator.clipboard.writeText(order.message)
+    } catch {
+      // Contexte non sécurisé ou permission refusée : repli textarea.
+      const zone = document.createElement('textarea')
+      zone.value = order.message
+      zone.setAttribute('readonly', '')
+      zone.style.position = 'fixed'
+      zone.style.opacity = '0'
+      document.body.appendChild(zone)
+      zone.select()
+      document.execCommand('copy')
+      zone.remove()
+    }
+    setCopie(true)
+    clearTimeout(copieTimerRef.current)
+    copieTimerRef.current = setTimeout(() => setCopie(false), 2500)
+  }
+
+  // Le panier n'est vidé que lorsque le client confirme l'envoi : un clic
+  // sur wa.me qui échoue ne doit pas détruire un panier composé avec soin.
+  const confirmerEnvoi = () => {
+    clear()
+    close()
   }
 
   return (
@@ -250,6 +289,10 @@ function CartDrawer() {
                   ))}
                 </ul>
               )}
+
+              {/* L'accessoire naturel du panier (vase avec le bouquet,
+                  cache-pot avec la plante), proposé sans quitter le tiroir. */}
+              <SuggestionsPanier />
             </div>
 
             {items.length > 0 && (
@@ -379,17 +422,27 @@ function CartDrawer() {
               href={order.link}
               target="_blank"
               rel="noreferrer"
-              onClick={clear}
             >
               <Icon name="whatsapp" size={19} />
               Envoyer ma commande sur WhatsApp
             </a>
+            <button
+              type="button"
+              className="btn btn-outline confirm-copier"
+              onClick={copierRecap}
+            >
+              <Icon name={copie ? 'check' : 'copier'} size={17} />
+              {copie ? 'Récapitulatif copié !' : 'Copier le récapitulatif'}
+            </button>
             <p className="confirm-alt">
               Ou appelez-nous au{' '}
               <a href={`tel:+224${CONTACT.phoneDisplay.replace(/\s/g, '')}`}>
                 {CONTACT.phoneDisplay}
               </a>
             </p>
+            <button className="btn btn-primary" onClick={confirmerEnvoi}>
+              J’ai bien envoyé ma commande
+            </button>
             <button className="link-back" onClick={close}>
               Continuer mes achats
             </button>
