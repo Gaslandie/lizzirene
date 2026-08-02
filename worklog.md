@@ -71,6 +71,26 @@
 - En attente de l'avis de Claude Code sur la méthode Bluehost exacte ;
   aucune configuration externe ni implémentation n'a encore été effectuée.
 
+## 2026-08-02 — Préparation de la mise en production Bluehost
+
+- Passage de toutes les URL publiques et SEO à `https://lizzirenedeco.com` et
+  régénération du sitemap.
+- Remplacement du fallback GitHub Pages par un `.htaccess` Apache : HTTPS sans
+  `www`, routes React, compression, cache et en-têtes de sécurité.
+- Remplacement local du workflow Pages par un pipeline GitHub Actions sécurisé
+  qui vérifie, construit et synchronise `dist/` par FTPS sur Bluehost avec un
+  compte dédié au seul répertoire de Lizzirene Déco.
+- Ajout d'un marqueur de cible obligatoire, conservation des challenges SSL,
+  validation TLS du certificat Bluehost et verrouillage des actions tierces sur
+  leur commit exact.
+- Lint rendu bloquant sans avertissement et build de production validé.
+- Audit public : le domaine reste sur des pages de parking Bluehost et `www`
+  n'a pas encore de HTTPS. L'environnement GitHub reste à configurer avant le
+  premier push de production.
+- Validation réelle du compte FTP cantonné : connexion FTPS explicite sur le
+  port 21, certificat valide via `ftp.bluehost.com`, et racine distante limitée
+  à `.well-known/`, `cgi-bin/` et `.ftpquota`. SFTP n'est pas requis.
+
 ## 2026-07-29 — Correction du nom de marque
 
 - Harmonisation du nom visible en `Lizzirene Déco`, avec accent sur `Déco`.

@@ -1,45 +1,289 @@
-name: Déploiement GitHub Pages
+name: Déploiement Bluehost
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      ref:
+        description: Commit, branche ou tag à redéployer (vide = version sélectionnée)
+        required: false
+        type: string
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
-# Une seule mise en ligne à la fois ; les push suivants attendent leur tour.
+# Un transfert interrompu peut laisser un site incomplet : les déploiements
+# restent donc séquentiels et ne s'annulent jamais entre eux.
 concurrency:
-  group: pages
+  group: production-bluehost
   cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - name: Récupérer le code
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
 
-      - uses: actions/setup-node@v4
+      - name: Autoriser uniquement une version déjà fusionnée dans main
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          git merge-base --is-ancestor HEAD origin/main
+
+      - name: Installer Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
           cache: npm
 
-      - run: npm ci
-      - run: npm run build
+      - name: Installer les dépendances
+        run: npm ci
 
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - name: Vérifier le code
+        run: npm run lint
+
+      - name: Construire le site
+        run: npm run build
+
+      - name: Vérifier l'artefact
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          test -s dist/index.html
+          test -s dist/.htaccess
+          test -s dist/.deploy-target-ok
+          grep -Fq 'https://lizzirenedeco.com/' dist/index.html
+          if find dist -type l -print -quit | grep -q .; then
+            echo 'Un lien symbolique est interdit dans le site publié.' >&2
+            exit 1
+          fi
+
+      - name: Conserver le site construit
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          path: dist
+          name: site-bluehost
+          path: dist/
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: 14
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      name: production
+      url: https://lizzirenedeco.com
     steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Télécharger le site construit
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: site-bluehost
+          path: dist/
+
+      - name: Installer le client FTPS
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends lftp
+          lftp --version
+
+      # Le certificat présenté par ce serveur est valide pour *.bluehost.com,
+      # pas pour son alias mybluehost.me. lftp associe donc ftp.bluehost.com à
+      # l'IP exacte du compte tout en vérifiant le certificat et son nom.
+      - name: Valider les paramètres Bluehost
+        shell: bash
+        env:
+          BLUEHOST_FTP_IP: ${{ vars.BLUEHOST_FTP_IP }}
+          BLUEHOST_FTP_USER: ${{ vars.BLUEHOST_FTP_USER }}
+        run: |
+          set -Eeuo pipefail
+          test -n "$BLUEHOST_FTP_IP"
+          [[ "$BLUEHOST_FTP_IP" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          IFS=. read -r octet1 octet2 octet3 octet4 <<< "$BLUEHOST_FTP_IP"
+          for octet in "$octet1" "$octet2" "$octet3" "$octet4"; do
+            (( octet >= 0 && octet <= 255 ))
+          done
+
+          test -n "$BLUEHOST_FTP_USER"
+          [[ "$BLUEHOST_FTP_USER" =~ ^[A-Za-z0-9@._+-]+$ ]]
+
+      - name: Vérifier la cible Bluehost
+        shell: bash
+        env:
+          BLUEHOST_FTP_IP: ${{ vars.BLUEHOST_FTP_IP }}
+          BLUEHOST_FTP_USER: ${{ vars.BLUEHOST_FTP_USER }}
+          LFTP_PASSWORD: ${{ secrets.BLUEHOST_FTP_PASSWORD }}
+        run: |
+          set -Eeuo pipefail
+          test -n "$LFTP_PASSWORD"
+          marqueur="$RUNNER_TEMP/deploy-target-ok.remote"
+
+          lftp \
+            --norc \
+            --user "$BLUEHOST_FTP_USER" \
+            --env-password \
+            -p 21 \
+            -e "
+              set cmd:fail-exit yes;
+              set dns:name/ftp.bluehost.com $BLUEHOST_FTP_IP;
+              set net:max-retries 2;
+              set net:timeout 20;
+              set ftp:passive-mode yes;
+              set ftp:ignore-pasv-address yes;
+              set ftp:list-options -a;
+              set ftp:ssl-force yes;
+              set ftp:ssl-auth TLS;
+              set ftp:ssl-protect-data yes;
+              set ftp:ssl-protect-list yes;
+              set ssl:use-sni yes;
+              set ssl:verify-certificate yes;
+              set ssl:check-hostname yes;
+              get .deploy-target-ok -o $marqueur;
+              bye
+            " \
+            'ftp://ftp.bluehost.com'
+
+          grep -Fxq 'lizzirenedeco.com' "$marqueur"
+
+      - name: Publier sur Bluehost
+        shell: bash
+        env:
+          BLUEHOST_FTP_IP: ${{ vars.BLUEHOST_FTP_IP }}
+          BLUEHOST_FTP_USER: ${{ vars.BLUEHOST_FTP_USER }}
+          LFTP_PASSWORD: ${{ secrets.BLUEHOST_FTP_PASSWORD }}
+        run: |
+          set -Eeuo pipefail
+          lftp \
+            --norc \
+            --user "$BLUEHOST_FTP_USER" \
+            --env-password \
+            -p 21 \
+            -e "
+              set cmd:fail-exit yes;
+              set dns:name/ftp.bluehost.com $BLUEHOST_FTP_IP;
+              set net:max-retries 2;
+              set net:timeout 30;
+              set ftp:passive-mode yes;
+              set ftp:ignore-pasv-address yes;
+              set ftp:list-options -a;
+              set ftp:ssl-force yes;
+              set ftp:ssl-auth TLS;
+              set ftp:ssl-protect-data yes;
+              set ftp:ssl-protect-list yes;
+              set ssl:use-sni yes;
+              set ssl:verify-certificate yes;
+              set ssl:check-hostname yes;
+              set xfer:use-temp-file yes;
+              mirror \
+                --reverse \
+                --delete \
+                --scan-all-first \
+                --no-perms \
+                --no-symlinks \
+                --parallel=4 \
+                --verbose=1 \
+                --max-errors=1 \
+                --exclude-glob='.well-known/' \
+                --exclude-glob='.ftpquota' \
+                --exclude-glob='cgi-bin/' \
+                '$GITHUB_WORKSPACE/dist/' \
+                /;
+              bye
+            " \
+            'ftp://ftp.bluehost.com'
+
+      - name: Vérifier les fichiers publiés
+        shell: bash
+        env:
+          BLUEHOST_FTP_IP: ${{ vars.BLUEHOST_FTP_IP }}
+          BLUEHOST_FTP_USER: ${{ vars.BLUEHOST_FTP_USER }}
+          LFTP_PASSWORD: ${{ secrets.BLUEHOST_FTP_PASSWORD }}
+        run: |
+          set -Eeuo pipefail
+          verification="$RUNNER_TEMP/bluehost-verification"
+          mkdir -p "$verification"
+
+          lftp \
+            --norc \
+            --user "$BLUEHOST_FTP_USER" \
+            --env-password \
+            -p 21 \
+            -e "
+              set cmd:fail-exit yes;
+              set dns:name/ftp.bluehost.com $BLUEHOST_FTP_IP;
+              set net:max-retries 2;
+              set net:timeout 20;
+              set ftp:passive-mode yes;
+              set ftp:ignore-pasv-address yes;
+              set ftp:list-options -a;
+              set ftp:ssl-force yes;
+              set ftp:ssl-auth TLS;
+              set ftp:ssl-protect-data yes;
+              set ftp:ssl-protect-list yes;
+              set ssl:use-sni yes;
+              set ssl:verify-certificate yes;
+              set ssl:check-hostname yes;
+              get index.html -o $verification/index.html;
+              get .htaccess -o $verification/htaccess;
+              get .deploy-target-ok -o $verification/deploy-target-ok;
+              bye
+            " \
+            'ftp://ftp.bluehost.com'
+
+          test -s "$verification/index.html"
+          test -s "$verification/htaccess"
+          grep -Fxq 'lizzirenedeco.com' "$verification/deploy-target-ok"
+          grep -Fq 'https://lizzirenedeco.com/' "$verification/index.html"
+          grep -Fq 'RewriteEngine On' "$verification/htaccess"
+
+      - name: Vérifier le site public
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          for source in \
+            'http://lizzirenedeco.com/' \
+            'http://www.lizzirenedeco.com/' \
+            'https://www.lizzirenedeco.com/'
+          do
+            destination="$(curl \
+              --fail \
+              --silent \
+              --show-error \
+              --location \
+              --max-redirs 5 \
+              --retry 4 \
+              --retry-delay 5 \
+              --retry-all-errors \
+              --connect-timeout 10 \
+              --max-time 45 \
+              --output /dev/null \
+              --write-out '%{url_effective}' \
+              "$source")"
+            [[ "$destination" == 'https://lizzirenedeco.com/' ]]
+          done
+
+          for chemin in / /produits
+          do
+            contenu="$(curl \
+              --fail \
+              --silent \
+              --show-error \
+              --retry 4 \
+              --retry-delay 5 \
+              --retry-all-errors \
+              --connect-timeout 10 \
+              --max-time 45 \
+              "https://lizzirenedeco.com$chemin")"
+            grep -Fq '<div id="root"></div>' <<< "$contenu"
+          done

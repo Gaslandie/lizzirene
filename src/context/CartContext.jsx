@@ -120,6 +120,8 @@ export function CartProvider({ children }) {
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }
 
+// Le hook partage volontairement le contexte avec son fournisseur.
+// oxlint-disable-next-line react/only-export-components
 export function useCart() {
   const ctx = useContext(CartContext)
   if (!ctx) throw new Error('useCart doit être utilisé dans un CartProvider')

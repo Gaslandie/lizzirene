@@ -13,7 +13,18 @@ import Produit from './pages/Produit.jsx'
 import Introuvable from './pages/Introuvable.jsx'
 import { useRouter } from './hooks/useRouter.js'
 import { trouverProduit } from './data/products.js'
-import { appliquerDonneesStructurees } from './utils/donneesStructurees.js'
+import {
+  appliquerDonneesStructurees,
+  SITE,
+} from './utils/donneesStructurees.js'
+import {
+  urlAccueil,
+  urlAPropos,
+  urlContact,
+  urlProduit,
+  urlProduits,
+  urlServices,
+} from './utils/navigation.js'
 
 const METADONNEES = {
   accueil: {
@@ -79,10 +90,29 @@ function App() {
       .querySelector('meta[property="og:description"]')
       ?.setAttribute('content', meta.description)
 
+    const cheminsCanoniques = {
+      accueil: urlAccueil(),
+      produits: urlProduits(categorie),
+      services: urlServices(theme),
+      apropos: urlAPropos(),
+      contact: urlContact(),
+    }
+    const cheminCanonique = produit
+      ? urlProduit(produit.id)
+      : cheminsCanoniques[page] || window.location.pathname
+    const urlCanonique = new URL(cheminCanonique, SITE).href
+
+    document
+      .querySelector('link[rel="canonical"]')
+      ?.setAttribute('href', urlCanonique)
+    document
+      .querySelector('meta[property="og:url"]')
+      ?.setAttribute('content', urlCanonique)
+
     // Ce que les moteurs lisent en plus du texte : boutique, horaires, zone
     // desservie, questions fréquentes, fiche produit et fil d'Ariane.
     appliquerDonneesStructurees({ page, produit, categorie })
-  }, [page, produitId, categorie])
+  }, [page, produitId, categorie, theme])
 
   let contenu
   if (page === 'accueil') {
