@@ -10,11 +10,9 @@ import {
   urlServices,
 } from './navigation.js'
 
-// Adresse publique du site — à changer en même temps que `base` dans
-// `vite.config.js` le jour du nom de domaine définitif. Les moteurs veulent
-// des URL absolues ; les helpers de navigation ne produisent que des chemins
-// commençant par `BASE_URL`, donc par « / ».
-export const SITE = 'https://gaslandie.github.io/lizzirene/'
+// Adresse canonique publique. Les moteurs veulent des URL absolues ; les
+// helpers de navigation ne produisent que des chemins commençant par « / ».
+export const SITE = 'https://lizzirenedeco.com/'
 
 const absolu = (chemin) => new URL(chemin, SITE).href
 

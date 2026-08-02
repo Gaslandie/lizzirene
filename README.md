@@ -59,9 +59,8 @@ src/
 - **Questions fréquentes** → `src/data/faq.js` (accueil, page contact et balisage
   `FAQPage` lisent la même liste)
 - **Occasions** → `src/data/occasions.js`
-- **Adresse publique du site** → `SITE` dans `src/utils/donneesStructurees.js`,
-  `SITE` dans `scripts/generer-sitemap.mjs` et `base` dans `vite.config.js` :
-  ces trois valeurs changent ensemble le jour du nom de domaine définitif
+- **Adresse publique du site** → `https://lizzirenedeco.com`, centralisée dans
+  les métadonnées, les données structurées et le générateur de sitemap
 
 ### Référencement
 
@@ -79,6 +78,17 @@ npm run sitemap   # régénère public/sitemap.xml depuis le catalogue
 
 Le sitemap est reconstruit automatiquement avant chaque build : un produit
 ajouté à `src/data/products.js` s'y retrouve sans intervention.
+
+## Mise en production
+
+Le dépôt GitHub reste la source du site. Chaque push fusionné dans `main`
+déclenche `.github/workflows/deploy.yml` : installation reproductible,
+lint strict, build Vite, puis synchronisation FTPS chiffrée avec un compte
+dédié au seul répertoire du site sur Bluehost.
+
+La configuration unique du domaine, de l'accès FTPS et des paramètres GitHub est
+décrite dans [DEPLOIEMENT.md](DEPLOIEMENT.md). Aucun identifiant Bluehost ne
+doit être ajouté au dépôt.
 
 ### Optimisation des images
 

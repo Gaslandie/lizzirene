@@ -434,10 +434,35 @@ l'hôte, le port, le chemin et la méthode de transfert.
 
 Hébergement public retenu : **Bluehost**.
 
-GitHub reste le dépôt source et le déclencheur du déploiement automatique. La méthode cible est un workflow GitHub Actions qui exécute `npm ci`, `npm run lint`, `npm run build`, puis publie le contenu de `dist/` vers le répertoire web Bluehost de `lizzirenedeco.com`, probablement par SFTP/SSH selon les accès disponibles.
+GitHub reste le dépôt source et le déclencheur du déploiement automatique. La
+méthode finalement retenue est **FTPS explicite avec un compte FTP dédié et
+cantonné au Document Root de Lizzirene Déco**. Ce choix a été confirmé par une
+connexion réelle sur le port 21 : TLS fonctionne et la racine distante ne
+contient que `.well-known/`, `cgi-bin/` et `.ftpquota`. L'échec de SFTP du
+compte secondaire n'est donc pas bloquant. Le workflow exécute `npm ci`, un
+lint strict et le build, puis publie `dist/` dans la racine de ce compte.
 
-À confirmer par Claude Code avant implémentation : la meilleure méthode de transfert Bluehost sur ce forfait, les secrets GitHub nécessaires, la règle `.htaccess` exacte pour les routes React, et la stratégie de retour arrière.
+La cible est protégée par un marqueur `.deploy-target-ok`. TLS est obligatoire
+pour le contrôle et les données, le certificat et son nom d'hôte sont vérifiés,
+le mot de passe est limité à l'environnement GitHub `production` et seuls les
+commits déjà fusionnés dans `main` peuvent être redéployés.
 
 ## Implémentation et vérifications
 
-Non commencées. Aucune modification DNS, GitHub ou Bluehost n'a été effectuée pendant cette phase de discussion.
+Préparation locale effectuée le 2026-08-02 :
+
+- URL canonique, métadonnées sociales, données structurées, robots et sitemap
+  passés sur `https://lizzirenedeco.com` ;
+- base Vite passée à `/` et ancien fallback GitHub Pages retiré ;
+- `.htaccess` ajouté pour HTTPS, redirection sans `www`, routes React,
+  compression et cache ;
+- workflow GitHub Pages remplacé localement par le build et déploiement FTPS
+  Bluehost sécurisé ;
+- procédure unique documentée dans `DEPLOIEMENT.md` ;
+- lint strict et build de production validés localement.
+
+L'audit public du même jour montre encore des pages de parking : le domaine ne
+sert pas encore le site et `www` n'a pas encore de certificat valide. Restent
+donc les opérations de compte : créer le marqueur distant, enregistrer les
+variables et le secret FTPS dans GitHub, pousser les changements puis vérifier
+DNS et HTTPS.

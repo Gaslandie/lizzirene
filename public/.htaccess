@@ -1,0 +1,57 @@
+DirectoryIndex index.html
+
+<IfModule mod_negotiation.c>
+  Options -MultiViews
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Bluehost peut renouveler le certificat via un challenge HTTP.
+  RewriteRule ^\.well-known/acme-challenge/ - [L]
+
+  # Une seule adresse publique : HTTPS, sans www.
+  RewriteCond %{HTTPS} !=on [OR]
+  RewriteCond %{HTTP_HOST} !^lizzirenedeco\.com$ [NC]
+  RewriteRule ^ https://lizzirenedeco.com%{REQUEST_URI} [R=301,L,NE]
+
+  # Les vrais fichiers sont servis directement ; les routes React reçoivent
+  # index.html afin de rester accessibles après un rafraîchissement.
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  # index.html doit toujours être revalidé après un déploiement.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+
+  # Vite donne un nom haché aux fichiers JS et CSS.
+  <FilesMatch "\.(?:js|css|woff|woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Les images publiques gardent un nom stable et doivent pouvoir évoluer.
+  <FilesMatch "\.(?:webp|avif|jpe?g|png|svg)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript
+  AddOutputFilterByType DEFLATE application/javascript application/json image/svg+xml
+</IfModule>
+
+# Le marqueur de déploiement et les autres fichiers cachés ne sont jamais publics.
+<IfModule mod_authz_core.c>
+  <FilesMatch "^\.">
+    Require all denied
+  </FilesMatch>
+</IfModule>

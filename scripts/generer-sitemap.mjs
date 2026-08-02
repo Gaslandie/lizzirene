@@ -6,9 +6,9 @@ import { dirname, resolve } from 'node:path'
 // Écrit à la main, ce fichier oublierait chaque nouveau produit ; généré
 // avant chaque build, il ne peut plus mentir.
 //
-// À changer en même temps que `base` (vite.config.js) et `SITE`
-// (src/utils/donneesStructurees.js) le jour du nom de domaine définitif.
-const SITE = 'https://gaslandie.github.io/lizzirene/'
+// Domaine canonique public. Cette valeur reste alignée avec `SITE` dans
+// src/utils/donneesStructurees.js et la balise canonical de index.html.
+const SITE = 'https://lizzirenedeco.com/'
 
 const racine = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 

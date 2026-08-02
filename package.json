@@ -8,8 +8,8 @@
     "optimize:images": "node scripts/optimize-images.mjs",
     "sitemap": "node scripts/generer-sitemap.mjs",
     "prebuild": "npm run optimize:images && npm run sitemap",
-    "build": "vite build && cp dist/index.html dist/404.html",
-    "lint": "oxlint",
+    "build": "vite build",
+    "lint": "oxlint --deny-warnings",
     "preview": "vite preview"
   },
   "dependencies": {
