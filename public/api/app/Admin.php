@@ -194,7 +194,7 @@ final class Admin
         }
 
         $extension = $extensions[$mime];
-        $filename = $product['id'] . '-' . bin2hex(random_bytes(10)) . '.' . $extension;
+        $filename = $id . '-' . bin2hex(random_bytes(10)) . '.' . $extension;
         $destination = rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $filename;
         $part = $destination . '.part';
         [$outputWidth, $outputHeight] = $this->reencodeImage($temporary, $mime, $part);
