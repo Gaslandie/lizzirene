@@ -652,6 +652,7 @@ final class Orders
             'version' => (int) $order['version'],
             'createdAt' => (string) $order['created_at'],
             'updatedAt' => (string) $order['updated_at'],
+            'linkedToAccount' => $order['user_id'] !== null,
         ];
 
         $message = $this->whatsAppMessage($response);
