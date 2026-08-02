@@ -130,9 +130,6 @@ jobs:
 
           lftp \
             --norc \
-            --user "$BLUEHOST_FTP_USER" \
-            --env-password \
-            -p 21 \
             -e "
               set cmd:fail-exit yes;
               set dns:name/ftp.bluehost.com $BLUEHOST_FTP_IP;
@@ -148,10 +145,10 @@ jobs:
               set ssl:use-sni yes;
               set ssl:verify-certificate yes;
               set ssl:check-hostname yes;
+              open --user '$BLUEHOST_FTP_USER' --env-password -p 21 ftp://ftp.bluehost.com;
               get .deploy-target-ok -o $marqueur;
               bye
-            " \
-            'ftp://ftp.bluehost.com'
+            "
 
           grep -Fxq 'lizzirenedeco.com' "$marqueur"
 
@@ -165,9 +162,6 @@ jobs:
           set -Eeuo pipefail
           lftp \
             --norc \
-            --user "$BLUEHOST_FTP_USER" \
-            --env-password \
-            -p 21 \
             -e "
               set cmd:fail-exit yes;
               set dns:name/ftp.bluehost.com $BLUEHOST_FTP_IP;
@@ -184,6 +178,7 @@ jobs:
               set ssl:verify-certificate yes;
               set ssl:check-hostname yes;
               set xfer:use-temp-file yes;
+              open --user '$BLUEHOST_FTP_USER' --env-password -p 21 ftp://ftp.bluehost.com;
               mirror \
                 --reverse \
                 --delete \
@@ -199,8 +194,7 @@ jobs:
                 '$GITHUB_WORKSPACE/dist/' \
                 /;
               bye
-            " \
-            'ftp://ftp.bluehost.com'
+            "
 
       - name: Vérifier les fichiers publiés
         shell: bash
@@ -215,9 +209,6 @@ jobs:
 
           lftp \
             --norc \
-            --user "$BLUEHOST_FTP_USER" \
-            --env-password \
-            -p 21 \
             -e "
               set cmd:fail-exit yes;
               set dns:name/ftp.bluehost.com $BLUEHOST_FTP_IP;
@@ -233,12 +224,12 @@ jobs:
               set ssl:use-sni yes;
               set ssl:verify-certificate yes;
               set ssl:check-hostname yes;
+              open --user '$BLUEHOST_FTP_USER' --env-password -p 21 ftp://ftp.bluehost.com;
               get index.html -o $verification/index.html;
               get .htaccess -o $verification/htaccess;
               get .deploy-target-ok -o $verification/deploy-target-ok;
               bye
-            " \
-            'ftp://ftp.bluehost.com'
+            "
 
           test -s "$verification/index.html"
           test -s "$verification/htaccess"
