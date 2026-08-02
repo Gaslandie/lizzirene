@@ -1,0 +1,26 @@
+Options -Indexes
+DirectoryIndex disabled
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Le code interne, les migrations et les exemples de configuration ne
+  # doivent jamais être servis directement par Apache.
+  RewriteRule ^(?:app|database)(?:/|$) - [F,L,NC]
+  RewriteRule ^config(?:\.|$) - [F,L,NC]
+
+  RewriteRule ^index\.php$ - [L]
+  RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+<IfModule mod_authz_core.c>
+  <FilesMatch "^(?:config.*|.*\.(?:sql|json|log|ini|env))$">
+    Require all denied
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "no-referrer"
+</IfModule>

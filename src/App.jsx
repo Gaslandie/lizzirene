@@ -1,18 +1,30 @@
 import { useEffect } from 'react'
-import { CartProvider } from './context/CartContext.jsx'
+import { useProducts } from './context/ProductsContext.jsx'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
 import WhatsAppFab from './components/WhatsAppFab.jsx'
 import CartDrawer from './components/CartDrawer.jsx'
 import Accueil from './pages/Accueil.jsx'
 import PageContact from './pages/Contact.jsx'
+import Confidentialite from './pages/Confidentialite.jsx'
 import Produits from './pages/Produits.jsx'
 import Services from './pages/Services.jsx'
 import APropos from './pages/APropos.jsx'
 import Produit from './pages/Produit.jsx'
 import Introuvable from './pages/Introuvable.jsx'
+import Connexion from './pages/Connexion.jsx'
+import Inscription from './pages/Inscription.jsx'
+import Compte from './pages/Compte.jsx'
+import CommandeClient from './pages/CommandeClient.jsx'
+import AdminLayout from './components/admin/AdminLayout.jsx'
+import InstallationAdmin from './pages/admin/InstallationAdmin.jsx'
+import TableauDeBord from './pages/admin/TableauDeBord.jsx'
+import ProduitsAdmin from './pages/admin/ProduitsAdmin.jsx'
+import ProduitAdminForm from './pages/admin/ProduitAdminForm.jsx'
+import CommandesAdmin from './pages/admin/CommandesAdmin.jsx'
+import CommandeAdmin from './pages/admin/CommandeAdmin.jsx'
+import NouvelleCommandeAdmin from './pages/admin/NouvelleCommandeAdmin.jsx'
 import { useRouter } from './hooks/useRouter.js'
-import { trouverProduit } from './data/products.js'
 import {
   appliquerDonneesStructurees,
   SITE,
@@ -52,6 +64,58 @@ const METADONNEES = {
     description:
       'Contactez Lizzirene Déco à Kipé pour une commande, une livraison à Conakry ou un projet de décoration.',
   },
+  confidentialite: {
+    title: 'Politique de confidentialité — Lizzirene Déco',
+    description: 'Utilisation et protection des données sur Lizzirene Déco.',
+  },
+  connexion: {
+    title: 'Connexion — Lizzirene Déco',
+    description: 'Connectez-vous à votre espace client Lizzirene Déco.',
+  },
+  inscription: {
+    title: 'Créer mon compte — Lizzirene Déco',
+    description: 'Créez votre espace client Lizzirene Déco.',
+  },
+  compte: {
+    title: 'Mon espace — Lizzirene Déco',
+    description: 'Consultez vos commandes et vos informations de livraison.',
+  },
+  'compte-commande': {
+    title: 'Suivi de commande — Lizzirene Déco',
+    description: 'Suivez votre commande Lizzirene Déco.',
+  },
+  admin: {
+    title: 'Administration — Lizzirene Déco',
+    description: 'Administration privée Lizzirene Déco.',
+  },
+  'admin-installation': {
+    title: 'Installation de l’administration — Lizzirene Déco',
+    description: 'Installation privée Lizzirene Déco.',
+  },
+  'admin-produits': {
+    title: 'Produits — Administration Lizzirene Déco',
+    description: 'Gestion privée du catalogue.',
+  },
+  'admin-produit': {
+    title: 'Modifier un produit — Administration Lizzirene Déco',
+    description: 'Gestion privée du catalogue.',
+  },
+  'admin-produit-nouveau': {
+    title: 'Nouveau produit — Administration Lizzirene Déco',
+    description: 'Gestion privée du catalogue.',
+  },
+  'admin-commandes': {
+    title: 'Commandes — Administration Lizzirene Déco',
+    description: 'Gestion privée des commandes.',
+  },
+  'admin-commande': {
+    title: 'Détail commande — Administration Lizzirene Déco',
+    description: 'Gestion privée des commandes.',
+  },
+  'admin-commande-nouvelle': {
+    title: 'Nouvelle commande WhatsApp — Administration Lizzirene Déco',
+    description: 'Enregistrement privé d’une commande reçue hors du panier.',
+  },
   introuvable: {
     title: 'Page introuvable — Lizzirene Déco',
     description: "Cette page n'existe pas ou n'est plus disponible.",
@@ -64,14 +128,20 @@ function App() {
     categorie,
     theme,
     produitId,
+    commandeReference,
+    adminProduitId,
     aller,
     choisirCategorie,
     choisirTheme,
     allerProduit,
   } = useRouter()
+  const { products } = useProducts()
 
   useEffect(() => {
-    const produit = page === 'produit' ? trouverProduit(produitId) : null
+    const produit =
+      page === 'produit'
+        ? products.find((item) => item.id === produitId)
+        : null
     const meta = produit
       ? {
           title: `${produit.name} — Lizzirene Déco`,
@@ -112,7 +182,15 @@ function App() {
     // Ce que les moteurs lisent en plus du texte : boutique, horaires, zone
     // desservie, questions fréquentes, fiche produit et fil d'Ariane.
     appliquerDonneesStructurees({ page, produit, categorie })
-  }, [page, produitId, categorie, theme])
+    document
+      .querySelector('meta[name="robots"]')
+      ?.setAttribute(
+        'content',
+        page.startsWith('admin') || ['connexion', 'inscription', 'compte', 'compte-commande'].includes(page)
+          ? 'noindex, nofollow'
+          : 'index, follow',
+      )
+  }, [page, produitId, categorie, theme, products])
 
   let contenu
   if (page === 'accueil') {
@@ -153,12 +231,56 @@ function App() {
     )
   } else if (page === 'contact') {
     contenu = <PageContact />
+  } else if (page === 'confidentialite') {
+    contenu = <Confidentialite />
+  } else if (page === 'connexion') {
+    contenu = <Connexion onAller={aller} />
+  } else if (page === 'inscription') {
+    contenu = <Inscription onAller={aller} />
+  } else if (page === 'compte') {
+    contenu = <Compte onAller={aller} />
+  } else if (page === 'compte-commande') {
+    contenu = (
+      <CommandeClient reference={commandeReference} onAller={aller} />
+    )
+  } else if (page === 'admin') {
+    contenu = <TableauDeBord onAller={aller} />
+  } else if (page === 'admin-installation') {
+    contenu = <InstallationAdmin onAller={aller} />
+  } else if (page === 'admin-produits') {
+    contenu = <ProduitsAdmin onAller={aller} />
+  } else if (page === 'admin-produit-nouveau') {
+    contenu = <ProduitAdminForm onAller={aller} />
+  } else if (page === 'admin-produit') {
+    contenu = (
+      <ProduitAdminForm productId={adminProduitId} onAller={aller} />
+    )
+  } else if (page === 'admin-commandes') {
+    contenu = <CommandesAdmin onAller={aller} />
+  } else if (page === 'admin-commande-nouvelle') {
+    contenu = <NouvelleCommandeAdmin onAller={aller} />
+  } else if (page === 'admin-commande') {
+    contenu = (
+      <CommandeAdmin reference={commandeReference} onAller={aller} />
+    )
   } else {
     contenu = <Introuvable onAller={aller} />
   }
 
+  if (page.startsWith('admin')) {
+    return (
+      <AdminLayout
+        page={page}
+        onAller={aller}
+        allowInstallation={page === 'admin-installation'}
+      >
+        {contenu}
+      </AdminLayout>
+    )
+  }
+
   return (
-    <CartProvider>
+    <>
       <Navbar
         page={page}
         categorie={categorie}
@@ -174,8 +296,8 @@ function App() {
         onTheme={choisirTheme}
       />
       <WhatsAppFab />
-      <CartDrawer />
-    </CartProvider>
+      <CartDrawer onAller={aller} />
+    </>
   )
 }
 

@@ -8,9 +8,8 @@ import { useCart } from '../context/CartContext.jsx'
 import {
   LIBELLES_CATEGORIES_PRODUITS,
   normaliserCategorie,
-  produitsPourCategorie,
-  trouverProduit,
 } from '../data/products.js'
+import { useProducts } from '../context/ProductsContext.jsx'
 import { formatPrice, waLink } from '../config.js'
 import {
   intercepterNavigation,
@@ -21,13 +20,17 @@ import Introuvable from './Introuvable.jsx'
 
 function Produit({ produitId, onAller, onCategorie, onProduit }) {
   const { add } = useCart()
-  const produit = trouverProduit(produitId)
+  const { findProduct, productsForCategory, loading } = useProducts()
+  const produit = findProduct(produitId)
 
+  if (!produit && loading) {
+    return <div className="page-state">Chargement du produit…</div>
+  }
   if (!produit) return <Introuvable produit onAller={onAller} />
 
   const famille = normaliserCategorie(produit.category)
   const libelleCategorie = LIBELLES_CATEGORIES_PRODUITS[produit.category]
-  const produitsApparentes = produitsPourCategorie(famille)
+  const produitsApparentes = productsForCategory(famille)
     .filter((item) => item.id !== produit.id)
     .slice(0, 3)
 
@@ -89,7 +92,7 @@ function Produit({ produitId, onAller, onCategorie, onProduit }) {
                 <h1 tabIndex={-1}>{produit.name}</h1>
                 <p className="product-detail-description">{produit.desc}</p>
                 <div className="product-detail-price">
-                  {produit.price != null ? (
+                  {produit.price != null && produit.availability !== 'out_of_stock' ? (
                     <>
                       {produit.prixPrefixe && (
                         <small>{produit.prixPrefixe}</small>
@@ -97,12 +100,14 @@ function Produit({ produitId, onAller, onCategorie, onProduit }) {
                       <span>{formatPrice(produit.price)}</span>
                     </>
                   ) : (
-                    produit.priceLabel || 'Prix sur devis'
+                    produit.availability === 'out_of_stock'
+                      ? 'Indisponible'
+                      : produit.priceLabel || 'Prix sur devis'
                   )}
                 </div>
 
                 <div className="product-detail-actions">
-                  {produit.price != null ? (
+                  {produit.price != null && produit.availability !== 'out_of_stock' ? (
                     <button
                       className="btn btn-primary"
                       onClick={() => add(produit)}
@@ -120,7 +125,9 @@ function Produit({ produitId, onAller, onCategorie, onProduit }) {
                       rel="noreferrer"
                     >
                       <Icon name="whatsapp" size={19} />
-                      {produit.priceLabel
+                      {produit.availability === 'out_of_stock'
+                        ? 'Nous contacter'
+                        : produit.priceLabel
                         ? 'Demander le prix'
                         : 'Demander un devis'}
                     </a>

@@ -5,10 +5,25 @@ import {
   BASE,
   urlAccueil,
   urlContact,
+  urlConfidentialite,
   urlProduit,
   urlProduits,
   urlServices,
   urlAPropos,
+  urlAdmin,
+  urlAdminCommande,
+  urlAdminCommandes,
+  urlAdminInstallation,
+  urlAdminNouvelleCommande,
+  urlAdminNouveauProduit,
+  urlAdminProduit,
+  urlAdminProduits,
+  urlCompte,
+  urlCompteCommande,
+  urlConnexion,
+  urlInscription,
+  effacerClaimToken,
+  memoriserClaimToken,
 } from '../utils/navigation.js'
 
 const cheminRelatif = () => {
@@ -43,87 +58,143 @@ const lireEtat = () => {
     segments.length === 0 &&
     (categorieDemandee !== null || window.location.hash === '#boutique')
 
+  const base = {
+    categorie,
+    theme,
+    produitId: null,
+    commandeReference: null,
+    adminProduitId: null,
+    ancienneUrl: false,
+  }
+
   if (ancienneUrl) {
-    return { page: 'produits', categorie, theme: 'tous', produitId: null, ancienneUrl: true }
+    return { ...base, page: 'produits', theme: 'tous', ancienneUrl: true }
   }
 
   if (relatif === null) {
-    return {
-      page: 'introuvable',
-      categorie: 'tous',
-      theme: 'tous',
-      produitId: null,
-      ancienneUrl: false,
-    }
+    return { ...base, page: 'introuvable', categorie: 'tous', theme: 'tous' }
   }
 
   if (segments.length === 0) {
-    return {
-      page: 'accueil',
-      categorie: 'tous',
-      theme: 'tous',
-      produitId: null,
-      ancienneUrl: false,
-    }
+    return { ...base, page: 'accueil', categorie: 'tous', theme: 'tous' }
   }
 
   if (segments.length === 1 && segments[0] === 'contact') {
-    return {
-      page: 'contact',
-      categorie: 'tous',
-      theme: 'tous',
-      produitId: null,
-      ancienneUrl: false,
-    }
+    return { ...base, page: 'contact', categorie: 'tous', theme: 'tous' }
+  }
+
+  if (segments.length === 1 && segments[0] === 'confidentialite') {
+    return { ...base, page: 'confidentialite', categorie: 'tous', theme: 'tous' }
   }
 
   if (segments[0] === 'produits' && segments.length === 1) {
-    return {
-      page: 'produits',
-      categorie,
-      theme: 'tous',
-      produitId: null,
-      ancienneUrl: false,
-    }
+    return { ...base, page: 'produits', theme: 'tous' }
   }
 
   if (segments[0] === 'produits' && segments.length === 2) {
     return {
+      ...base,
       page: 'produit',
       categorie: 'tous',
       theme: 'tous',
       produitId: decoder(segments[1]),
-      ancienneUrl: false,
     }
   }
 
   if (segments.length === 1 && segments[0] === 'a-propos') {
-    return {
-      page: 'apropos',
-      categorie: 'tous',
-      theme: 'tous',
-      produitId: null,
-      ancienneUrl: false,
-    }
+    return { ...base, page: 'apropos', categorie: 'tous', theme: 'tous' }
   }
 
   if (segments.length === 1 && segments[0] === 'services') {
+    return { ...base, page: 'services', categorie: 'tous' }
+  }
+
+  if (segments.length === 1 && segments[0] === 'connexion') {
+    return { ...base, page: 'connexion', categorie: 'tous', theme: 'tous' }
+  }
+
+  if (segments.length === 1 && segments[0] === 'inscription') {
+    return { ...base, page: 'inscription', categorie: 'tous', theme: 'tous' }
+  }
+
+  if (segments.length === 1 && segments[0] === 'mon-compte') {
+    return { ...base, page: 'compte', categorie: 'tous', theme: 'tous' }
+  }
+
+  if (
+    segments.length === 3 &&
+    segments[0] === 'mon-compte' &&
+    segments[1] === 'commandes'
+  ) {
     return {
-      page: 'services',
+      ...base,
+      page: 'compte-commande',
       categorie: 'tous',
-      theme,
-      produitId: null,
-      ancienneUrl: false,
+      theme: 'tous',
+      commandeReference: decoder(segments[2]),
     }
   }
 
-  return {
-    page: 'introuvable',
-    categorie: 'tous',
-    theme: 'tous',
-    produitId: null,
-    ancienneUrl: false,
+  if (segments.length === 1 && segments[0] === 'admin') {
+    return { ...base, page: 'admin', categorie: 'tous', theme: 'tous' }
   }
+
+  if (segments.length === 2 && segments.join('/') === 'admin/installation') {
+    return {
+      ...base,
+      page: 'admin-installation',
+      categorie: 'tous',
+      theme: 'tous',
+    }
+  }
+
+  if (segments.length === 2 && segments.join('/') === 'admin/produits') {
+    return { ...base, page: 'admin-produits', categorie: 'tous', theme: 'tous' }
+  }
+
+  if (segments.length === 3 && segments.join('/') === 'admin/produits/nouveau') {
+    return {
+      ...base,
+      page: 'admin-produit-nouveau',
+      categorie: 'tous',
+      theme: 'tous',
+    }
+  }
+
+  if (segments.length === 3 && segments[0] === 'admin' && segments[1] === 'produits') {
+    return {
+      ...base,
+      page: 'admin-produit',
+      categorie: 'tous',
+      theme: 'tous',
+      adminProduitId: decoder(segments[2]),
+    }
+  }
+
+  if (segments.length === 2 && segments.join('/') === 'admin/commandes') {
+    return { ...base, page: 'admin-commandes', categorie: 'tous', theme: 'tous' }
+  }
+
+  if (segments.length === 3 && segments.join('/') === 'admin/commandes/nouvelle') {
+    return {
+      ...base,
+      page: 'admin-commande-nouvelle',
+      categorie: 'tous',
+      theme: 'tous',
+    }
+  }
+
+  if (segments.length === 3 && segments[0] === 'admin' && segments[1] === 'commandes') {
+    return {
+      ...base,
+      page: 'admin-commande',
+      categorie: 'tous',
+      theme: 'tous',
+      commandeReference: decoder(segments[2]),
+    }
+  }
+
+  return { ...base, page: 'introuvable', categorie: 'tous', theme: 'tous' }
 }
 
 const defilerVers = (ancre, essais = 12) => {
@@ -187,12 +258,29 @@ export function useRouter() {
   }, [])
 
   const aller = useCallback(
-    (page, { ancre } = {}) => {
+    (page, { ancre, id, reference, claimToken, returnTo } = {}) => {
+      if (page === 'connexion' || page === 'inscription') {
+        if (claimToken) memoriserClaimToken(claimToken, reference)
+        else if (returnTo === 'commande') effacerClaimToken()
+      }
       let href = urlAccueil(ancre)
       if (page === 'produits') href = urlProduits()
       if (page === 'services') href = urlServices()
       if (page === 'apropos') href = urlAPropos()
       if (page === 'contact') href = urlContact()
+      if (page === 'confidentialite') href = urlConfidentialite()
+      if (page === 'connexion') href = urlConnexion({ claimToken, returnTo })
+      if (page === 'inscription') href = urlInscription({ returnTo })
+      if (page === 'compte') href = urlCompte()
+      if (page === 'compte-commande') href = urlCompteCommande(reference)
+      if (page === 'admin') href = urlAdmin()
+      if (page === 'admin-installation') href = urlAdminInstallation()
+      if (page === 'admin-produits') href = urlAdminProduits()
+      if (page === 'admin-produit-nouveau') href = urlAdminNouveauProduit()
+      if (page === 'admin-produit') href = urlAdminProduit(id)
+      if (page === 'admin-commandes') href = urlAdminCommandes()
+      if (page === 'admin-commande-nouvelle') href = urlAdminNouvelleCommande()
+      if (page === 'admin-commande') href = urlAdminCommande(reference)
 
       window.history.pushState({}, '', href)
       finaliserNavigation({ ancre })

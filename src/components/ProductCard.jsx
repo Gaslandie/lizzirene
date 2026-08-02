@@ -9,6 +9,7 @@ function ProductCard({ produit, onProduit, headingLevel = 'h3' }) {
   const { add } = useCart()
   const categorie = LIBELLES_CATEGORIES_PRODUITS[produit.category]
   const Heading = headingLevel
+  const indisponible = produit.availability === 'out_of_stock'
 
   const ouvrirProduit = (event) => {
     if (!intercepterNavigation(event)) return
@@ -55,7 +56,7 @@ function ProductCard({ produit, onProduit, headingLevel = 'h3' }) {
       <div
         className={`product-foot ${produit.price == null ? 'product-foot-devis' : ''}`}
       >
-        {produit.price != null ? (
+        {produit.price != null && !indisponible ? (
           <>
             <div className="price-stack">
               {produit.prixPrefixe && (
@@ -75,7 +76,7 @@ function ProductCard({ produit, onProduit, headingLevel = 'h3' }) {
         ) : (
           <>
             <span className="price price-devis">
-              {produit.priceLabel || 'Sur devis'}
+              {indisponible ? 'Indisponible' : produit.priceLabel || 'Sur devis'}
             </span>
             <a
               className="btn btn-whatsapp add-btn"
@@ -87,7 +88,11 @@ function ProductCard({ produit, onProduit, headingLevel = 'h3' }) {
               aria-label={`Demander un devis pour ${produit.name} sur WhatsApp`}
             >
               <Icon name="whatsapp" size={17} />
-              {produit.priceLabel ? 'Demander le prix' : 'Demander'}
+              {indisponible
+                ? 'Nous contacter'
+                : produit.priceLabel
+                  ? 'Demander le prix'
+                  : 'Demander'}
             </a>
           </>
         )}

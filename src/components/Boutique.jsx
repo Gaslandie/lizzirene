@@ -6,11 +6,10 @@ import FlowerAvailability from './FlowerAvailability.jsx'
 import {
   CATEGORIES,
   LIBELLES_CATEGORIES_PRODUITS,
-  PRODUCTS,
   SOUS_CATEGORIES_FLEURS,
   normaliserCategorie,
-  produitsPourCategorie,
 } from '../data/products.js'
+import { useProducts } from '../context/ProductsContext.jsx'
 import { waLink } from '../config.js'
 
 // Ordre d'affichage : produits photographiés d'abord — les visuels
@@ -79,6 +78,7 @@ function GrilleProduits({ produits, onProduit, headingLevel = 'h3' }) {
 }
 
 function Boutique({ categorie = 'tous', onCategorie, onProduit }) {
+  const { products, productsForCategory, source, error } = useProducts()
   const [recherche, setRecherche] = useState('')
   const [budget, setBudget] = useState('tous')
   const [tri, setTri] = useState('reco')
@@ -116,11 +116,11 @@ function Boutique({ categorie = 'tous', onCategorie, onProduit }) {
 
   const preparer = (produits) => trier(produits.filter(correspond))
 
-  const produitsVisibles = preparer(produitsPourCategorie(categorieActive))
+  const produitsVisibles = preparer(productsForCategory(categorieActive))
   const groupesFleurs = SOUS_CATEGORIES_FLEURS.map((groupe) => ({
     ...groupe,
     produits: preparer(
-      PRODUCTS.filter((produit) => produit.category === groupe.id),
+      products.filter((produit) => produit.category === groupe.id),
     ),
   }))
 
@@ -153,6 +153,12 @@ function Boutique({ categorie = 'tous', onCategorie, onProduit }) {
   return (
     <section className="boutique catalogue" id="catalogue" tabIndex={-1}>
       <div className="container">
+        {source === 'static' && error && (
+          <p className="catalogue-offline form-alert form-alert-warning" role="status">
+            Le catalogue en direct est momentanément indisponible. Les produits
+            restent visibles, mais prix et disponibilités seront confirmés sur WhatsApp.
+          </p>
+        )}
         {/* Filtres à gauche, compteur à droite : une barre d'outils,
             pas une section de plus. */}
         <div className="catalogue-barre">

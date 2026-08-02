@@ -1,6 +1,12 @@
 // Jeu d'icônes maison : traits fins, style épuré, une seule source pour tout le site.
 // Usage : <Icon name="bag" size={22} />
 const OUTLINE = {
+  user: (
+    <>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4.5 21a7.5 7.5 0 0 1 15 0" />
+    </>
+  ),
   bag: (
     <>
       <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />

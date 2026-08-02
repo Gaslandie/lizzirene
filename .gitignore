@@ -9,6 +9,9 @@ lerna-debug.log*
 
 node_modules
 dist
+public/api/config.local.php
+public/uploads/products/*
+!public/uploads/products/.gitkeep
 dist-ssr
 *.local
 .vercel

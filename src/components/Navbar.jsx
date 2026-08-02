@@ -3,6 +3,7 @@ import Icon from './Icon.jsx'
 import MenuDeroulant from './MenuDeroulant.jsx'
 import { CONTACT, PHOTOS, waLink } from '../config.js'
 import { useCart } from '../context/CartContext.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 import { FAMILLES } from '../data/products.js'
 import { FAMILLES_SERVICES } from '../data/services.js'
 import {
@@ -12,6 +13,9 @@ import {
   urlProduits,
   urlServices,
   urlAPropos,
+  urlAdmin,
+  urlCompte,
+  urlConnexion,
 } from '../utils/navigation.js'
 
 // Entrées des deux panneaux déroulants, construites depuis la source de
@@ -47,6 +51,9 @@ function Navbar({
   const [open, setOpen] = useState(false)
   const burgerRef = useRef(null)
   const { count, setOpen: openCart } = useCart()
+  const { user } = useAuth()
+  const accountPage = user?.role === 'admin' ? 'admin' : user ? 'compte' : 'connexion'
+  const accountUrl = user?.role === 'admin' ? urlAdmin() : user ? urlCompte() : urlConnexion()
 
   useEffect(() => {
     if (!open) return undefined
@@ -177,6 +184,18 @@ function Navbar({
           </nav>
 
           <div className="nav-cta">
+            <a
+              className="account-btn"
+              href={accountUrl}
+              onClick={(event) =>
+                allerPage(event, accountPage)
+              }
+              aria-label={user?.role === 'admin' ? 'Ouvrir l’administration' : user ? `Ouvrir le compte de ${user.name}` : 'Se connecter ou créer un compte'}
+              title={user?.role === 'admin' ? 'Administration' : user ? 'Mon espace' : 'Compte client'}
+            >
+              <Icon name="user" size={21} />
+              <span>{user?.role === 'admin' ? 'Admin' : user ? user.name.split(' ')[0] : 'Compte'}</span>
+            </a>
             <button
               className="cart-btn"
               onClick={() => openCart(true)}
