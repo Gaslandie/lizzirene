@@ -56,6 +56,7 @@ const entrees = [
   url('services', '0.8'),
   url('a-propos', '0.6'),
   url('contact', '0.7'),
+  url('confidentialite', '0.3'),
   ...familles.map((id) => url(`produits?categorie=${id}`, '0.7')),
   ...produits.map((id) => url(`produits/${id}`, '0.6')),
 ]

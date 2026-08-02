@@ -3,7 +3,9 @@ import Media from './Media.jsx'
 import Icon from './Icon.jsx'
 import { SuggestionsPanier } from './SeMarieBienAvec.jsx'
 import { useCart } from '../context/CartContext.jsx'
+import { useAuth } from '../context/AuthContext.jsx'
 import { CONTACT, ZONES, formatPrice, waLink } from '../config.js'
+import { apiRequest } from '../services/api.js'
 
 const FOCUSABLE_SELECTOR = [
   'a[href]',
@@ -14,7 +16,18 @@ const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(',')
 
-function CartDrawer() {
+const dateIsoConakry = () => {
+  const parts = new Intl.DateTimeFormat('fr-FR', {
+    timeZone: 'Africa/Conakry',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(new Date())
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]))
+  return `${values.year}-${values.month}-${values.day}`
+}
+
+function CartDrawer({ onAller }) {
   const {
     items,
     setQty,
@@ -26,21 +39,53 @@ function CartDrawer() {
     total,
     totalMinimum,
   } = useCart()
-  const [step, setStep] = useState('panier') // panier | commande | confirme
+  const { user } = useAuth()
+  const [step, setStep] = useState('panier') // panier | choix | commande | confirme
   const [order, setOrder] = useState(null)
+  const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [deliveryMode, setDeliveryMode] = useState('delivery')
+  const [differentRecipient, setDifferentRecipient] = useState(false)
   const [copie, setCopie] = useState(false)
   const copieTimerRef = useRef(null)
   const drawerRef = useRef(null)
   const closeButtonRef = useRef(null)
   const triggerRef = useRef(null)
   const closeTimerRef = useRef(null)
+  const idempotencyRef = useRef(null)
+  const submittingRef = useRef(false)
 
-  const close = useCallback(() => {
+  const close = useCallback((options = {}) => {
+    if (submittingRef.current) return
+    const resetConfirmation = options?.reset === true
     setOpen(false)
+    if (resetConfirmation || step !== 'confirme') {
+      idempotencyRef.current = null
+    }
     // Laisse l'animation se terminer avant de revenir au panier.
     clearTimeout(closeTimerRef.current)
-    closeTimerRef.current = setTimeout(() => setStep('panier'), 300)
-  }, [setOpen])
+    closeTimerRef.current = setTimeout(() => {
+      if (resetConfirmation || step !== 'confirme') {
+        setStep('panier')
+        setOrder(null)
+        setError('')
+        setCopie(false)
+        setDifferentRecipient(false)
+        setDeliveryMode('delivery')
+      }
+    }, 300)
+  }, [setOpen, step])
+
+  // Un rattachement réussi vide le panier depuis la page de connexion. Dans
+  // ce cas, retirer aussi la confirmation conservée dans le tiroir.
+  useEffect(() => {
+    if (open || items.length > 0 || !order) return
+    idempotencyRef.current = null
+    setStep('panier')
+    setOrder(null)
+    setError('')
+    setCopie(false)
+  }, [items.length, open, order])
 
   useEffect(
     () => () => {
@@ -53,7 +98,6 @@ function CartDrawer() {
   useEffect(() => {
     if (!open) return undefined
 
-    clearTimeout(closeTimerRef.current)
     triggerRef.current = document.querySelector('.cart-btn')
     const focusFrame = window.requestAnimationFrame(() => {
       closeButtonRef.current?.focus()
@@ -122,12 +166,13 @@ function CartDrawer() {
     return () => window.cancelAnimationFrame(focusFrame)
   }, [open, step])
 
-  const handleOrder = (e) => {
+  const handleOrder = async (e) => {
     e.preventDefault()
     const data = Object.fromEntries(new FormData(e.target))
+    setError('')
+    setSubmitting(true)
+    submittingRef.current = true
 
-    // Maquette : la commande part sur WhatsApp.
-    // Plus tard : POST /commandes vers l'API NestJS.
     const lignes = items
       .map(
         (i) =>
@@ -138,7 +183,7 @@ function CartDrawer() {
       .join('\n')
 
     const message = [
-      'Nouvelle commande — Lizzirene Déco',
+      'Nouvelle demande — Lizzirene Déco',
       '',
       lignes,
       '',
@@ -146,21 +191,96 @@ function CartDrawer() {
       totalMinimum
         ? 'Les produits marqués “à partir de” peuvent varier selon la composition finale.'
         : null,
-      'Paiement à la livraison',
       '',
       `Nom : ${data.nom}`,
       `Téléphone : ${data.telephone}`,
-      `Commune : ${data.zone}`,
-      `Adresse : ${data.adresse}`,
+      data.deliveryMode === 'pickup'
+        ? 'Retrait souhaité à la boutique de Kipé'
+        : `Commune : ${data.zone}`,
+      data.deliveryMode === 'delivery' ? `Quartier : ${data.quartier}` : null,
+      data.deliveryMode === 'delivery' ? `Adresse / repère : ${data.adresse}` : null,
       data.date ? `Livraison souhaitée : ${data.date}` : null,
-      data.note ? `Note : ${data.note}` : null,
+      data.destinataireNom ? `Destinataire : ${data.destinataireNom}` : null,
+      data.destinataireTelephone
+        ? `Téléphone destinataire : ${data.destinataireTelephone}`
+        : null,
+      data.messageCarte ? `Message carte : ${data.messageCarte}` : null,
+      data.note ? `Précision : ${data.note}` : null,
     ]
       .filter(Boolean)
       .join('\n')
 
-    setOrder({ nom: data.nom, link: waLink(message), message })
-    setCopie(false)
-    setStep('confirme')
+    if (!idempotencyRef.current) {
+      idempotencyRef.current =
+        globalThis.crypto?.randomUUID?.() ||
+        `checkout-${Date.now()}-${Math.random().toString(36).slice(2)}`
+    }
+
+    try {
+      const created = await apiRequest('/orders', {
+        method: 'POST',
+        headers: { 'Idempotency-Key': idempotencyRef.current },
+        body: {
+          name: data.nom,
+          phone: data.telephone,
+          email: data.email || null,
+          deliveryMode: data.deliveryMode,
+          commune: data.deliveryMode === 'delivery' ? data.zone : null,
+          quartier: data.deliveryMode === 'delivery' ? data.quartier : null,
+          addressLandmark:
+            data.deliveryMode === 'delivery' ? data.adresse : null,
+          desiredDate: data.date || null,
+          recipientName: data.destinataireNom || null,
+          recipientPhone: data.destinataireTelephone || null,
+          cardMessage: data.messageCarte || null,
+          note: data.note || null,
+          items: items.map((item) => ({ id: item.id, quantity: item.qty })),
+        },
+      })
+
+      setOrder({
+        ...created,
+        nom: created.customer.name,
+        link: created.whatsappUrl || waLink(created.whatsappMessage),
+        message: created.whatsappMessage,
+        offline: false,
+      })
+      setCopie(false)
+      setStep('confirme')
+    } catch (requestError) {
+      const fallbackAllowed =
+        requestError.status === 0 ||
+        requestError.status >= 500 ||
+        ['configuration_required', 'database_unavailable', 'invalid_response'].includes(
+          requestError.code,
+        )
+
+      if (!fallbackAllowed) {
+        setError(requestError.message)
+        return
+      }
+
+      const offlineMessage = [
+        'Demande WhatsApp — Lizzirene Déco',
+        'Le catalogue en ligne est momentanément indisponible : prix et disponibilités à confirmer.',
+        '',
+        ...message.split('\n').slice(1),
+      ].join('\n')
+      setOrder({
+        nom: data.nom,
+        link: waLink(offlineMessage),
+        message: offlineMessage,
+        reference: null,
+        claimToken: null,
+        publicToken: null,
+        offline: true,
+      })
+      setCopie(false)
+      setStep('confirme')
+    } finally {
+      setSubmitting(false)
+      submittingRef.current = false
+    }
   }
 
   // Secours quand wa.me ne s'ouvre pas (ordinateur sans WhatsApp, pop-up
@@ -189,7 +309,36 @@ function CartDrawer() {
   // sur wa.me qui échoue ne doit pas détruire un panier composé avec soin.
   const confirmerEnvoi = () => {
     clear()
+    idempotencyRef.current = null
+    close({ reset: true })
+  }
+
+  const naviguerDepuisPanier = (page, options) => {
     close()
+    window.setTimeout(() => onAller?.(page, options), 320)
+  }
+
+  const commencerCommande = () => {
+    idempotencyRef.current = null
+    setOrder(null)
+    setError('')
+    setStep(user ? 'commande' : 'choix')
+  }
+
+  const dateConakry = dateIsoConakry()
+  const dateMax = new Date(`${dateConakry}T00:00:00Z`)
+  dateMax.setUTCFullYear(dateMax.getUTCFullYear() + 1)
+  const dateMaximum = dateMax.toISOString().slice(0, 10)
+
+  const ouvrirWhatsApp = () => {
+    if (!order?.reference || !order?.publicToken) return
+    apiRequest(
+      `/orders/${encodeURIComponent(order.reference)}/whatsapp-opened`,
+      {
+        method: 'POST',
+        body: { token: order.publicToken },
+      },
+    ).catch(() => {})
   }
 
   return (
@@ -211,6 +360,7 @@ function CartDrawer() {
         <header className="drawer-head">
           <h3>
             {step === 'panier' && `Mon panier${count ? ` (${count})` : ''}`}
+            {step === 'choix' && 'Comment continuer ?'}
             {step === 'commande' && 'Préparer la commande'}
             {step === 'confirme' && 'Commande prête à envoyer'}
           </h3>
@@ -219,6 +369,7 @@ function CartDrawer() {
             onClick={close}
             className="drawer-close"
             aria-label="Fermer"
+            disabled={submitting}
           >
             <Icon name="close" size={22} />
           </button>
@@ -273,6 +424,7 @@ function CartDrawer() {
                           <button
                             onClick={() => setQty(i.id, i.qty + 1)}
                             aria-label={`Ajouter un ${i.name}`}
+                            disabled={i.qty >= 20}
                           >
                             <Icon name="plus" size={16} />
                           </button>
@@ -311,7 +463,7 @@ function CartDrawer() {
                 </p>
                 <button
                   className="btn btn-primary"
-                  onClick={() => setStep('commande')}
+                  onClick={commencerCommande}
                 >
                   Commander
                   <Icon name="arrow" size={18} />
@@ -321,20 +473,82 @@ function CartDrawer() {
           </>
         )}
 
+        {/* --- Choix facultatif du compte --- */}
+        {step === 'choix' && (
+          <div className="drawer-body checkout-choice">
+            <div className="checkout-choice-main">
+              <Icon name="whatsapp" size={26} />
+              <h4>Commander rapidement</h4>
+              <p>
+                Aucun compte nécessaire. Nous enregistrons la demande puis vous
+                ouvrez WhatsApp pour confirmer avec la boutique.
+              </p>
+              <button
+                className="btn btn-whatsapp"
+                onClick={() => setStep('commande')}
+              >
+                Continuer sans compte
+              </button>
+            </div>
+
+            <div className="checkout-account-option">
+              <span className="checkout-separator">ou</span>
+              <h4>Utiliser mon espace client</h4>
+              <ul>
+                <li><Icon name="check" size={15} /> Suivre la commande</li>
+                <li><Icon name="check" size={15} /> Retrouver l’historique</li>
+                <li><Icon name="check" size={15} /> Adresse mémorisée après la commande</li>
+              </ul>
+              <div className="checkout-account-actions">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => naviguerDepuisPanier('inscription', { returnTo: 'commande' })}
+                >
+                  Créer mon compte
+                </button>
+                <button
+                  className="btn btn-outline"
+                  onClick={() => naviguerDepuisPanier('connexion', { returnTo: 'commande' })}
+                >
+                  J’ai déjà un compte
+                </button>
+              </div>
+            </div>
+            <button className="link-back" onClick={() => setStep('panier')}>
+              Retour au panier
+            </button>
+          </div>
+        )}
+
         {/* --- Étape 2 : les coordonnées de livraison --- */}
         {step === 'commande' && (
           <form className="drawer-body checkout" onSubmit={handleOrder}>
-            <div className="cod-badge">
-              <Icon name="cash" size={20} />
+            <div className="cod-badge checkout-info-badge">
+              <Icon name="whatsapp" size={20} />
               <span>
-                <strong>Paiement à la livraison</strong> — vous réglez en
-                espèces à la réception de votre commande.
+                <strong>Demande enregistrée puis WhatsApp</strong> — la boutique
+                confirme ensuite la disponibilité, le délai et la livraison.
               </span>
             </div>
 
+            {user && (
+              <p className="checkout-connected">
+                <Icon name="user" size={17} /> Commande rattachée au compte de {user.name}.
+                Votre adresse sera mémorisée si vous choisissez la livraison.
+              </p>
+            )}
+            {error && <p className="form-alert" role="alert">{error}</p>}
+
             <label>
               Nom complet
-              <input name="nom" type="text" required placeholder="Votre nom" />
+              <input
+                name="nom"
+                type="text"
+                required
+                defaultValue={user?.name || ''}
+                autoComplete="name"
+                placeholder="Votre nom"
+              />
             </label>
             <label>
               Téléphone
@@ -342,12 +556,50 @@ function CartDrawer() {
                 name="telephone"
                 type="tel"
                 required
+                defaultValue={user?.phone || ''}
+                autoComplete="tel"
+                inputMode="tel"
                 placeholder="6XX XX XX XX"
               />
             </label>
             <label>
+              E-mail <small>(facultatif)</small>
+              <input
+                name="email"
+                type="email"
+                defaultValue={user?.email || ''}
+                autoComplete="email"
+                placeholder="Pour votre reçu ou votre compte"
+              />
+            </label>
+            <fieldset className="checkout-mode">
+              <legend>Comment souhaitez-vous recevoir la commande ?</legend>
+              <label>
+                <input
+                  type="radio"
+                  name="deliveryMode"
+                  value="delivery"
+                  checked={deliveryMode === 'delivery'}
+                  onChange={() => setDeliveryMode('delivery')}
+                />
+                Livraison à Conakry
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  name="deliveryMode"
+                  value="pickup"
+                  checked={deliveryMode === 'pickup'}
+                  onChange={() => setDeliveryMode('pickup')}
+                />
+                Retrait à la boutique de Kipé
+              </label>
+            </fieldset>
+            {deliveryMode === 'delivery' && (
+              <>
+            <label>
               Commune de livraison
-              <select name="zone" required defaultValue="">
+              <select name="zone" required defaultValue={user?.commune || ''}>
                 <option value="" disabled>
                   Choisir une commune
                 </option>
@@ -357,32 +609,78 @@ function CartDrawer() {
               </select>
             </label>
             <label>
+              Quartier
+              <input
+                name="quartier"
+                type="text"
+                required
+                defaultValue={user?.quartier || ''}
+                placeholder="Ex : Kipé, Nongo, Lambanyi…"
+              />
+            </label>
+            <label>
               Adresse / repère
               <input
                 name="adresse"
                 type="text"
                 required
-                placeholder="Quartier, rue, point de repère"
+                defaultValue={user?.addressLandmark || ''}
+                placeholder="Rue, immeuble ou point de repère connu"
               />
             </label>
+              </>
+            )}
             <label>
-              Date de livraison souhaitée
-              <input name="date" type="date" />
+              Date souhaitée
+              <input
+                name="date"
+                type="date"
+                min={dateConakry}
+                max={dateMaximum}
+              />
             </label>
+            <label className="checkout-recipient-toggle">
+              <input
+                type="checkbox"
+                checked={differentRecipient}
+                onChange={(event) => setDifferentRecipient(event.target.checked)}
+              />
+              <span>La commande est destinée à une autre personne</span>
+            </label>
+            {differentRecipient && (
+              <div className="checkout-recipient-fields">
+                <label>
+                  Nom du destinataire
+                  <input name="destinataireNom" required />
+                </label>
+                <label>
+                  Téléphone du destinataire <small>(facultatif)</small>
+                  <input name="destinataireTelephone" type="tel" inputMode="tel" />
+                </label>
+              </div>
+            )}
             <label>
               Message sur la carte (optionnel)
               <textarea
-                name="note"
+                name="messageCarte"
                 rows="3"
                 placeholder="Ex : Joyeux anniversaire Maman"
+              />
+            </label>
+            <label>
+              Précision pour la boutique (optionnel)
+              <textarea
+                name="note"
+                rows="3"
+                placeholder="Couleurs, heure, consigne particulière…"
               />
             </label>
 
             <div className="cart-total">
               <span>
                 {totalMinimum
-                  ? 'Total minimum à payer à la livraison'
-                  : 'Total à payer à la livraison'}
+                  ? `Total minimum ${deliveryMode === 'pickup' ? 'au retrait' : 'à payer à la livraison'}`
+                  : `Total ${deliveryMode === 'pickup' ? 'au retrait' : 'à payer à la livraison'}`}
               </span>
               <strong>{formatPrice(total)}</strong>
             </div>
@@ -393,13 +691,13 @@ function CartDrawer() {
               </p>
             )}
 
-            <button type="submit" className="btn btn-primary">
-              Préparer l’envoi
+            <button type="submit" className="btn btn-primary" disabled={submitting}>
+              {submitting ? 'Enregistrement…' : 'Enregistrer et continuer sur WhatsApp'}
             </button>
             <button
               type="button"
               className="link-back"
-              onClick={() => setStep('panier')}
+              onClick={() => setStep(user ? 'panier' : 'choix')}
             >
               Retour au panier
             </button>
@@ -413,15 +711,27 @@ function CartDrawer() {
               <Icon name="check" size={34} strokeWidth={2} />
             </div>
             <h4>Merci {order.nom} !</h4>
-            <p>
-              Votre récapitulatif est prêt. Envoyez-le maintenant sur WhatsApp
-              pour transmettre la commande et confirmer la livraison.
-            </p>
+            {order.reference ? (
+              <>
+                <p className="confirm-reference">Référence <strong>{order.reference}</strong></p>
+                <p>
+                  Votre demande est enregistrée. Envoyez maintenant le
+                  récapitulatif sur WhatsApp ; la boutique confirmera ensuite la
+                  disponibilité et la livraison.
+                </p>
+              </>
+            ) : (
+              <p className="form-alert form-alert-warning">
+                L’enregistrement en ligne est momentanément indisponible. Votre
+                récapitulatif reste prêt à être envoyé directement sur WhatsApp.
+              </p>
+            )}
             <a
               className="btn btn-whatsapp"
               href={order.link}
               target="_blank"
               rel="noreferrer"
+              onClick={ouvrirWhatsApp}
             >
               <Icon name="whatsapp" size={19} />
               Envoyer ma commande sur WhatsApp
@@ -434,6 +744,47 @@ function CartDrawer() {
               <Icon name={copie ? 'check' : 'copier'} size={17} />
               {copie ? 'Récapitulatif copié !' : 'Copier le récapitulatif'}
             </button>
+            {!user && order.claimToken && (
+              <div className="confirm-account-actions">
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={() =>
+                    naviguerDepuisPanier('inscription', {
+                      claimToken: order.claimToken,
+                      reference: order.reference,
+                    })
+                  }
+                >
+                  Créer mon compte et suivre cette commande
+                </button>
+                <button
+                  type="button"
+                  className="admin-text-button"
+                  onClick={() =>
+                    naviguerDepuisPanier('connexion', {
+                      claimToken: order.claimToken,
+                      reference: order.reference,
+                    })
+                  }
+                >
+                  J’ai déjà un compte
+                </button>
+              </div>
+            )}
+            {user?.role === 'customer' && order.reference && (
+              <button
+                type="button"
+                className="btn btn-outline"
+                onClick={() =>
+                  naviguerDepuisPanier('compte-commande', {
+                    reference: order.reference,
+                  })
+                }
+              >
+                Voir le suivi dans mon espace
+              </button>
+            )}
             <p className="confirm-alt">
               Ou appelez-nous au{' '}
               <a href={`tel:+224${CONTACT.phoneDisplay.replace(/\s/g, '')}`}>
@@ -441,9 +792,9 @@ function CartDrawer() {
               </a>
             </p>
             <button className="btn btn-primary" onClick={confirmerEnvoi}>
-              J’ai bien envoyé ma commande
+              Terminer et vider mon panier
             </button>
-            <button className="link-back" onClick={close}>
+            <button className="link-back" onClick={confirmerEnvoi}>
               Continuer mes achats
             </button>
           </div>

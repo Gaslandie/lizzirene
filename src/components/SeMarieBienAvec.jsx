@@ -3,7 +3,8 @@ import Media from './Media.jsx'
 import Reveal from './Reveal.jsx'
 import ProductCard from './ProductCard.jsx'
 import { useCart } from '../context/CartContext.jsx'
-import { PRODUCTS, normaliserCategorie } from '../data/products.js'
+import { normaliserCategorie } from '../data/products.js'
+import { useProducts } from '../context/ProductsContext.jsx'
 import { formatPrice } from '../config.js'
 
 // Le catalogue est littéralement conçu pour le cross-sell : les vases, les
@@ -24,11 +25,14 @@ const COMPLEMENTS = {
 // bouquet cadeau), les produits sans prix (rien à ajouter au panier d'un
 // clic) et les produits sans photo (pas de visuel provisoire ici).
 const suggerable = (produit) =>
-  produit.src && produit.price != null && produit.tag !== 'Hommage'
+  produit.src &&
+  produit.price != null &&
+  produit.tag !== 'Hommage' &&
+  produit.availability !== 'out_of_stock'
 
 // Les compléments les moins chers d'abord : l'accessoire à 120 000 GNF posé
 // à côté du bouquet à 700 000 monte le panier sans faire réfléchir.
-const suggestionsPour = (familleIds, exclure = [], nombre = 3) => {
+const suggestionsPour = (products, familleIds, exclure = [], nombre = 3) => {
   const familles = [...new Set(familleIds.map(normaliserCategorie))]
   const cibles = [...new Set(familles.flatMap((id) => COMPLEMENTS[id] || []))]
     // Une famille déjà représentée n'est pas un complément.
@@ -37,7 +41,7 @@ const suggestionsPour = (familleIds, exclure = [], nombre = 3) => {
 
   return cibles
     .flatMap((familleId) =>
-      PRODUCTS.filter(
+      products.filter(
         (produit) =>
           normaliserCategorie(produit.category) === familleId &&
           suggerable(produit) &&
@@ -50,7 +54,12 @@ const suggestionsPour = (familleIds, exclure = [], nombre = 3) => {
 
 // Version fiche produit : une rangée de cartes complètes sous le détail.
 export function SeMarieBienAvec({ produit, onProduit }) {
-  const suggestions = suggestionsPour([produit.category], [produit.id])
+  const { products } = useProducts()
+  const suggestions = suggestionsPour(
+    products,
+    [produit.category],
+    [produit.id],
+  )
   if (suggestions.length === 0) return null
 
   return (
@@ -78,15 +87,17 @@ export function SeMarieBienAvec({ produit, onProduit }) {
 // le panier. Les articles déjà ajoutés disparaissent des suggestions.
 export function SuggestionsPanier() {
   const { items, add } = useCart()
+  const { products } = useProducts()
   if (items.length === 0) return null
 
-  // Les lignes du panier ne portent que les champs du futur modèle Mongo
-  // (id, name, price, qty…) : la catégorie se retrouve par l'id.
+  // La catégorie est relue dans le catalogue courant afin que les suggestions
+  // suivent immédiatement les changements effectués dans l'administration.
   const categories = items
-    .map((item) => PRODUCTS.find((produit) => produit.id === item.id)?.category)
+    .map((item) => products.find((produit) => produit.id === item.id)?.category)
     .filter(Boolean)
 
   const suggestions = suggestionsPour(
+    products,
     categories,
     items.map((item) => item.id),
     2,

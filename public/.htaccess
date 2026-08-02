@@ -1,4 +1,5 @@
 DirectoryIndex index.html
+Options -Indexes
 
 <IfModule mod_negotiation.c>
   Options -MultiViews
@@ -14,6 +15,15 @@ DirectoryIndex index.html
   RewriteCond %{HTTPS} !=on [OR]
   RewriteCond %{HTTP_HOST} !^lizzirenedeco\.com$ [NC]
   RewriteRule ^ https://lizzirenedeco.com%{REQUEST_URI} [R=301,L,NE]
+
+  # Le sitemap vient de la base afin qu'un produit ajouté dans
+  # l'administration soit indexable sans attendre un nouveau déploiement.
+  RewriteRule ^sitemap\.xml$ api/index.php [QSA,L]
+
+  # Ces répertoires ont leurs propres règles. Ils ne doivent jamais tomber
+  # dans le fallback React, y compris lorsqu'une ressource n'existe pas.
+  RewriteRule ^(?:private|storage)(?:/|$) - [F,L,NC]
+  RewriteRule ^(?:api|uploads)(?:/|$) - [L,NC]
 
   # Les vrais fichiers sont servis directement ; les routes React reçoivent
   # index.html afin de rester accessibles après un rafraîchissement.
@@ -42,6 +52,8 @@ DirectoryIndex index.html
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always set Strict-Transport-Security "max-age=31536000"
 </IfModule>
 
 <IfModule mod_deflate.c>

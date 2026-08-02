@@ -3,8 +3,9 @@ import Icon from './Icon.jsx'
 import { CONTACT, waLink } from '../config.js'
 
 function Contact() {
-  // Le formulaire compose un message WhatsApp prêt à envoyer — même canal
-  // que les commandes. Il sera doublé d'un POST vers l'API NestJS plus tard.
+  // Une demande générale reste volontairement directe sur WhatsApp. Lorsqu’un
+  // échange devient une commande, l’administratrice peut l’enregistrer dans
+  // son espace afin de ne pas perdre le suivi.
   const handleSubmit = (e) => {
     e.preventDefault()
     const data = Object.fromEntries(new FormData(e.target))

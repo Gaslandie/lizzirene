@@ -1,120 +1,181 @@
-# Déployer Lizzirene Déco sur Bluehost depuis GitHub
+# Déploiement Bluehost de Lizzirene Déco
 
-## Architecture retenue
+## Architecture
 
-- **Bluehost** sert `lizzirenedeco.com`, gère le DNS et le certificat HTTPS.
-- **GitHub** reste la source du code et de l'historique.
-- **GitHub Actions** vérifie et construit le site, puis synchronise `dist/`
-  par **FTPS explicite** à chaque push sur `main`.
-- Le compte FTP de déploiement est dédié à ce site et son répertoire d'accueil
-  est directement le Document Root de `lizzirenedeco.com`.
+- `lizzirenedeco.com` est servi par Bluehost avec HTTPS.
+- GitHub reste la source du code.
+- Un push sur `main` construit puis publie `dist/` par FTPS.
+- MySQL conserve les comptes, produits, commandes et historiques.
+- `/uploads/products/` conserve les photos ajoutées par l’administratrice.
+- La configuration contenant les secrets vit hors du dossier public, dans
+  `/home2/fnksrwmy/lizzirene-private/config.php`.
 
-GitHub Pages ne sert plus la production : le catalogue, le panier et la
-commande WhatsApp font du site une vitrine commerciale.
+Le workflow ne supprime jamais la configuration privée ni les photos. Il publie
+les nouveaux fichiers en deux phases, puis vérifie le site public et l’API.
 
-## 1. Préparer une fois Bluehost
+## 1. Paramètres GitHub déjà nécessaires
 
-1. Dans **Hosting → Lizzirene Déco → Domains**, vérifier que
-   `lizzirenedeco.com` est bien le domaine principal de ce site.
-2. Dans **Files & Access → File Manager**, ouvrir le Document Root exact. Avant
-   la première synchronisation, sauvegarder tout fichier métier éventuellement
-   présent. Le compte FTP dédié doit ouvrir directement ce dossier, jamais la
-   racine d'un compte qui contient d'autres sites.
-3. Conserver les dossiers techniques `.well-known/` et `cgi-bin/`. Le workflow
-   les exclut explicitement de ses suppressions, ainsi que `.ftpquota`.
-4. Dans ce Document Root, créer un fichier caché nommé exactement
-   `.deploy-target-ok`, puis y écrire une seule ligne :
+Dans **GitHub → Settings → Environments → production** :
 
-   ```text
-   lizzirenedeco.com
-   ```
+| Type | Nom | Valeur |
+| --- | --- | --- |
+| Variable | `BLUEHOST_FTP_IP` | `50.6.153.225` |
+| Variable | `BLUEHOST_FTP_USER` | `lizzirenedeploy@lizzirenedeco.com` |
+| Secret | `BLUEHOST_FTP_PASSWORD` | mot de passe du compte FTP dédié |
+| Secret | `BLUEHOST_MIGRATION_TOKEN` | troisième secret de 64 caractères, identique à `migration_token` |
+| Variable | `BLUEHOST_API_READY` | absent ou `false` avant l’installation, puis `true` |
 
-   Le workflow télécharge et vérifie ce marqueur **avant** toute synchronisation
-   avec suppression. S'il manque ou ne correspond pas, la publication s'arrête.
-5. Garder le compte FTP dédié actif et cantonné à ce Document Root. Il ne faut
-   pas activer SSH ni partager un accès global au compte Bluehost.
-
-Le navigateur peut traduire automatiquement des noms techniques dans le
-portail Bluehost. Pour les identifiants, chemins et noms de dossiers, désactiver
-la traduction de la page et recopier la valeur originale.
-
-## 2. Configurer l'environnement GitHub
-
-Dans `Gaslandie/lizzirene`, ouvrir **Settings → Environments**, créer
-`production`, puis limiter ses branches de déploiement à `main`.
-
-Dans **Environment variables**, ajouter :
-
-| Variable | Valeur |
-| --- | --- |
-| `BLUEHOST_FTP_IP` | adresse IPv4 affichée par Bluehost pour ce compte FTP |
-| `BLUEHOST_FTP_USER` | nom d'utilisateur complet du compte FTP dédié |
-
-Dans **Environment secrets**, ajouter :
-
-| Secret | Valeur |
-| --- | --- |
-| `BLUEHOST_FTP_PASSWORD` | mot de passe du compte FTP dédié |
-
-Le mot de passe doit être collé directement dans GitHub : ne pas l'envoyer dans
-une conversation, le mettre dans un fichier ou le versionner. Le workflow le
-fournit à `lftp` par variable d'environnement ; il n'apparaît pas dans la ligne
-de commande.
-
-Le transfert utilise le port `21` avec TLS obligatoire sur le contrôle et les
-données. Le certificat est vérifié sous le nom `ftp.bluehost.com`, que le runner
-GitHub dirige vers l'IP précise du serveur. La vérification du certificat et du
-nom d'hôte reste activée.
-
-## 3. Premier déploiement et domaine
-
-1. Dans Bluehost, vérifier le certificat SSL gratuit pour
-   **`lizzirenedeco.com` et `www.lizzirenedeco.com`**. Les deux noms doivent être
-   couverts avant d'imposer HTTPS ; relancer AutoSSL si nécessaire.
-2. Pousser les changements sur `main`. Le workflow
-   **Actions → Déploiement Bluehost** démarre automatiquement.
-3. Vérifier que les jobs `build` puis `deploy` réussissent.
-4. Tester l'accueil, `/produits`, une fiche produit et `/contact` après un
-   rafraîchissement direct.
-5. Vérifier les quatre entrées suivantes :
-   - `http://lizzirenedeco.com` ;
-   - `https://lizzirenedeco.com` ;
-   - `http://www.lizzirenedeco.com` ;
-   - `https://www.lizzirenedeco.com`.
-
-Les trois variantes non canoniques doivent rediriger vers
-`https://lizzirenedeco.com`. Le fichier `public/.htaccess` gère HTTPS, la
-redirection sans `www` et les routes React.
-
-Le workflow contrôle après transfert `index.html`, `.htaccess` et le marqueur,
-puis teste l'accueil public, une route profonde et les trois redirections. Une
-erreur DNS, SSL ou Apache laisse donc le déploiement rouge même si les fichiers
-ont déjà été envoyés.
-
-Comme le domaine et l'hébergement sont chez Bluehost, leur connexion peut
-ajuster automatiquement les enregistrements web. Ne modifier manuellement que
-`@` et `www` si Bluehost l'exige ; ne jamais supprimer les enregistrements
-MX/TXT d'une future messagerie.
-
-## 4. Déploiements suivants et retour arrière
-
-Après la première mise en ligne, le flux normal est automatique :
+Le compte FTP doit arriver directement dans le Document Root de
+`lizzirenedeco.com`. Le fichier `.deploy-target-ok` doit y contenir exactement :
 
 ```text
-push sur main → lint → build → synchronisation FTPS → lizzirenedeco.com
+lizzirenedeco.com
 ```
 
-Un lint ou un build en échec arrête le processus avant Bluehost. Les
-déploiements sont séquentiels et le fichier HTML n'est pas mis en cache, afin
-que la nouvelle version apparaisse immédiatement.
+Ne jamais envoyer ou enregistrer le mot de passe FTP dans le dépôt.
 
-Pour revenir à une version déjà fusionnée dans `main`, relancer manuellement le
-workflow et saisir son SHA dans le champ `ref`. Le workflow refuse une version
-qui ne fait pas partie de l'historique de `main`.
+## 2. Créer la base MySQL dans Bluehost
 
-Ce retour arrière reconstruit le code Git ; il ne restaure pas une ancienne
-configuration DNS/SSL et ne remplace pas une sauvegarde serveur initiale.
+Dans **Select PHP Version** ou **MultiPHP Manager**, choisir PHP 8.1 ou plus
+récent et vérifier les extensions `pdo_mysql`, `mbstring`, `fileinfo` et `gd`.
+Le fichier `.user.ini` publié règle aussi les limites nécessaires aux photos ;
+Bluehost peut appliquer ces valeurs après quelques minutes.
 
-Une fois la production confirmée, désactiver l'ancien site GitHub Pages dans
-**Settings → Pages** pour éviter de conserver une copie périmée à l'ancienne
-adresse `gaslandie.github.io/lizzirene/`.
+Dans cPanel, ouvrir **MySQL Databases** :
+
+1. créer une base, par exemple `lizzirene` ;
+2. créer un utilisateur dédié, par exemple `lizzireneapp`, avec un mot de passe
+   généré et long ;
+3. ajouter cet utilisateur à cette base avec **ALL PRIVILEGES** ;
+4. noter les noms complets affichés par cPanel. Bluehost ajoute généralement le
+   préfixe du compte, par exemple `fnksrwmy_lizzirene`.
+
+Ne pas réutiliser un utilisateur MySQL appartenant à un autre site.
+
+## 3. Créer la configuration privée
+
+Dans **cPanel → File Manager**, remonter à `/home2/fnksrwmy`, puis créer :
+
+```text
+/home2/fnksrwmy/lizzirene-private/
+/home2/fnksrwmy/lizzirene-private/sessions/
+```
+
+Appliquer si cPanel le permet : dossiers `700`, fichier `config.php` `600`.
+Ces éléments doivent rester hors de
+`/home2/fnksrwmy/html_public/site_Web_17d0c211`.
+
+Générer trois secrets différents. Dans le terminal cPanel ou un terminal local,
+exécuter trois fois :
+
+```bash
+php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"
+```
+
+Créer `/home2/fnksrwmy/lizzirene-private/config.php` avec le contenu suivant,
+puis remplacer uniquement les valeurs en majuscules :
+
+```php
+<?php
+
+declare(strict_types=1);
+
+return [
+    'environment' => 'production',
+    'app_url' => 'https://lizzirenedeco.com',
+    'app_key' => 'SECRET_A_DE_64_CARACTERES_OU_PLUS',
+    'setup_enabled' => true,
+    'setup_token' => 'SECRET_B_DIFFERENT_DE_64_CARACTERES_OU_PLUS',
+    'migration_token' => 'SECRET_C_DIFFERENT_DE_64_CARACTERES_OU_PLUS',
+    'whatsapp_number' => '224664327554',
+    'database' => [
+        'dsn' => 'mysql:host=localhost;dbname=NOM_COMPLET_BASE;charset=utf8mb4',
+        'username' => 'NOM_COMPLET_UTILISATEUR',
+        'password' => 'MOT_DE_PASSE_MYSQL',
+    ],
+    'session' => [
+        'name' => '__Host-lizzirene_session',
+        'idle_minutes' => 120,
+        'admin_idle_minutes' => 30,
+        'absolute_hours' => 12,
+        'save_path' => '/home2/fnksrwmy/lizzirene-private/sessions',
+    ],
+    'uploads' => [
+        'public_path' => '/uploads/products',
+        'max_bytes' => 8 * 1024 * 1024,
+        'max_pixels' => 16000000,
+        'max_dimension' => 1800,
+        'max_output_bytes' => 6 * 1024 * 1024,
+        'max_total_bytes' => 500 * 1024 * 1024,
+    ],
+    'orders' => [
+        'request_expiry_hours' => 72,
+    ],
+];
+```
+
+Les trois secrets doivent être distincts. Ne jamais utiliser les exemples
+`CHANGE_ME`, le nom du domaine ou un mot de passe humain pour `app_key` et
+les jetons. Ajouter `SECRET_C` dans le secret GitHub
+`BLUEHOST_MIGRATION_TOKEN` ; il permet au workflow d’appliquer les migrations
+avant de publier une nouvelle version de l’API et ne doit jamais apparaître
+dans une variable publique.
+
+## 4. Publier et installer l’administration
+
+1. Fusionner la branche validée dans `main` et attendre le workflow
+   **Déploiement Bluehost**.
+2. Vérifier `https://lizzirenedeco.com/api/v1/health` :
+   `configured`, `database` doivent être vrais ; `installed` est encore faux.
+3. Ouvrir `https://lizzirenedeco.com/admin/installation`.
+4. Saisir le jeton `setup_token`, puis créer le premier compte administratrice.
+   Cette action crée les tables et importe les 84 produits existants.
+5. Vérifier l’accès à `/admin`, ajouter une photo test et créer une commande test.
+
+Immédiatement après l’installation, modifier le fichier privé :
+
+```php
+'setup_enabled' => false,
+'setup_token' => '',
+```
+
+Puis définir la variable GitHub `BLUEHOST_API_READY` à `true` et relancer le
+workflow. Les contrôles de production exigeront alors une base connectée, une
+installation terminée et un catalogue non vide. Conserver `migration_token`
+dans le fichier privé et `BLUEHOST_MIGRATION_TOKEN` dans les secrets GitHub :
+ils assurent les futures mises à jour automatiques de la base. Le point
+`/api/v1/health` est volontairement en lecture seule.
+
+## 5. Contrôles après activation
+
+- créer une commande sans compte, vérifier sa référence et le message WhatsApp ;
+- créer un compte après cette commande et vérifier son rattachement ;
+- confirmer la commande dans l’administration ;
+- ajouter un produit en brouillon, envoyer une photo, puis le publier ;
+- relancer un second déploiement et vérifier que cette photo existe toujours ;
+- tester `/`, `/produits`, `/mon-compte`, `/admin` et une URL profonde après
+  rafraîchissement ;
+- vérifier les redirections HTTP et `www` vers
+  `https://lizzirenedeco.com/`.
+
+## 6. Sauvegardes et retour arrière
+
+Sauvegarder régulièrement :
+
+- la base MySQL via cPanel/phpMyAdmin ;
+- `/uploads/products/` ;
+- le fichier privé `config.php` dans un coffre chiffré.
+
+Tester périodiquement une restauration. Un retour arrière GitHub restaure le
+code, pas la base ni les photos. Ne jamais remplacer une migration SQL déjà
+appliquée ; toute évolution future de schéma doit recevoir un nouveau numéro.
+
+Pour redéployer une version déjà fusionnée dans `main`, lancer manuellement le
+workflow et saisir son SHA dans `ref`. Le workflow refuse une version extérieure
+à l’historique de `main`.
+
+## 7. Domaine et messagerie
+
+Les enregistrements web attendus sont déjà : `A @ → 50.6.153.225` et
+`CNAME www → lizzirenedeco.com`. Ne pas supprimer les enregistrements MX, SPF,
+DKIM ou DMARC lors d’une modification du domaine : ils servent à la messagerie.

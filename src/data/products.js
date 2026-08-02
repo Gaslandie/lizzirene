@@ -2,7 +2,8 @@ import { PHOTOS, SERVICE_THEME_PHOTOS } from '../config.js'
 
 // Catalogue de la boutique. Prix en GNF (nombres bruts, formatés à l'affichage).
 // `price: null` = article sur devis : le client passe par WhatsApp.
-// À terme ces données viendront de l'API NestJS / MongoDB.
+// Ce catalogue sert de source initiale et de secours. En production, l’API
+// PHP/MySQL prend le relais et l’administration peut le faire évoluer.
 export const SOUS_CATEGORIES_FLEURS = [
   { id: 'fleurs-naturelles', label: 'Fleurs naturelles' },
   { id: 'fleurs-artificielles', label: 'Fleurs artificielles' },

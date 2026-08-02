@@ -140,10 +140,15 @@ const filDAriane = (etapes) => ({
 // Fiche produit. `price: null` signifie « sur devis » : on ne publie alors
 // aucun prix plutôt qu'un prix faux — une offre sans montant reste valide.
 const produitSchema = (produit) => {
+  const availability = produit.availability === 'out_of_stock'
+    ? 'https://schema.org/OutOfStock'
+    : produit.availability === 'on_order'
+      ? 'https://schema.org/PreOrder'
+      : 'https://schema.org/InStock'
   const offre = {
     '@type': 'Offer',
     url: absolu(urlProduit(produit.id)),
-    availability: 'https://schema.org/InStock',
+    availability,
     priceCurrency: 'GNF',
     seller: { '@id': ID_BOUTIQUE },
   }

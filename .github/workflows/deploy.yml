@@ -22,7 +22,22 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root-integration-password
+          MYSQL_DATABASE: lizzirene_test
+          MYSQL_USER: lizzirene
+          MYSQL_PASSWORD: integration-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -proot-integration-password"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
     steps:
       - name: Récupérer le code
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -47,8 +62,335 @@ jobs:
       - name: Installer les dépendances
         run: npm ci
 
+      - name: Installer PHP pour les contrôles
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends \
+            php-cli php-gd php-mbstring php-mysql
+
       - name: Vérifier le code
         run: npm run lint
+
+      - name: Vérifier l’API PHP
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          php --version
+          find public/api -type f -name '*.php' -print0 \
+            | xargs -0 -n1 php -l
+
+      - name: Tester l’API avec MySQL
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          config="$RUNNER_TEMP/lizzirene-test-config.php"
+          sessions="$RUNNER_TEMP/lizzirene-sessions"
+          uploads="$RUNNER_TEMP/lizzirene-uploads"
+          server_log="$RUNNER_TEMP/lizzirene-api.log"
+          admin_cookies="$RUNNER_TEMP/admin-cookies.txt"
+          guest_cookies="$RUNNER_TEMP/guest-cookies.txt"
+          customer_secondary_cookies="$RUNNER_TEMP/customer-secondary-cookies.txt"
+          mkdir -p "$sessions" "$uploads"
+
+          cat > "$config" <<PHP
+          <?php
+          return [
+              'environment' => 'development',
+              'app_url' => 'http://127.0.0.1:8765',
+              'app_key' => str_repeat('a', 64),
+              'setup_enabled' => true,
+              'setup_token' => str_repeat('b', 64),
+              'migration_token' => str_repeat('c', 64),
+              'whatsapp_number' => '224664327554',
+              'database' => [
+                  'dsn' => 'mysql:host=127.0.0.1;port=3306;dbname=lizzirene_test;charset=utf8mb4',
+                  'username' => 'lizzirene',
+                  'password' => 'integration-password',
+              ],
+              'session' => [
+                  'name' => 'lizzirene_test_session',
+                  'idle_minutes' => 120,
+                  'admin_idle_minutes' => 30,
+                  'absolute_hours' => 12,
+                  'save_path' => '$sessions',
+              ],
+              'uploads' => [
+                  'directory' => '$uploads',
+                  'public_path' => '/uploads/products',
+                  'max_bytes' => 8388608,
+                  'max_pixels' => 16000000,
+                  'max_dimension' => 1800,
+                  'max_output_bytes' => 6291456,
+                  'max_total_bytes' => 524288000,
+              ],
+              'orders' => ['request_expiry_hours' => 72],
+          ];
+          PHP
+
+          export LIZZIRENE_CONFIG_PATH="$config"
+          php -S 127.0.0.1:8765 -t public public/api/index.php \
+            > "$server_log" 2>&1 &
+          server_pid=$!
+          cleanup() {
+            kill "$server_pid" 2>/dev/null || true
+          }
+          failure_log() {
+            cat "$server_log" >&2 || true
+          }
+          trap cleanup EXIT
+          trap failure_log ERR
+
+          for attempt in {1..30}; do
+            if health="$(curl --fail --silent --show-error \
+              'http://127.0.0.1:8765/api/v1/health')"; then
+              break
+            fi
+            sleep 1
+          done
+          jq -e '
+            .data.configured == true and
+            .data.database == true and
+            .data.installed == false
+          ' <<< "$health" > /dev/null
+
+          migration_sans_token_statut="$(curl --silent --show-error \
+            --request POST \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --output "$RUNNER_TEMP/migration-sans-token.json" \
+            --write-out '%{http_code}' \
+            'http://127.0.0.1:8765/api/v1/setup/migrate')"
+          [[ "$migration_sans_token_statut" == '404' ]]
+          jq -e '.error.code | type == "string"' \
+            "$RUNNER_TEMP/migration-sans-token.json" > /dev/null
+
+          migration_mauvaise_origine_statut="$(curl --silent --show-error \
+            --request POST \
+            --header 'Origin: https://example.invalid' \
+            --header "X-Migration-Token: $(printf 'c%.0s' {1..64})" \
+            --output "$RUNNER_TEMP/migration-mauvaise-origine.json" \
+            --write-out '%{http_code}' \
+            'http://127.0.0.1:8765/api/v1/setup/migrate')"
+          [[ "$migration_mauvaise_origine_statut" == '403' ]]
+          jq -e '.error.code | type == "string"' \
+            "$RUNNER_TEMP/migration-mauvaise-origine.json" > /dev/null
+
+          migration="$(curl --fail-with-body --silent --show-error \
+            --request POST \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-Migration-Token: $(printf 'c%.0s' {1..64})" \
+            'http://127.0.0.1:8765/api/v1/setup/migrate')"
+          jq -e '
+            .data.migrated == true and
+            ((.data.pendingVersions // []) | length == 0)
+          ' <<< "$migration" > /dev/null
+
+          setup="$(curl --fail-with-body --silent --show-error \
+            --cookie-jar "$admin_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header 'Content-Type: application/json' \
+            --header "X-Setup-Token: $(printf 'b%.0s' {1..64})" \
+            --data '{"name":"Administratrice Test","phone":"664 32 75 54","email":"admin@example.test","password":"AdminPass!123"}' \
+            'http://127.0.0.1:8765/api/v1/setup/initialize')"
+          admin_csrf="$(jq -er '.data.csrfToken' <<< "$setup")"
+          jq -e '.data.catalogImported == true and .data.user.role == "admin"' \
+            <<< "$setup" > /dev/null
+
+          products="$(curl --fail --silent --show-error \
+            --cookie "$admin_cookies" \
+            'http://127.0.0.1:8765/api/v1/admin/products')"
+          jq -e '.data | length == 84' <<< "$products" > /dev/null
+
+          product="$(curl --fail-with-body --silent --show-error \
+            --cookie "$admin_cookies" --cookie-jar "$admin_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $admin_csrf" \
+            --header 'Content-Type: application/json' \
+            --data '{"name":"Produit intégration","category":"fleurs-naturelles","description":"Produit créé uniquement par le test d’intégration.","priceMode":"fixed","price":125000,"priceLabel":null,"prixPrefixe":null,"tag":"Test","src":null,"alt":null,"imagePosition":null,"variant":"soft","status":"active","availability":"available","featuredHome":false,"sortOrder":9999,"version":1}' \
+            'http://127.0.0.1:8765/api/v1/admin/products')"
+          product_id="$(jq -er '.data.recordId' <<< "$product")"
+          product_version="$(jq -er '.data.version' <<< "$product")"
+          test_image="$RUNNER_TEMP/product-test.png"
+          php -r '$image=imagecreatetruecolor(64,64); imagepng($image, $argv[1]); imagedestroy($image);' "$test_image"
+          uploaded="$(curl --fail-with-body --silent --show-error \
+            --cookie "$admin_cookies" --cookie-jar "$admin_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $admin_csrf" \
+            --form "image=@$test_image;type=image/png" \
+            --form 'alt=Photo du produit de test' \
+            --form "version=$product_version" \
+            "http://127.0.0.1:8765/api/v1/admin/products/$product_id/image")"
+          jq -e '.data.src | startswith("/uploads/products/")' \
+            <<< "$uploaded" > /dev/null
+          uploaded_version="$(jq -er '.data.version' <<< "$uploaded")"
+          curl --fail-with-body --silent --show-error \
+            --cookie "$admin_cookies" --cookie-jar "$admin_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $admin_csrf" \
+            --form "image=@$test_image;type=image/png" \
+            --form 'alt=Nouvelle photo du produit de test' \
+            --form "version=$uploaded_version" \
+            "http://127.0.0.1:8765/api/v1/admin/products/$product_id/image" \
+            > /dev/null
+          test "$(find "$uploads" -maxdepth 1 -type f -name '*.png' | wc -l)" -eq 1
+
+          guest_session="$(curl --fail --silent --show-error \
+            --cookie-jar "$guest_cookies" \
+            'http://127.0.0.1:8765/api/v1/session')"
+          guest_csrf="$(jq -er '.data.csrfToken' <<< "$guest_session")"
+          order_payload='{"name":"Cliente Test","phone":"610 81 17 17","email":null,"deliveryMode":"delivery","commune":"Ratoma","quartier":"Kipé","addressLandmark":"Près de la boutique","desiredDate":null,"recipientName":null,"recipientPhone":null,"cardMessage":null,"note":null,"items":[{"id":"bouquet-roses-a-partir","quantity":1}]}'
+          order="$(curl --fail-with-body --silent --show-error \
+            --cookie "$guest_cookies" --cookie-jar "$guest_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $guest_csrf" \
+            --header 'Idempotency-Key: integration-order-0001' \
+            --header 'Content-Type: application/json' \
+            --data "$order_payload" \
+            'http://127.0.0.1:8765/api/v1/orders')"
+          order_reference="$(jq -er '.data.reference' <<< "$order")"
+          claim_token="$(jq -er '.data.claimToken' <<< "$order")"
+          repeated_reference="$(curl --fail-with-body --silent --show-error \
+            --cookie "$guest_cookies" --cookie-jar "$guest_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $guest_csrf" \
+            --header 'Idempotency-Key: integration-order-0001' \
+            --header 'Content-Type: application/json' \
+            --data "$order_payload" \
+            'http://127.0.0.1:8765/api/v1/orders' | jq -er '.data.reference')"
+          [[ "$repeated_reference" == "$order_reference" ]]
+
+          registration="$(curl --fail-with-body --silent --show-error \
+            --cookie "$guest_cookies" --cookie-jar "$guest_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $guest_csrf" \
+            --header 'Content-Type: application/json' \
+            --data "{\"name\":\"Cliente Test\",\"phone\":\"610 81 17 17\",\"email\":\"cliente@example.test\",\"password\":\"ClientPass!123\",\"claimToken\":\"$claim_token\",\"consent\":true}" \
+            'http://127.0.0.1:8765/api/v1/auth/register')"
+          customer_csrf="$(jq -er '.data.csrfToken' <<< "$registration")"
+          jq -e '
+            .data.user.role == "customer" and
+            .data.user.commune == "Ratoma" and
+            .data.user.quartier == "Kipé" and
+            .data.claimWarning == null
+          ' \
+            <<< "$registration" > /dev/null
+          customer_orders="$(curl --fail --silent --show-error \
+            --cookie "$guest_cookies" \
+            'http://127.0.0.1:8765/api/v1/me/orders')"
+          jq -e --arg reference "$order_reference" \
+            '.data | length == 1 and .[0].reference == $reference' \
+            <<< "$customer_orders" > /dev/null
+
+          secondary_session="$(curl --fail --silent --show-error \
+            --cookie-jar "$customer_secondary_cookies" \
+            'http://127.0.0.1:8765/api/v1/session')"
+          secondary_csrf="$(jq -er '.data.csrfToken' <<< "$secondary_session")"
+          curl --fail-with-body --silent --show-error \
+            --cookie "$customer_secondary_cookies" --cookie-jar "$customer_secondary_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $secondary_csrf" \
+            --header 'Content-Type: application/json' \
+            --data '{"identifier":"610 81 17 17","password":"ClientPass!123"}' \
+            'http://127.0.0.1:8765/api/v1/auth/login' > /dev/null
+
+          password_change="$(curl --fail-with-body --silent --show-error \
+            --request PATCH \
+            --cookie "$guest_cookies" --cookie-jar "$guest_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $customer_csrf" \
+            --header 'Content-Type: application/json' \
+            --data '{"currentPassword":"ClientPass!123","newPassword":"NouveauPass!456"}' \
+            'http://127.0.0.1:8765/api/v1/me/password')"
+          jq -e '.data.updated == true and (.data.csrfToken | length > 20)' \
+            <<< "$password_change" > /dev/null
+          revoked_session="$(curl --fail --silent --show-error \
+            --cookie "$customer_secondary_cookies" --cookie-jar "$customer_secondary_cookies" \
+            'http://127.0.0.1:8765/api/v1/session')"
+          jq -e '.data.user == null and (.data.csrfToken | length > 20)' \
+            <<< "$revoked_session" > /dev/null
+          revoked_csrf="$(jq -er '.data.csrfToken' <<< "$revoked_session")"
+          curl --fail-with-body --silent --show-error \
+            --cookie "$customer_secondary_cookies" --cookie-jar "$customer_secondary_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $revoked_csrf" \
+            --header 'Content-Type: application/json' \
+            --data '{"identifier":"610 81 17 17","password":"NouveauPass!456"}' \
+            'http://127.0.0.1:8765/api/v1/auth/login' > /dev/null
+
+          customer_csrf="$(jq -er '.data.csrfToken' <<< "$password_change")"
+          profile_update="$(curl --fail-with-body --silent --show-error \
+            --request PATCH \
+            --cookie "$guest_cookies" --cookie-jar "$guest_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $customer_csrf" \
+            --header 'Content-Type: application/json' \
+            --data '{"name":"Cliente Test","phone":"610 81 17 17","email":"cliente2@example.test","commune":"Ratoma","quartier":"Kipé","addressLandmark":"Près de la boutique","currentPassword":"NouveauPass!456"}' \
+            'http://127.0.0.1:8765/api/v1/me')"
+          jq -e '.data.user.email == "cliente2@example.test" and (.data.csrfToken | length > 20)' \
+            <<< "$profile_update" > /dev/null
+          identity_revoked_session="$(curl --fail --silent --show-error \
+            --cookie "$customer_secondary_cookies" --cookie-jar "$customer_secondary_cookies" \
+            'http://127.0.0.1:8765/api/v1/session')"
+          jq -e '.data.user == null and (.data.csrfToken | length > 20)' \
+            <<< "$identity_revoked_session" > /dev/null
+
+          manual="$(curl --fail-with-body --silent --show-error \
+            --cookie "$admin_cookies" --cookie-jar "$admin_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $admin_csrf" \
+            --header 'Idempotency-Key: integration-manual-0001' \
+            --header 'Content-Type: application/json' \
+            --data '{"name":"Commande directe","phone":"622 00 00 00","email":null,"description":"Bouquet convenu directement sur WhatsApp","subtotal":250000,"deliveryMode":"pickup","commune":null,"quartier":null,"addressLandmark":null,"deliveryFee":null,"desiredDate":null,"recipientName":null,"recipientPhone":null,"note":null,"paymentStatus":"unpaid"}' \
+            'http://127.0.0.1:8765/api/v1/admin/orders/manual')"
+          jq -e '.data.status == "confirmed" and .data.total == 250000' \
+            <<< "$manual" > /dev/null
+          manual_reference="$(jq -er '.data.reference' <<< "$manual")"
+          manual_version="$(jq -er '.data.version' <<< "$manual")"
+          repeated_manual_reference="$(curl --fail-with-body --silent --show-error \
+            --cookie "$admin_cookies" --cookie-jar "$admin_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $admin_csrf" \
+            --header 'Idempotency-Key: integration-manual-0001' \
+            --header 'Content-Type: application/json' \
+            --data '{"name":"Commande directe","phone":"622 00 00 00","email":null,"description":"Bouquet convenu directement sur WhatsApp","subtotal":250000,"deliveryMode":"pickup","commune":null,"quartier":null,"addressLandmark":null,"deliveryFee":null,"desiredDate":null,"recipientName":null,"recipientPhone":null,"note":null,"paymentStatus":"unpaid"}' \
+            'http://127.0.0.1:8765/api/v1/admin/orders/manual' | jq -er '.data.reference')"
+          [[ "$repeated_manual_reference" == "$manual_reference" ]]
+
+          corrected_manual="$(curl --fail-with-body --silent --show-error \
+            --request PATCH \
+            --cookie "$admin_cookies" --cookie-jar "$admin_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $admin_csrf" \
+            --header 'Content-Type: application/json' \
+            --data "{\"version\":$manual_version,\"name\":\"Cliente Test\",\"phone\":\"610 81 17 17\",\"email\":\"cliente@example.test\",\"deliveryMode\":\"pickup\",\"commune\":null,\"quartier\":null,\"addressLandmark\":null,\"desiredDate\":null,\"recipientName\":null,\"recipientPhone\":null,\"cardMessage\":null,\"note\":\"Téléphone corrigé par la boutique\"}" \
+            "http://127.0.0.1:8765/api/v1/admin/orders/$manual_reference/details")"
+          jq -e '.data.linkedToAccount == true and .data.customer.phone == "+224610811717"' \
+            <<< "$corrected_manual" > /dev/null
+
+          admin_order="$(curl --fail --silent --show-error \
+            --cookie "$admin_cookies" \
+            "http://127.0.0.1:8765/api/v1/admin/orders/$order_reference")"
+          order_version="$(jq -er '.data.version' <<< "$admin_order")"
+          updated_order="$(curl --fail-with-body --silent --show-error \
+            --request PATCH \
+            --cookie "$admin_cookies" --cookie-jar "$admin_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $admin_csrf" \
+            --header 'Content-Type: application/json' \
+            --data "{\"version\":$order_version,\"status\":\"confirmed\",\"paymentStatus\":\"unpaid\",\"priceAdjustment\":0,\"adjustmentReason\":null,\"deliveryFee\":10000,\"customerMessage\":null,\"privateNote\":null}" \
+            "http://127.0.0.1:8765/api/v1/admin/orders/$order_reference")"
+          jq -e '.data.status == "confirmed" and .data.total == 1210000 and .data.totalIsMinimum == false' \
+            <<< "$updated_order" > /dev/null
+
+          final_health="$(curl --fail --silent --show-error \
+            'http://127.0.0.1:8765/api/v1/health')"
+          jq -e '.data.database == true and .data.installed == true' \
+            <<< "$final_health" > /dev/null
+          if grep -E 'PHP (Warning|Notice|Deprecated|Fatal error|Parse error)' "$server_log"; then
+            echo 'Le serveur PHP a produit un avertissement ou une erreur.' >&2
+            exit 1
+          fi
 
       - name: Construire le site
         run: npm run build
@@ -59,8 +401,22 @@ jobs:
           set -Eeuo pipefail
           test -s dist/index.html
           test -s dist/.htaccess
+          test -s dist/.user.ini
           test -s dist/.deploy-target-ok
+          test -s dist/api/index.php
+          test -s dist/api/.htaccess
+          test -s dist/api/database/001_initial_schema.sql
+          test -s dist/api/database/catalogue-initial.json
+          test -s dist/uploads/.htaccess
           grep -Fq 'https://lizzirenedeco.com/' dist/index.html
+          test ! -e dist/api/config.local.php
+          if find dist -type f \( \
+            -name '.env' -o -name '.env.*' -o -name '*.pem' -o \
+            -name '*.key' -o -name 'config.local.php' \
+          \) -print -quit | grep -q .; then
+            echo 'Un secret ou fichier de configuration locale est présent dans l’artefact.' >&2
+            exit 1
+          fi
           if find dist -type l -print -quit | grep -q .; then
             echo 'Un lien symbolique est interdit dans le site publié.' >&2
             exit 1
@@ -127,6 +483,9 @@ jobs:
           set -Eeuo pipefail
           test -n "$LFTP_PASSWORD"
           marqueur="$RUNNER_TEMP/deploy-target-ok.remote"
+          marqueur_runtime="$RUNNER_TEMP/runtime-protected.local"
+          marqueur_runtime_distant="$RUNNER_TEMP/runtime-protected.remote"
+          printf '%s\n' 'lizzirenedeco.com' > "$marqueur_runtime"
 
           lftp \
             --norc \
@@ -147,10 +506,137 @@ jobs:
               set ssl:check-hostname yes;
               open --user '$BLUEHOST_FTP_USER' --env-password -p 21 ftp://ftp.bluehost.com;
               get .deploy-target-ok -o $marqueur;
+              mkdir -p uploads/products;
+              put $marqueur_runtime -o uploads/products/.runtime-protected;
+              get uploads/products/.runtime-protected -o $marqueur_runtime_distant;
               bye
             "
 
           grep -Fxq 'lizzirenedeco.com' "$marqueur"
+          grep -Fxq 'lizzirenedeco.com' "$marqueur_runtime_distant"
+
+      - name: Prépublier et appliquer les migrations
+        if: vars.BLUEHOST_API_READY == 'true'
+        shell: bash
+        env:
+          BLUEHOST_FTP_IP: ${{ vars.BLUEHOST_FTP_IP }}
+          BLUEHOST_FTP_USER: ${{ vars.BLUEHOST_FTP_USER }}
+          LFTP_PASSWORD: ${{ secrets.BLUEHOST_FTP_PASSWORD }}
+          BLUEHOST_MIGRATION_TOKEN: ${{ secrets.BLUEHOST_MIGRATION_TOKEN }}
+        run: |
+          set -Eeuo pipefail
+          test -n "$LFTP_PASSWORD"
+          test "${#BLUEHOST_MIGRATION_TOKEN}" -ge 64
+          [[ "$BLUEHOST_MIGRATION_TOKEN" != *$'\n'* ]]
+          [[ "$BLUEHOST_MIGRATION_TOKEN" != *$'\r'* ]]
+          test -d dist/api/database
+
+          # L'ancien code de l'API reçoit uniquement les migrations. Il peut
+          # ainsi faire évoluer le schéma avant que le nouveau code soit actif.
+          lftp \
+            --norc \
+            -e "
+              set cmd:fail-exit yes;
+              set dns:name/ftp.bluehost.com $BLUEHOST_FTP_IP;
+              set net:max-retries 2;
+              set net:timeout 30;
+              set ftp:passive-mode yes;
+              set ftp:ignore-pasv-address yes;
+              set ftp:list-options -a;
+              set ftp:ssl-force yes;
+              set ftp:ssl-auth TLS;
+              set ftp:ssl-protect-data yes;
+              set ftp:ssl-protect-list yes;
+              set ssl:use-sni yes;
+              set ssl:verify-certificate yes;
+              set ssl:check-hostname yes;
+              set xfer:use-temp-file yes;
+              open --user '$BLUEHOST_FTP_USER' --env-password -p 21 ftp://ftp.bluehost.com;
+              mirror \
+                --reverse \
+                --scan-all-first \
+                --no-perms \
+                --no-symlinks \
+                --parallel=2 \
+                --verbose=1 \
+                --max-errors=1 \
+                '$GITHUB_WORKSPACE/dist/api/database' \
+                /api/;
+              bye
+            "
+
+          migration="$(curl \
+            --fail-with-body \
+            --silent \
+            --show-error \
+            --request POST \
+            --retry 4 \
+            --retry-delay 5 \
+            --retry-all-errors \
+            --connect-timeout 10 \
+            --max-time 45 \
+            --header 'Origin: https://lizzirenedeco.com' \
+            --header "X-Migration-Token: $BLUEHOST_MIGRATION_TOKEN" \
+            'https://lizzirenedeco.com/api/v1/setup/migrate')"
+          jq -e '
+            .data.migrated == true and
+            ((.data.pendingVersions // []) | length == 0)
+          ' <<< "$migration" > /dev/null
+
+      - name: Prévisualiser le nettoyage Bluehost
+        shell: bash
+        env:
+          BLUEHOST_FTP_IP: ${{ vars.BLUEHOST_FTP_IP }}
+          BLUEHOST_FTP_USER: ${{ vars.BLUEHOST_FTP_USER }}
+          LFTP_PASSWORD: ${{ secrets.BLUEHOST_FTP_PASSWORD }}
+        run: |
+          set -Eeuo pipefail
+          test -n "$LFTP_PASSWORD"
+          plan="$RUNNER_TEMP/nettoyage-bluehost.lftp"
+
+          lftp \
+            --norc \
+            -e "
+              set cmd:fail-exit yes;
+              set dns:name/ftp.bluehost.com $BLUEHOST_FTP_IP;
+              set net:max-retries 2;
+              set net:timeout 30;
+              set ftp:passive-mode yes;
+              set ftp:ignore-pasv-address yes;
+              set ftp:list-options -a;
+              set ftp:ssl-force yes;
+              set ftp:ssl-auth TLS;
+              set ftp:ssl-protect-data yes;
+              set ftp:ssl-protect-list yes;
+              set ssl:use-sni yes;
+              set ssl:verify-certificate yes;
+              set ssl:check-hostname yes;
+              open --user '$BLUEHOST_FTP_USER' --env-password -p 21 ftp://ftp.bluehost.com;
+              mirror \
+                --reverse \
+                --delete \
+                --dry-run \
+                --scan-all-first \
+                --no-perms \
+                --no-symlinks \
+                --parallel=4 \
+                --max-errors=1 \
+                --exclude-glob='.well-known/' \
+                --exclude-glob='.ftpquota' \
+                --exclude-glob='cgi-bin/' \
+                --exclude-glob='uploads/products/' \
+                --exclude-glob='api/config.local.php' \
+                --exclude='^index\.html$' \
+                --exclude='^\.htaccess$' \
+                '$GITHUB_WORKSPACE/dist/' \
+                /;
+              bye
+            " > "$plan"
+
+          if grep -Fq -e 'uploads/products' -e 'api/config.local.php' "$plan"; then
+            echo 'Le nettoyage prévu touche un répertoire persistant protégé.' >&2
+            exit 1
+          fi
 
       - name: Publier sur Bluehost
         shell: bash
@@ -179,6 +665,28 @@ jobs:
               set ssl:check-hostname yes;
               set xfer:use-temp-file yes;
               open --user '$BLUEHOST_FTP_USER' --env-password -p 21 ftp://ftp.bluehost.com;
+
+              mirror \
+                --reverse \
+                --scan-all-first \
+                --no-perms \
+                --no-symlinks \
+                --parallel=4 \
+                --verbose=1 \
+                --max-errors=1 \
+                --exclude-glob='.well-known/' \
+                --exclude-glob='.ftpquota' \
+                --exclude-glob='cgi-bin/' \
+                --exclude-glob='uploads/products/' \
+                --exclude-glob='api/config.local.php' \
+                --exclude='^index\.html$' \
+                --exclude='^\.htaccess$' \
+                '$GITHUB_WORKSPACE/dist/' \
+                /;
+
+              put '$GITHUB_WORKSPACE/dist/.htaccess' -o .htaccess;
+              put '$GITHUB_WORKSPACE/dist/index.html' -o index.html;
+
               mirror \
                 --reverse \
                 --delete \
@@ -191,6 +699,10 @@ jobs:
                 --exclude-glob='.well-known/' \
                 --exclude-glob='.ftpquota' \
                 --exclude-glob='cgi-bin/' \
+                --exclude-glob='uploads/products/' \
+                --exclude-glob='api/config.local.php' \
+                --exclude='^index\.html$' \
+                --exclude='^\.htaccess$' \
                 '$GITHUB_WORKSPACE/dist/' \
                 /;
               bye
@@ -227,18 +739,32 @@ jobs:
               open --user '$BLUEHOST_FTP_USER' --env-password -p 21 ftp://ftp.bluehost.com;
               get index.html -o $verification/index.html;
               get .htaccess -o $verification/htaccess;
+              get .user.ini -o $verification/user-ini;
               get .deploy-target-ok -o $verification/deploy-target-ok;
+              get api/index.php -o $verification/api-index.php;
+              get api/.htaccess -o $verification/api-htaccess;
+              get uploads/.htaccess -o $verification/uploads-htaccess;
+              get uploads/products/.runtime-protected -o $verification/runtime-protected;
               bye
             "
 
           test -s "$verification/index.html"
           test -s "$verification/htaccess"
+          test -s "$verification/user-ini"
           grep -Fxq 'lizzirenedeco.com' "$verification/deploy-target-ok"
-          grep -Fq 'https://lizzirenedeco.com/' "$verification/index.html"
-          grep -Fq 'RewriteEngine On' "$verification/htaccess"
+          grep -Fxq 'lizzirenedeco.com' "$verification/runtime-protected"
+          cmp --silent dist/index.html "$verification/index.html"
+          cmp --silent dist/.htaccess "$verification/htaccess"
+          cmp --silent dist/.user.ini "$verification/user-ini"
+          cmp --silent dist/api/index.php "$verification/api-index.php"
+          cmp --silent dist/api/.htaccess "$verification/api-htaccess"
+          cmp --silent dist/uploads/.htaccess "$verification/uploads-htaccess"
 
       - name: Vérifier le site public
         shell: bash
+        env:
+          BLUEHOST_API_READY: ${{ vars.BLUEHOST_API_READY }}
+          BLUEHOST_MIGRATION_TOKEN: ${{ secrets.BLUEHOST_MIGRATION_TOKEN }}
         run: |
           set -Eeuo pipefail
 
@@ -278,3 +804,117 @@ jobs:
               "https://lizzirenedeco.com$chemin")"
             grep -Fq '<div id="root"></div>' <<< "$contenu"
           done
+
+          health="$(curl \
+            --fail \
+            --silent \
+            --show-error \
+            --retry 4 \
+            --retry-delay 5 \
+            --retry-all-errors \
+            --connect-timeout 10 \
+            --max-time 45 \
+            'https://lizzirenedeco.com/api/v1/health')"
+          jq -e '
+            .data.service == "lizzirene-api" and
+            (.data.requirements.php | test("^8\\.[1-9][0-9]*\\.")) and
+            .data.requirements.pdoMysql == true and
+            .data.requirements.mbstring == true and
+            .data.requirements.fileinfo == true
+            and .data.requirements.gd == true
+          ' <<< "$health" > /dev/null
+
+          if [[ "$BLUEHOST_API_READY" == 'true' ]]; then
+            test "${#BLUEHOST_MIGRATION_TOKEN}" -ge 64
+            [[ "$BLUEHOST_MIGRATION_TOKEN" != *$'\n'* ]]
+            [[ "$BLUEHOST_MIGRATION_TOKEN" != *$'\r'* ]]
+            jq -e '
+              .data.configured == true and
+              .data.database == true and
+              .data.installed == true
+            ' <<< "$health" > /dev/null
+            produits="$(curl \
+              --fail \
+              --silent \
+              --show-error \
+              --retry 4 \
+              --retry-delay 5 \
+              --retry-all-errors \
+              --connect-timeout 10 \
+              --max-time 45 \
+              'https://lizzirenedeco.com/api/v1/products')"
+            jq -e '.data | type == "array" and length > 0' \
+              <<< "$produits" > /dev/null
+
+            migration="$(curl \
+              --fail-with-body \
+              --silent \
+              --show-error \
+              --request POST \
+              --retry 4 \
+              --retry-delay 5 \
+              --retry-all-errors \
+              --connect-timeout 10 \
+              --max-time 45 \
+              --header 'Origin: https://lizzirenedeco.com' \
+              --header "X-Migration-Token: $BLUEHOST_MIGRATION_TOKEN" \
+              'https://lizzirenedeco.com/api/v1/setup/migrate')"
+            jq -e '
+              .data.migrated == true and
+              ((.data.pendingVersions // []) | length == 0)
+            ' <<< "$migration" > /dev/null
+          fi
+
+          verifier_json_status() {
+            local chemin="$1"
+            local attendu="$2"
+            local sortie="$RUNNER_TEMP/reponse-api.json"
+            local statut
+            statut="$(curl --silent --show-error \
+              --retry 4 \
+              --retry-delay 5 \
+              --retry-all-errors \
+              --connect-timeout 10 \
+              --max-time 45 \
+              --output "$sortie" \
+              --write-out '%{http_code}' "https://lizzirenedeco.com$chemin")"
+            [[ "$statut" == "$attendu" ]]
+            jq -e '.error.code | type == "string"' "$sortie" > /dev/null
+          }
+
+          verifier_json_status '/api/v1/inconnu' '404'
+          verifier_json_status '/api/v1/admin/dashboard' '401'
+
+          for chemin_sensible in \
+            '/api/app/Config.php' \
+            '/api/database/001_initial_schema.sql' \
+            '/api/config.example.php' \
+            '/.env' \
+            '/.user.ini' \
+            '/.deploy-target-ok' \
+            '/uploads/'
+          do
+            statut="$(curl --silent --show-error \
+              --retry 4 \
+              --retry-delay 5 \
+              --retry-all-errors \
+              --connect-timeout 10 \
+              --max-time 45 \
+              --output /dev/null \
+              --write-out '%{http_code}' \
+              "https://lizzirenedeco.com$chemin_sensible")"
+            [[ "$statut" == '403' || "$statut" == '404' ]]
+          done
+
+          sitemap="$(curl \
+            --fail \
+            --silent \
+            --show-error \
+            --retry 4 \
+            --retry-delay 5 \
+            --retry-all-errors \
+            --connect-timeout 10 \
+            --max-time 45 \
+            'https://lizzirenedeco.com/sitemap.xml')"
+          grep -Fq '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' \
+            <<< "$sitemap"

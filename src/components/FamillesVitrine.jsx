@@ -1,7 +1,7 @@
 import Reveal from './Reveal.jsx'
 import Icon from './Icon.jsx'
 import Media from './Media.jsx'
-import { PRODUCTS } from '../data/products.js'
+import { useProducts } from '../context/ProductsContext.jsx'
 import { intercepterNavigation, urlProduits } from '../utils/navigation.js'
 
 // Une phrase par famille : la tuile doit dire ce qu'on y trouve, pas
@@ -19,24 +19,25 @@ const PROMESSES = {
 
 // Nombre d'articles réellement au catalogue : la tuile ne promet pas un rayon
 // vide, et le compteur se met à jour tout seul quand le catalogue grandit.
-const compter = (famille) =>
-  PRODUCTS.filter((produit) => famille.categories.includes(produit.category))
+const compter = (products, famille) =>
+  products.filter((produit) => famille.categories.includes(produit.category))
     .length
 
 // Photo de la tuile : le premier article photographié de la famille. Une
 // famille sans photo garde le visuel provisoire de `Media` plutôt qu'un trou.
-const photoDe = (famille) =>
-  PRODUCTS.find(
+const photoDe = (products, famille) =>
+  products.find(
     (produit) => famille.categories.includes(produit.category) && produit.src,
   )
 
 function FamillesVitrine({ familles, titre, chapeau, onCategorie }) {
+  const { products } = useProducts()
   const ouvrir = (event, id) => {
     if (!intercepterNavigation(event)) return
     onCategorie?.(id, { ajouterHistorique: true })
   }
 
-  const visibles = familles.filter((famille) => compter(famille) > 0)
+  const visibles = familles.filter((famille) => compter(products, famille) > 0)
   if (visibles.length === 0) return null
 
   return (
@@ -51,8 +52,8 @@ function FamillesVitrine({ familles, titre, chapeau, onCategorie }) {
       )}
       <div className="familles-grid">
         {visibles.map((famille, i) => {
-          const photo = photoDe(famille)
-          const nombre = compter(famille)
+          const photo = photoDe(products, famille)
+          const nombre = compter(products, famille)
           return (
             <Reveal key={famille.id} variant="zoom" delay={(i % 3) * 80}>
               <a

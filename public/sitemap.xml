@@ -21,6 +21,10 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://lizzirenedeco.com/confidentialite</loc>
+    <priority>0.3</priority>
+  </url>
+  <url>
     <loc>https://lizzirenedeco.com/produits?categorie=fleurs</loc>
     <priority>0.7</priority>
   </url>

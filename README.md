@@ -1,129 +1,82 @@
-# Lizzirene Déco — site vitrine & boutique
+# Lizzirene Déco
 
-Site de **Lizzirene Déco by Madame Sandouno Irene Mayer** — fleuriste et décoration d'intérieur à Kipé, Conakry (Guinée).
-_« Des fleurs pour chaque émotion »_
+Site marchand de Lizzirene Déco à Kipé, Conakry : catalogue, panier, commande
+assistée par WhatsApp, comptes clients facultatifs et administration privée.
 
-Bouquets personnalisés, compositions florales, terrariums faits main, box cadeaux, plantes
-et décoration florale d'événements. Livraison partout à Conakry, **paiement à la livraison**.
+Le parcours est volontairement simple : le client peut commander sans compte.
+Le site enregistre d’abord sa demande et lui donne une référence, puis ouvre
+WhatsApp avec le récapitulatif. La commande reste « à confirmer » jusqu’à ce que
+la boutique confirme la disponibilité, le prix final et la livraison.
 
-Le front propose plusieurs pages avec des URL partageables : accueil, catalogue,
-fiches produits et contact.
+## Fonctionnalités
+
+- catalogue administrable, brouillons, produits indisponibles et archivage ;
+- panier conservé sur l’appareil, livraison à Conakry ou retrait à Kipé ;
+- commande invitée sans inscription, puis confirmation sur WhatsApp ;
+- compte client facultatif avec adresse, historique et suivi des statuts ;
+- rattachement d’une commande invitée à un nouveau compte ou à un compte existant ;
+- tableau de bord administrateur, suivi, correction des coordonnées et ajustement du prix ;
+- saisie manuelle d’une commande reçue directement sur WhatsApp ou par téléphone ;
+- ajout de photos JPEG, PNG ou WebP, réencodées et redimensionnées côté serveur ;
+- paiement à la livraison ou au retrait. Aucun paiement Orange Money n’est intégré.
 
 ## Stack
 
-| Étape | Technologie |
+| Partie | Technologie |
 | --- | --- |
-| Front-end (actuel) | React 19 + Vite, CSS natif (variables) |
-| Back-end (à venir) | NestJS |
-| Base de données (à venir) | MongoDB |
+| Interface | React 19, Vite, CSS natif |
+| API | PHP 8.1+ sans framework |
+| Données | MySQL / MariaDB, PDO et migrations SQL |
+| Hébergement | Bluehost, Apache, HTTPS |
+| Livraison | GitHub Actions vers Bluehost par FTPS explicite |
 
-## Démarrer
+L’API et l’interface sont servies sur le même domaine. L’authentification utilise
+des sessions PHP sécurisées et un jeton CSRF ; aucun jeton de connexion n’est
+stocké dans `localStorage`.
 
-```bash
-npm install
-npm run dev      # http://localhost:5173
-npm run build    # génère dist/
-npm run preview  # prévisualise le build
-```
-
-## Structure
-
-```
-image-sources/          originaux conservés hors du site publié
-public/optimized/       variantes légères générées pour le site
-public/robots.txt       ouvert à tous les moteurs, pointe vers le sitemap
-public/sitemap.xml      généré avant chaque build depuis le catalogue réel
-src/
-  config.js             coordonnées, photos, zones de livraison, format des prix
-  data/products.js      catalogue (nom, catégorie, prix, photo)
-  data/services.js      prestations, regroupées par thème
-  data/occasions.js     entrées par occasion (Saint-Valentin, Tabaski, mariages…)
-  data/faq.js           source unique des questions fréquentes
-  context/CartContext   panier (état + persistance navigateur)
-  components/           sections et composants réutilisables
-  pages/                accueil, catalogue, fiche produit et contact
-  hooks/useRouter.js    navigation entre les pages sans dépendance externe
-  utils/navigation.js  construction centralisée des URL internes
-  utils/donneesStructurees.js  balisage schema.org injecté à chaque page
-  index.css             toute la mise en forme (palette en haut du fichier)
-```
-
-### Points d'entrée pour modifier le site
-
-- **Couleurs / typographie** → variables en haut de `src/index.css`
-- **Téléphone, WhatsApp, email, adresse** → `src/config.js`
-- **Produits et prix** → `src/data/products.js` (`price: null` affiche « Sur devis »)
-- **Photos** → déposer les sources dans `image-sources/`, les ajouter au manifeste de
-  `scripts/optimize-images.mjs`, puis référencer leurs variantes dans `PHOTOS`
-  (`src/config.js`)
-- **Questions fréquentes** → `src/data/faq.js` (accueil, page contact et balisage
-  `FAQPage` lisent la même liste)
-- **Occasions** → `src/data/occasions.js`
-- **Adresse publique du site** → `https://lizzirenedeco.com`, centralisée dans
-  les métadonnées, les données structurées et le générateur de sitemap
-
-### Référencement
-
-Chaque page injecte un graphe [schema.org](https://schema.org) unique
-(`src/utils/donneesStructurees.js`) : la boutique (`Florist` / `LocalBusiness`
-avec adresse, horaires réels et zone desservie), le site, les questions
-fréquentes sur l'accueil et le contact, puis la fiche `Product` et le fil
-d'Ariane sur les pages produits. Un article « sur devis » ne publie aucun
-montant ; un prix « à partir de » est déclaré comme minimum, jamais comme prix
-ferme.
+## Développement
 
 ```bash
-npm run sitemap   # régénère public/sitemap.xml depuis le catalogue
+npm ci
+npm run dev
+npm run lint
+npm run build
 ```
 
-Le sitemap est reconstruit automatiquement avant chaque build : un produit
-ajouté à `src/data/products.js` s'y retrouve sans intervention.
+Le build exécute aussi :
 
-## Mise en production
+- l’optimisation des images ;
+- la génération du catalogue SQL initial de 84 produits ;
+- la génération du sitemap statique de secours.
 
-Le dépôt GitHub reste la source du site. Chaque push fusionné dans `main`
-déclenche `.github/workflows/deploy.yml` : installation reproductible,
-lint strict, build Vite, puis synchronisation FTPS chiffrée avec un compte
-dédié au seul répertoire du site sur Bluehost.
+Sans configuration MySQL locale, le front utilise le catalogue statique et la
+commande peut toujours partir directement sur WhatsApp. La production utilise
+le catalogue de l’API dès que Bluehost est configuré.
 
-La configuration unique du domaine, de l'accès FTPS et des paramètres GitHub est
-décrite dans [DEPLOIEMENT.md](DEPLOIEMENT.md). Aucun identifiant Bluehost ne
-doit être ajouté au dépôt.
+## Structure utile
 
-### Optimisation des images
-
-```bash
-npm run optimize:images
+```text
+public/api/                    API PHP et migration initiale
+public/uploads/                règles Apache des photos administrateur
+src/context/                   authentification, catalogue et panier
+src/pages/admin/               administration produits et commandes
+src/pages/Compte.jsx           espace client
+src/components/CartDrawer.jsx  tunnel panier → référence → WhatsApp
+src/config.js                  coordonnées publiques de la boutique
+src/data/products.js           catalogue initial et secours
+scripts/                       images, seed API et sitemap
 ```
 
-La commande produit dans `public/optimized/` des variantes WebP redimensionnées,
-sans agrandir les sources. Elle est aussi lancée automatiquement avant chaque build.
-Les composants utilisent `srcSet` et `sizes` pour laisser le navigateur choisir la
-bonne largeur. Une photo répétée doit rester définie une seule fois dans `PHOTOS`, puis
-être réutilisée dans les produits, les fiches, le panier et la galerie : le navigateur
-ne la télécharge ainsi qu'une fois grâce à son cache.
+## Production
 
-Les fichiers source restent dans `image-sources/` pour permettre une nouvelle compression
-sans perte quand d'autres formats ou dimensions seront nécessaires. Comme ce dossier est
-hors de `public/`, GitHub Pages ne publie que les variantes de `public/optimized/`.
+Chaque push fusionné dans `main` déclenche le lint JavaScript, le lint de tous
+les fichiers PHP, les tests MySQL, les migrations protégées, le build, les
+contrôles de l’artefact, le transfert FTPS et des tests publics. Les photos ajoutées depuis l’administration et la
+configuration privée sont explicitement exclues des suppressions de déploiement.
 
-La palette est extraite du logo officiel : turquoise `#36C0C0`, bleu-vert `#2A585C`,
-jaune `#FBDD13`.
+L’activation MySQL et la première administratrice sont détaillées dans
+[DEPLOIEMENT.md](DEPLOIEMENT.md). Le fonctionnement quotidien est décrit dans
+[ADMINISTRATION.md](ADMINISTRATION.md).
 
-## Le panier
-
-Panier fonctionnel côté client, conservé dans le navigateur (`localStorage`).
-Le tunnel de commande se fait en trois étapes — panier, coordonnées de livraison,
-confirmation — et la commande part sur WhatsApp avec le récapitulatif complet.
-
-Les champs (`id`, `name`, `price`, `qty`) sont déjà alignés sur le futur modèle
-MongoDB : le branchement sur l'API NestJS se fera sans retoucher l'interface.
-
-## Reste à faire avant la mise en ligne
-
-- [x] Retirer les **témoignages provisoires** ; cette section ne reviendra
-      qu'avec de vrais avis clients et leur accord de publication
-- [ ] Confirmer les **prix** des articles actuellement « Sur devis »
-- [ ] Ajouter les **photos** manquantes (galerie, boutique, produits)
-- [ ] Vérifier le **pseudo Instagram** exact dans `src/config.js`
-- [ ] Brancher le formulaire de contact et les commandes sur l'API NestJS
+Ne jamais versionner un mot de passe, un jeton d’installation, une clé privée ou
+le fichier `config.php` de production.

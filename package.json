@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "api:catalogue": "node scripts/generer-catalogue-api.mjs",
     "optimize:images": "node scripts/optimize-images.mjs",
     "sitemap": "node scripts/generer-sitemap.mjs",
-    "prebuild": "npm run optimize:images && npm run sitemap",
+    "prebuild": "npm run optimize:images && npm run api:catalogue && npm run sitemap",
     "build": "vite build",
     "lint": "oxlint --deny-warnings",
     "preview": "vite preview"

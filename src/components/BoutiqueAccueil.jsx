@@ -2,7 +2,8 @@ import Reveal from './Reveal.jsx'
 import Icon from './Icon.jsx'
 import ProductCard from './ProductCard.jsx'
 import FamillesVitrine from './FamillesVitrine.jsx'
-import { FAMILLES, PRODUCTS } from '../data/products.js'
+import { FAMILLES, normaliserCategorie } from '../data/products.js'
+import { useProducts } from '../context/ProductsContext.jsx'
 import { intercepterNavigation, urlProduits } from '../utils/navigation.js'
 
 // L'accueil ne montre pas tout le catalogue : deux familles suffisent à
@@ -36,12 +37,28 @@ const AUTRES_FAMILLES = FAMILLES.filter(
   (famille) => !['fleurs', 'plantes'].includes(famille.id),
 )
 
-const produitsDe = (ids) =>
-  ids
-    .map((id) => PRODUCTS.find((produit) => produit.id === id))
-    .filter((produit) => produit && produit.src)
-
 function BoutiqueAccueil({ onCategorie, onProduit }) {
+  const { products } = useProducts()
+  const produitsDe = (rangee) => {
+    const vedettes = products
+      .filter(
+        (produit) =>
+          produit.featuredHome &&
+          normaliserCategorie(produit.category) === rangee.id &&
+          produit.src &&
+          produit.availability !== 'out_of_stock',
+      )
+      .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+
+    const source = vedettes.length > 0
+      ? vedettes
+      : rangee.produits
+          .map((id) => products.find((produit) => produit.id === id))
+          .filter(Boolean)
+
+    return source.filter((produit) => produit.src).slice(0, 4)
+      .filter((produit) => produit.availability !== 'out_of_stock')
+  }
   const ouvrir = (event, id) => {
     if (!intercepterNavigation(event)) return
     onCategorie?.(id, { ajouterHistorique: true })
@@ -51,7 +68,7 @@ function BoutiqueAccueil({ onCategorie, onProduit }) {
     <section className="boutique-accueil" id="boutique">
       <div className="container">
         {RANGEES.map((rangee, r) => {
-          const produits = produitsDe(rangee.produits)
+          const produits = produitsDe(rangee)
           if (produits.length === 0) return null
           return (
             <div className="rayon" key={rangee.id}>

@@ -6,6 +6,7 @@ import {
   intercepterNavigation,
   urlAccueil,
   urlContact,
+  urlConfidentialite,
   urlProduits,
   urlServices,
   urlAPropos,
@@ -205,7 +206,16 @@ function Footer({ onAller, onCategorie, onTheme }) {
           </div>
         </div>
         <div className="footer-bottom">
-          © 2026 Lizzirène Déco. Site conçu par GassTech Solutions.
+          <span>© 2026 Lizzirène Déco. Site conçu par GassTech Solutions.</span>
+          <a
+            href={urlConfidentialite()}
+            onClick={(event) => {
+              if (!intercepterNavigation(event)) return
+              onAller?.('confidentialite')
+            }}
+          >
+            Confidentialité
+          </a>
         </div>
       </div>
     </footer>
