@@ -722,6 +722,42 @@ export const SERVICE_THEME_PHOTOS = {
     sizes:
       '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
   }),
+  salleConference: responsivePhoto({
+    nom: 'service-salle-conference',
+    largeurs: [480, 800, 1280],
+    alt: 'Salle de conférence décorée de compositions florales blanches et vertes',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  evenementProfessionnel: responsivePhoto({
+    nom: 'service-evenement-professionnel',
+    largeurs: [480, 800, 1280],
+    alt: 'Décor floral sobre pour une réception professionnelle',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  inauguration: responsivePhoto({
+    nom: 'service-inauguration',
+    largeurs: [480, 800, 1280],
+    alt: 'Entrée fleurie avec ruban et ciseaux pour une inauguration',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  conseilAmenagementFloral: responsivePhoto({
+    nom: 'service-conseil-amenagement-floral',
+    largeurs: [480, 800, 1280],
+    alt: 'Conseil en aménagement floral dans un hall professionnel',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
   creations: responsivePhoto({
     nom: 'service-creations-florales',
     largeurs: [480, 800, 1280],
@@ -731,12 +767,57 @@ export const SERVICE_THEME_PHOTOS = {
     sizes:
       '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
   }),
+  boxCadeau: responsivePhoto({
+    nom: 'service-box-cadeau',
+    largeurs: [480, 800, 1280],
+    alt: 'Coffret cadeau fleuri avec chocolats, soin et peluche',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  accueilFleuri: responsivePhoto({
+    nom: 'service-accueil-fleuri',
+    largeurs: [480, 800, 1280],
+    alt: 'Bouquet de bienvenue remis dans un hall d’accueil',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  atelierCreationFlorale: responsivePhoto({
+    nom: 'service-atelier-creation-florale',
+    largeurs: [480, 800, 1280],
+    alt: 'Participants composant des bouquets pendant un atelier floral',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  emballageConservation: responsivePhoto({
+    nom: 'service-emballage-conservation',
+    largeurs: [480, 800, 1280],
+    alt: 'Bouquet protégé par un emballage respirant pour mieux conserver les fleurs',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
   evenements: responsivePhoto({
     nom: 'service-celebrations',
     largeurs: [480, 800, 1280],
     alt: 'Décoration florale d’événement avec table festive',
     width: 1280,
     height: 853,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  bapteme: responsivePhoto({
+    nom: 'service-bapteme',
+    largeurs: [480, 800, 1280],
+    alt: 'Table de baptême décorée de fleurs pastel et d’une bougie blanche',
+    width: 1280,
+    height: 721,
     sizes:
       '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
   }),
