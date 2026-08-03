@@ -52,7 +52,7 @@ function InstallationAdmin({ onAller }) {
       <span className="eyebrow">Installation unique</span>
       <h1>Créer l’espace administratrice</h1>
       <p>
-        Cette étape crée les tables MySQL, importe les 84 produits actuels et
+        Cette étape crée les tables MySQL, importe les produits actuels et
         crée le premier compte administrateur. Elle se bloque automatiquement
         une fois terminée.
       </p>

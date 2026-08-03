@@ -129,7 +129,7 @@ dans une variable publique.
    `configured`, `database` doivent être vrais ; `installed` est encore faux.
 3. Ouvrir `https://lizzirenedeco.com/admin/installation`.
 4. Saisir le jeton `setup_token`, puis créer le premier compte administratrice.
-   Cette action crée les tables et importe les 84 produits existants.
+   Cette action crée les tables et importe les produits versionnés existants.
 5. Vérifier l’accès à `/admin`, ajouter une photo test et créer une commande test.
 
 Immédiatement après l’installation, modifier le fichier privé :

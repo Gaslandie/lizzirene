@@ -46,7 +46,7 @@ npm run build
 Le build exécute aussi :
 
 - l’optimisation des images ;
-- la génération du catalogue SQL initial de 84 produits ;
+- la génération du catalogue SQL initial à partir des produits versionnés ;
 - la génération du sitemap statique de secours.
 
 Sans configuration MySQL locale, le front utilise le catalogue statique et la

@@ -197,10 +197,12 @@ jobs:
           jq -e '.data.catalogImported == true and .data.user.role == "admin"' \
             <<< "$setup" > /dev/null
 
+          expected_products="$(jq 'length' public/api/database/catalogue-initial.json)"
           products="$(curl --fail --silent --show-error \
             --cookie "$admin_cookies" \
             'http://127.0.0.1:8765/api/v1/admin/products')"
-          jq -e '.data | length == 84' <<< "$products" > /dev/null
+          jq -e --argjson expected "$expected_products" \
+            '.data | length == $expected' <<< "$products" > /dev/null
 
           product="$(curl --fail-with-body --silent --show-error \
             --cookie "$admin_cookies" --cookie-jar "$admin_cookies" \
