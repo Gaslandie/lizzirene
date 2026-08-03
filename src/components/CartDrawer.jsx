@@ -4,7 +4,7 @@ import Icon from './Icon.jsx'
 import { SuggestionsPanier } from './SeMarieBienAvec.jsx'
 import { useCart } from '../context/CartContext.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
-import { CONTACT, ZONES, formatPrice, waLink } from '../config.js'
+import { CONTACT, formatPrice, waLink } from '../config.js'
 import { apiRequest } from '../services/api.js'
 
 const FOCUSABLE_SELECTOR = [
@@ -15,17 +15,6 @@ const FOCUSABLE_SELECTOR = [
   'textarea:not([disabled])',
   '[tabindex]:not([tabindex="-1"])',
 ].join(',')
-
-const dateIsoConakry = () => {
-  const parts = new Intl.DateTimeFormat('fr-FR', {
-    timeZone: 'Africa/Conakry',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(new Date())
-  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]))
-  return `${values.year}-${values.month}-${values.day}`
-}
 
 function CartDrawer({ onAller }) {
   const {
@@ -45,7 +34,6 @@ function CartDrawer({ onAller }) {
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [deliveryMode, setDeliveryMode] = useState('delivery')
-  const [differentRecipient, setDifferentRecipient] = useState(false)
   const [copie, setCopie] = useState(false)
   const copieTimerRef = useRef(null)
   const drawerRef = useRef(null)
@@ -70,7 +58,6 @@ function CartDrawer({ onAller }) {
         setOrder(null)
         setError('')
         setCopie(false)
-        setDifferentRecipient(false)
         setDeliveryMode('delivery')
       }
     }, 300)
@@ -166,12 +153,40 @@ function CartDrawer({ onAller }) {
     return () => window.cancelAnimationFrame(focusFrame)
   }, [open, step])
 
+  // WhatsApp s'ouvre dès que la demande est enregistrée : le client ne doit
+  // pas avoir à retrouver un bouton dans son espace pour envoyer sa commande.
+  //
+  // Un site ne peut pas ENVOYER un message WhatsApp à la place du client —
+  // wa.me ne fait qu'ouvrir la conversation avec le texte pré-rempli, et
+  // l'envoi reste un geste manuel. Ce qu'on supprime ici, c'est le détour :
+  // la conversation s'ouvre d'elle-même, il ne reste que le bouton d'envoi.
+  const ouvrirConversation = (onglet, lien, reference, publicToken) => {
+    if (onglet && !onglet.closed) {
+      onglet.location.replace(lien)
+    } else {
+      // Onglet refusé par le navigateur : on emmène l'onglet courant. Le
+      // panier survit dans localStorage, et le retour arrière ramène au site.
+      window.location.assign(lien)
+    }
+
+    if (!reference || !publicToken) return
+    apiRequest(`/orders/${encodeURIComponent(reference)}/whatsapp-opened`, {
+      method: 'POST',
+      body: { token: publicToken },
+    }).catch(() => {})
+  }
+
   const handleOrder = async (e) => {
     e.preventDefault()
     const data = Object.fromEntries(new FormData(e.target))
     setError('')
     setSubmitting(true)
     submittingRef.current = true
+
+    // L'onglet est réservé MAINTENANT, dans le geste de clic : ouvert après
+    // l'attente du réseau, il serait bloqué comme une pop-up. On lui donnera
+    // l'adresse WhatsApp dès que l'API aura répondu.
+    const onglet = window.open('', '_blank')
 
     const lignes = items
       .map(
@@ -196,16 +211,7 @@ function CartDrawer({ onAller }) {
       `Téléphone : ${data.telephone}`,
       data.deliveryMode === 'pickup'
         ? 'Retrait souhaité à la boutique de Kipé'
-        : `Commune : ${data.zone}`,
-      data.deliveryMode === 'delivery' ? `Quartier : ${data.quartier}` : null,
-      data.deliveryMode === 'delivery' ? `Adresse / repère : ${data.adresse}` : null,
-      data.date ? `Livraison souhaitée : ${data.date}` : null,
-      data.destinataireNom ? `Destinataire : ${data.destinataireNom}` : null,
-      data.destinataireTelephone
-        ? `Téléphone destinataire : ${data.destinataireTelephone}`
-        : null,
-      data.messageCarte ? `Message carte : ${data.messageCarte}` : null,
-      data.note ? `Précision : ${data.note}` : null,
+        : 'Livraison à Conakry — adresse à préciser ensemble.',
     ]
       .filter(Boolean)
       .join('\n')
@@ -223,30 +229,33 @@ function CartDrawer({ onAller }) {
         body: {
           name: data.nom,
           phone: data.telephone,
-          email: data.email || null,
+          // Le compte client connaît parfois déjà l'adresse : on la joint
+          // quand elle existe, sans jamais la demander au moment d'acheter.
+          email: user?.email || null,
           deliveryMode: data.deliveryMode,
-          commune: data.deliveryMode === 'delivery' ? data.zone : null,
-          quartier: data.deliveryMode === 'delivery' ? data.quartier : null,
+          commune:
+            data.deliveryMode === 'delivery' ? user?.commune || null : null,
+          quartier:
+            data.deliveryMode === 'delivery' ? user?.quartier || null : null,
           addressLandmark:
-            data.deliveryMode === 'delivery' ? data.adresse : null,
-          desiredDate: data.date || null,
-          recipientName: data.destinataireNom || null,
-          recipientPhone: data.destinataireTelephone || null,
-          cardMessage: data.messageCarte || null,
-          note: data.note || null,
+            data.deliveryMode === 'delivery'
+              ? user?.addressLandmark || null
+              : null,
           items: items.map((item) => ({ id: item.id, quantity: item.qty })),
         },
       })
 
+      const lien = created.whatsappUrl || waLink(created.whatsappMessage)
       setOrder({
         ...created,
         nom: created.customer.name,
-        link: created.whatsappUrl || waLink(created.whatsappMessage),
+        link: lien,
         message: created.whatsappMessage,
         offline: false,
       })
       setCopie(false)
       setStep('confirme')
+      ouvrirConversation(onglet, lien, created.reference, created.publicToken)
     } catch (requestError) {
       const fallbackAllowed =
         requestError.status === 0 ||
@@ -256,6 +265,7 @@ function CartDrawer({ onAller }) {
         )
 
       if (!fallbackAllowed) {
+        onglet?.close()
         setError(requestError.message)
         return
       }
@@ -266,9 +276,10 @@ function CartDrawer({ onAller }) {
         '',
         ...message.split('\n').slice(1),
       ].join('\n')
+      const lienHorsLigne = waLink(offlineMessage)
       setOrder({
         nom: data.nom,
-        link: waLink(offlineMessage),
+        link: lienHorsLigne,
         message: offlineMessage,
         reference: null,
         claimToken: null,
@@ -277,6 +288,7 @@ function CartDrawer({ onAller }) {
       })
       setCopie(false)
       setStep('confirme')
+      ouvrirConversation(onglet, lienHorsLigne)
     } finally {
       setSubmitting(false)
       submittingRef.current = false
@@ -325,12 +337,9 @@ function CartDrawer({ onAller }) {
     setStep(user ? 'commande' : 'choix')
   }
 
-  const dateConakry = dateIsoConakry()
-  const dateMax = new Date(`${dateConakry}T00:00:00Z`)
-  dateMax.setUTCFullYear(dateMax.getUTCFullYear() + 1)
-  const dateMaximum = dateMax.toISOString().slice(0, 10)
-
-  const ouvrirWhatsApp = () => {
+  // Le lien reste disponible en secours sur l'écran de confirmation, si
+  // l'ouverture automatique a échoué ou si le client a fermé WhatsApp.
+  const rouvrirWhatsApp = () => {
     if (!order?.reference || !order?.publicToken) return
     apiRequest(
       `/orders/${encodeURIComponent(order.reference)}/whatsapp-opened`,
@@ -562,16 +571,6 @@ function CartDrawer({ onAller }) {
                 placeholder="6XX XX XX XX"
               />
             </label>
-            <label>
-              E-mail <small>(facultatif)</small>
-              <input
-                name="email"
-                type="email"
-                defaultValue={user?.email || ''}
-                autoComplete="email"
-                placeholder="Pour votre reçu ou votre compte"
-              />
-            </label>
             <fieldset className="checkout-mode">
               <legend>Comment souhaitez-vous recevoir la commande ?</legend>
               <label>
@@ -595,86 +594,17 @@ function CartDrawer({ onAller }) {
                 Retrait à la boutique de Kipé
               </label>
             </fieldset>
-            {deliveryMode === 'delivery' && (
-              <>
-            <label>
-              Commune de livraison
-              <select name="zone" required defaultValue={user?.commune || ''}>
-                <option value="" disabled>
-                  Choisir une commune
-                </option>
-                {ZONES.map((z) => (
-                  <option key={z}>{z}</option>
-                ))}
-              </select>
-            </label>
-            <label>
-              Quartier
-              <input
-                name="quartier"
-                type="text"
-                required
-                defaultValue={user?.quartier || ''}
-                placeholder="Ex : Kipé, Nongo, Lambanyi…"
-              />
-            </label>
-            <label>
-              Adresse / repère
-              <input
-                name="adresse"
-                type="text"
-                required
-                defaultValue={user?.addressLandmark || ''}
-                placeholder="Rue, immeuble ou point de repère connu"
-              />
-            </label>
-              </>
-            )}
-            <label>
-              Date souhaitée
-              <input
-                name="date"
-                type="date"
-                min={dateConakry}
-                max={dateMaximum}
-              />
-            </label>
-            <label className="checkout-recipient-toggle">
-              <input
-                type="checkbox"
-                checked={differentRecipient}
-                onChange={(event) => setDifferentRecipient(event.target.checked)}
-              />
-              <span>La commande est destinée à une autre personne</span>
-            </label>
-            {differentRecipient && (
-              <div className="checkout-recipient-fields">
-                <label>
-                  Nom du destinataire
-                  <input name="destinataireNom" required />
-                </label>
-                <label>
-                  Téléphone du destinataire <small>(facultatif)</small>
-                  <input name="destinataireTelephone" type="tel" inputMode="tel" />
-                </label>
-              </div>
-            )}
-            <label>
-              Message sur la carte (optionnel)
-              <textarea
-                name="messageCarte"
-                rows="3"
-                placeholder="Ex : Joyeux anniversaire Maman"
-              />
-            </label>
-            <label>
-              Précision pour la boutique (optionnel)
-              <textarea
-                name="note"
-                rows="3"
-                placeholder="Couleurs, heure, consigne particulière…"
-              />
-            </label>
+            {/* Adresse, date, destinataire, message de carte : tout cela se
+                règle dans la conversation WhatsApp, où la boutique confirme de
+                toute façon la disponibilité, les frais et l'heure. Le
+                formulaire ne garde que ce qui est indispensable pour rappeler
+                le client. */}
+            <p className="checkout-suite">
+              <Icon name="chat" size={17} />
+              {deliveryMode === 'delivery'
+                ? 'Adresse, date et message sur la carte : nous voyons cela ensemble sur WhatsApp, juste après.'
+                : 'Nous convenons de l’heure de votre passage sur WhatsApp, juste après.'}
+            </p>
 
             <div className="cart-total">
               <span>
@@ -715,15 +645,16 @@ function CartDrawer({ onAller }) {
               <>
                 <p className="confirm-reference">Référence <strong>{order.reference}</strong></p>
                 <p>
-                  Votre demande est enregistrée. Envoyez maintenant le
-                  récapitulatif sur WhatsApp ; la boutique confirmera ensuite la
-                  disponibilité et la livraison.
+                  WhatsApp vient de s’ouvrir avec votre récapitulatif.{' '}
+                  <strong>Appuyez sur envoyer</strong> dans la conversation :
+                  c’est ce qui prévient la boutique.
                 </p>
               </>
             ) : (
               <p className="form-alert form-alert-warning">
-                L’enregistrement en ligne est momentanément indisponible. Votre
-                récapitulatif reste prêt à être envoyé directement sur WhatsApp.
+                L’enregistrement en ligne est momentanément indisponible.
+                WhatsApp vient de s’ouvrir avec votre récapitulatif : appuyez
+                sur envoyer pour transmettre la commande.
               </p>
             )}
             <a
@@ -731,10 +662,10 @@ function CartDrawer({ onAller }) {
               href={order.link}
               target="_blank"
               rel="noreferrer"
-              onClick={ouvrirWhatsApp}
+              onClick={rouvrirWhatsApp}
             >
               <Icon name="whatsapp" size={19} />
-              Envoyer ma commande sur WhatsApp
+              Rouvrir la conversation WhatsApp
             </a>
             <button
               type="button"

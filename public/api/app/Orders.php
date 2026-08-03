@@ -45,9 +45,21 @@ final class Orders
         $phone = Validation::phone($data);
         $email = Validation::email($data);
         $deliveryMode = Validation::oneOf($data, 'deliveryMode', ['delivery', 'pickup']);
-        $commune = $deliveryMode === 'delivery' ? Validation::text($data, 'commune', 2, 80) : null;
-        $quartier = $deliveryMode === 'delivery' ? Validation::text($data, 'quartier', 2, 120) : null;
-        $landmark = $deliveryMode === 'delivery' ? Validation::text($data, 'addressLandmark', 2, 255) : null;
+        // L'adresse n'est plus exigée du client : elle se règle sur WhatsApp,
+        // où la boutique confirme de toute façon les frais et le délai. Les
+        // champs restent acceptés — un compte client les pré-remplit, et
+        // l'administration les complète après coup — mais ils ne bloquent
+        // plus la commande. La saisie manuelle par la boutique
+        // (`createManual`) les garde obligatoires : là, ils sont connus.
+        $commune = $deliveryMode === 'delivery'
+            ? Validation::text($data, 'commune', 2, 80, false)
+            : null;
+        $quartier = $deliveryMode === 'delivery'
+            ? Validation::text($data, 'quartier', 2, 120, false)
+            : null;
+        $landmark = $deliveryMode === 'delivery'
+            ? Validation::text($data, 'addressLandmark', 2, 255, false)
+            : null;
         $desiredDate = Validation::date($data, 'desiredDate');
         $recipientName = Validation::text($data, 'recipientName', 2, 120, false);
         $recipientPhone = Validation::phone($data, 'recipientPhone', false);
@@ -243,6 +255,7 @@ final class Orders
 
         $response = $this->orderResponse($orderId, true);
         $this->security->audit('order.created', 'order', $response['reference']);
+        $this->notifyShop($response);
         return $response;
     }
 
@@ -761,6 +774,55 @@ final class Orders
         return rtrim(strtr(base64_encode($raw), '+/', '-_'), '=');
     }
 
+    /**
+     * Prévient la boutique par e-mail dès qu'une commande est enregistrée.
+     *
+     * C'est le seul canal d'alerte qui ne dépend pas du client : le message
+     * WhatsApp, lui, ne part que si le client appuie sur « envoyer », et une
+     * commande peut donc rester invisible pour la boutique. L'envoi est
+     * volontairement silencieux — une commande enregistrée ne doit jamais
+     * échouer parce que le serveur de mail est indisponible.
+     */
+    private function notifyShop(array $order): void
+    {
+        try {
+            $to = trim((string) $this->config->get('shop_email', ''));
+            if ($to === '' || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
+                return;
+            }
+
+            $reference = (string) $order['reference'];
+            $subject = sprintf(
+                'Nouvelle commande %s - %s',
+                $reference,
+                (string) $order['customer']['name']
+            );
+
+            $body = $this->whatsAppMessage($order)
+                . "\n\n"
+                . 'Suivi : ' . rtrim((string) $this->config->get('app_url', ''), '/')
+                . '/admin' . "\n"
+                . 'Cette commande est enregistrée même si le client n’a pas '
+                . 'envoyé son message WhatsApp.';
+
+            $host = parse_url((string) $this->config->get('app_url', ''), PHP_URL_HOST);
+            $from = 'no-reply@' . (is_string($host) && $host !== '' ? $host : 'localhost');
+
+            @mail(
+                $to,
+                '=?UTF-8?B?' . base64_encode($subject) . '?=',
+                $body,
+                implode("\r\n", [
+                    'From: Lizzirene Deco <' . $from . '>',
+                    'Content-Type: text/plain; charset=UTF-8',
+                    'Content-Transfer-Encoding: 8bit',
+                ])
+            );
+        } catch (\Throwable $exception) {
+            error_log('[lizzirene-api] notification boutique : ' . $exception->getMessage());
+        }
+    }
+
     private function whatsAppMessage(array $order): string
     {
         $lines = [
@@ -794,9 +856,18 @@ final class Orders
         if ($order['delivery']['mode'] === 'pickup') {
             $lines[] = 'Retrait souhaité à la boutique de Kipé';
         } else {
-            $lines[] = 'Commune : ' . $order['delivery']['commune'];
-            $lines[] = 'Quartier : ' . $order['delivery']['quartier'];
-            $lines[] = 'Adresse / repère : ' . $order['delivery']['addressLandmark'];
+            // L'adresse n'est plus obligatoire au moment de la commande : on
+            // n'imprime que ce que le client a réellement donné, et on demande
+            // le reste dans la conversation plutôt que d'afficher des vides.
+            $adresse = array_filter([
+                $order['delivery']['commune'],
+                $order['delivery']['quartier'],
+                $order['delivery']['addressLandmark'],
+            ], static fn ($valeur): bool => $valeur !== null && $valeur !== '');
+
+            $lines[] = $adresse === []
+                ? 'Livraison à Conakry — adresse à préciser ensemble.'
+                : 'Livraison : ' . implode(' · ', $adresse);
         }
         if ($order['delivery']['desiredDate']) {
             $lines[] = 'Date souhaitée : ' . $order['delivery']['desiredDate'];
