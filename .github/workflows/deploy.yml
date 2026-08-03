@@ -506,7 +506,9 @@ jobs:
               set ssl:check-hostname yes;
               open --user '$BLUEHOST_FTP_USER' --env-password -p 21 ftp://ftp.bluehost.com;
               get .deploy-target-ok -o $marqueur;
+              set cmd:fail-exit no;
               mkdir -p uploads/products;
+              set cmd:fail-exit yes;
               put $marqueur_runtime -o uploads/products/.runtime-protected;
               get uploads/products/.runtime-protected -o $marqueur_runtime_distant;
               bye
