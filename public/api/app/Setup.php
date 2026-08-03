@@ -478,10 +478,6 @@ final class Setup
 
     private function seedCatalog(PDO $pdo): void
     {
-        if ((int) $pdo->query('SELECT COUNT(*) FROM products')->fetchColumn() > 0) {
-            return;
-        }
-
         $path = dirname(__DIR__) . '/database/catalogue-initial.json';
         $raw = file_get_contents($path);
         $products = is_string($raw) ? json_decode($raw, true) : null;
@@ -495,7 +491,29 @@ final class Setup
               price_label, price_prefix, tag, image_url, image_srcset,
               image_sizes, image_alt, image_width, image_height, image_position,
               visual_variant, care_json, status, availability, featured_home, sort_order)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             ON DUPLICATE KEY UPDATE
+               name = VALUES(name),
+               category = VALUES(category),
+               description = VALUES(description),
+               price_gnf = VALUES(price_gnf),
+               price_mode = VALUES(price_mode),
+               price_label = VALUES(price_label),
+               price_prefix = VALUES(price_prefix),
+               tag = VALUES(tag),
+               image_url = VALUES(image_url),
+               image_srcset = VALUES(image_srcset),
+               image_sizes = VALUES(image_sizes),
+               image_alt = VALUES(image_alt),
+               image_width = VALUES(image_width),
+               image_height = VALUES(image_height),
+               image_position = VALUES(image_position),
+               visual_variant = VALUES(visual_variant),
+               care_json = VALUES(care_json),
+               status = VALUES(status),
+               availability = VALUES(availability),
+               featured_home = VALUES(featured_home),
+               sort_order = VALUES(sort_order)'
         );
 
         foreach ($products as $product) {
