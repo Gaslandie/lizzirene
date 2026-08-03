@@ -235,7 +235,7 @@ jobs:
             --form "version=$uploaded_version" \
             "http://127.0.0.1:8765/api/v1/admin/products/$product_id/image" \
             > /dev/null
-          test "$(find "$uploads" -maxdepth 1 -type f -name '*.png' | wc -l)" -eq 1
+          test "$(find "$uploads" -maxdepth 1 -type f \( -name '*.jpg' -o -name '*.png' -o -name '*.webp' \) | wc -l)" -eq 1
 
           guest_session="$(curl --fail --silent --show-error \
             --cookie-jar "$guest_cookies" \
