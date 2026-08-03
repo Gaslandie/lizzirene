@@ -193,46 +193,83 @@ final class Admin
             throw new ApiException(500, 'upload_directory', 'Le dossier des images n’est pas accessible.');
         }
 
-        $extension = $extensions[$mime];
-        $filename = $id . '-' . bin2hex(random_bytes(10)) . '.' . $extension;
-        $destination = rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $filename;
-        $part = $destination . '.part';
-        [$outputWidth, $outputHeight] = $this->reencodeImage($temporary, $mime, $part);
+        // Base commune aux variantes : « <id>-<jeton> », complétée par la
+        // largeur et l'extension choisies par le ré-encodage.
+        $base = $id . '-' . bin2hex(random_bytes(10));
+        $set = $this->reencodeImageSet($temporary, $mime, $directory, $base);
+        $variants = $set['variants'];
+        $largest = $variants[count($variants) - 1];
+
         $maximumTotalBytes = (int) $this->config->get(
             'uploads.max_total_bytes',
             500 * 1024 * 1024
         );
         $publicPath = rtrim((string) $this->config->get('uploads.public_path', '/uploads/products'), '/');
-        $url = $publicPath . '/' . rawurlencode($filename);
+        $url = $publicPath . '/' . rawurlencode($largest['filename']);
+        $srcset = count($variants) > 1
+            ? implode(', ', array_map(
+                static fn (array $variant): string => $publicPath . '/'
+                    . rawurlencode($variant['filename']) . ' ' . $variant['width'] . 'w',
+                $variants
+            ))
+            : null;
+        // Mêmes points de bascule que le pipeline du dépôt, pour que les
+        // fiches envoyées depuis l'administration se comportent à l'identique.
+        $sizes = $srcset !== null
+            ? '(max-width: 720px) calc(100vw - 40px), (max-width: 900px) 50vw, 25vw'
+            : null;
+
+        $nettoyerParts = static function () use ($variants): void {
+            foreach ($variants as $variant) {
+                @unlink($variant['part']);
+            }
+        };
+
         $lockHandle = @fopen(rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '.upload.lock', 'c');
         if ($lockHandle === false || !flock($lockHandle, LOCK_EX)) {
-            @unlink($part);
+            $nettoyerParts();
             if (is_resource($lockHandle)) {
                 fclose($lockHandle);
             }
             throw new ApiException(503, 'upload_busy', 'Une autre photo est en cours de traitement. Réessayez.');
         }
 
+        $ecrits = [];
         try {
-            $oldManagedPath = $this->managedProductImagePath(
+            $anciens = $this->managedProductImageFiles(
                 is_string($product['src'] ?? null) ? $product['src'] : null,
+                is_string($product['srcSet'] ?? null) ? $product['srcSet'] : null,
                 $directory,
                 $publicPath
             );
-            $reclaimableBytes = $oldManagedPath !== null && is_file($oldManagedPath)
-                ? (int) filesize($oldManagedPath)
-                : 0;
-            if ($this->directoryBytes($directory) - $reclaimableBytes > $maximumTotalBytes) {
-                @unlink($part);
+            $reclaimableBytes = array_sum(array_map(
+                static fn (string $chemin): int => is_file($chemin) ? (int) filesize($chemin) : 0,
+                $anciens
+            ));
+            $ajout = array_sum(array_map(
+                static fn (array $variant): int => (int) filesize($variant['part']),
+                $variants
+            ));
+            if ($this->directoryBytes($directory) - $reclaimableBytes + $ajout > $maximumTotalBytes) {
+                $nettoyerParts();
                 throw new ApiException(
                     507,
                     'upload_quota',
                     'L’espace réservé aux photos est plein. Contactez la personne qui gère le site.'
                 );
             }
-            if (!chmod($part, 0644) || !rename($part, $destination)) {
-                @unlink($part);
-                throw new ApiException(500, 'upload_write', 'Impossible de finaliser l’image.');
+
+            foreach ($variants as $variant) {
+                $final = rtrim($directory, DIRECTORY_SEPARATOR)
+                    . DIRECTORY_SEPARATOR . $variant['filename'];
+                if (!chmod($variant['part'], 0644) || !rename($variant['part'], $final)) {
+                    $nettoyerParts();
+                    foreach ($ecrits as $chemin) {
+                        @unlink($chemin);
+                    }
+                    throw new ApiException(500, 'upload_write', 'Impossible de finaliser l’image.');
+                }
+                $ecrits[] = $final;
             }
 
             try {
@@ -240,23 +277,28 @@ final class Admin
                     $id,
                     $version,
                     $url,
+                    $srcset,
+                    $sizes,
                     $alt,
-                    $outputWidth,
-                    $outputHeight,
+                    $largest['width'],
+                    $largest['height'],
                     $this->security->sessionUserId() ?? 0
                 );
             } catch (Throwable $exception) {
-                @unlink($destination);
+                foreach ($ecrits as $chemin) {
+                    @unlink($chemin);
+                }
                 throw $exception;
             }
 
-            if (
-                $oldManagedPath !== null &&
-                $oldManagedPath !== $destination &&
-                is_file($oldManagedPath) &&
-                !@unlink($oldManagedPath)
-            ) {
-                error_log('[lizzirene-api] impossible de supprimer une ancienne image produit gérée.');
+            foreach ($anciens as $ancien) {
+                if (
+                    !in_array($ancien, $ecrits, true) &&
+                    is_file($ancien) &&
+                    !@unlink($ancien)
+                ) {
+                    error_log('[lizzirene-api] impossible de supprimer une ancienne image produit gérée.');
+                }
             }
         } finally {
             flock($lockHandle, LOCK_UN);
@@ -264,12 +306,21 @@ final class Admin
         }
         $this->security->audit('product.image_uploaded', 'product', (string) $id, [
             'path' => $url,
-            'mime' => $mime,
-            'bytes' => (int) filesize($destination),
+            'variants' => count($ecrits),
+            'format' => $set['extension'],
+            'bytes' => array_sum(array_map(
+                static fn (string $chemin): int => is_file($chemin) ? (int) filesize($chemin) : 0,
+                $ecrits
+            )),
         ]);
         return $updated;
     }
 
+    /**
+     * Le suffixe de largeur est facultatif : les photos envoyées avant le
+     * passage au multi-largeurs s'appellent encore « <id>-<jeton>.<ext> » et
+     * doivent rester supprimables.
+     */
     private function managedProductImagePath(
         ?string $oldUrl,
         string $directory,
@@ -281,18 +332,209 @@ final class Admin
         }
 
         $filename = rawurldecode(substr($oldUrl, strlen($prefix)));
-        if (!preg_match('/^[1-9][0-9]*-[a-f0-9]{20}\.(?:jpg|png|webp)$/D', $filename)) {
+        if (!preg_match('/^[1-9][0-9]*-[a-f0-9]{20}(?:-[0-9]{2,4})?\.(?:jpg|png|webp)$/D', $filename)) {
             return null;
         }
         return rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $filename;
     }
 
-    private function reencodeImage(string $source, string $mime, string $destination): array
-    {
+    /**
+     * Tous les fichiers gérés d'un produit : l'image principale et, depuis le
+     * multi-largeurs, ses variantes déclarées dans le srcset. Remplacer une
+     * photo doit effacer l'ancien jeu complet, sinon le dossier gonfle
+     * silencieusement à chaque envoi.
+     *
+     * @return list<string>
+     */
+    private function managedProductImageFiles(
+        ?string $oldUrl,
+        ?string $oldSrcset,
+        string $directory,
+        string $publicPath
+    ): array {
+        $urls = [$oldUrl];
+        if (is_string($oldSrcset) && $oldSrcset !== '') {
+            foreach (explode(',', $oldSrcset) as $candidat) {
+                $candidat = trim($candidat);
+                if ($candidat === '') {
+                    continue;
+                }
+                // « /uploads/products/12-abc-480.webp 480w » → l'URL seule.
+                $urls[] = explode(' ', $candidat)[0];
+            }
+        }
+
+        $chemins = [];
+        foreach ($urls as $url) {
+            $chemin = $this->managedProductImagePath($url, $directory, $publicPath);
+            if ($chemin !== null && !in_array($chemin, $chemins, true)) {
+                $chemins[] = $chemin;
+            }
+        }
+        return $chemins;
+    }
+
+    /**
+     * Ré-encode la photo envoyée en plusieurs largeurs, comme le fait
+     * `scripts/optimize-images.mjs` pour les produits du dépôt.
+     *
+     * Avant, une seule image bornée à 1800 px était produite dans le format
+     * d'origine : une photo de téléphone finissait à ~370 Ko en JPEG, quand
+     * les cartes du catalogue n'en affichent que ~450 px de large. Un PNG
+     * pouvait même sortir à 3,4 Mo sans dépasser le plafond.
+     *
+     * On écrit donc 480 et 810 px, en WebP quand l'hébergement sait l'écrire
+     * — sinon dans le format d'origine, la page reste correcte, seulement un
+     * peu plus lourde.
+     *
+     * @return array{extension:string, variants:list<array{width:int,height:int,part:string,filename:string}>}
+     */
+    private function reencodeImageSet(
+        string $source,
+        string $mime,
+        string $directory,
+        string $base
+    ): array {
         if (!extension_loaded('gd')) {
             throw new ApiException(503, 'image_processing_unavailable', 'Le traitement sécurisé des images est indisponible.');
         }
 
+        $image = $this->decodeImage($source, $mime);
+        $width = imagesx($image);
+        $height = imagesy($image);
+
+        // Le WebP est préféré partout où il est disponible ; à défaut on
+        // conserve le format reçu plutôt que de refuser l'envoi.
+        $webpAvailable = function_exists('imagewebp');
+        $outputMime = $webpAvailable ? 'image/webp' : $mime;
+        $extension = match ($outputMime) {
+            'image/webp' => 'webp',
+            'image/png' => 'png',
+            default => 'jpg',
+        };
+
+        $ceiling = max(320, min(
+            2400,
+            (int) $this->config->get('uploads.max_dimension', 1800)
+        ));
+        $targets = [];
+        foreach ([480, 810] as $cible) {
+            $largeur = min($cible, $ceiling, $width);
+            if ($largeur > 0 && !in_array($largeur, $targets, true)) {
+                $targets[] = $largeur;
+            }
+        }
+        // Image plus étroite que 480 px : une seule variante, à sa taille.
+        if ($targets === []) {
+            $targets[] = $width;
+        }
+        sort($targets);
+
+        $variants = [];
+        try {
+            foreach ($targets as $largeur) {
+                $hauteur = max(1, (int) round($height * ($largeur / $width)));
+                $filename = $base . '-' . $largeur . '.' . $extension;
+                $part = rtrim($directory, DIRECTORY_SEPARATOR)
+                    . DIRECTORY_SEPARATOR . $filename . '.part';
+                $this->writeVariant(
+                    $image,
+                    $outputMime,
+                    $part,
+                    $largeur,
+                    $hauteur,
+                    $width,
+                    $height
+                );
+                $variants[] = [
+                    'width' => $largeur,
+                    'height' => $hauteur,
+                    'part' => $part,
+                    'filename' => $filename,
+                ];
+            }
+        } catch (Throwable $exception) {
+            foreach ($variants as $variant) {
+                @unlink($variant['part']);
+            }
+            imagedestroy($image);
+            throw $exception;
+        }
+
+        imagedestroy($image);
+
+        return ['extension' => $extension, 'variants' => $variants];
+    }
+
+    /**
+     * Redimensionne puis écrit une variante. La transparence est préservée
+     * pour tout ce qui n'est pas du JPEG.
+     */
+    private function writeVariant(
+        \GdImage $image,
+        string $outputMime,
+        string $destination,
+        int $targetWidth,
+        int $targetHeight,
+        int $sourceWidth,
+        int $sourceHeight
+    ): void {
+        $resized = imagecreatetruecolor($targetWidth, $targetHeight);
+        if ($resized === false) {
+            throw new ApiException(503, 'image_processing_unavailable', 'La photo ne peut pas être redimensionnée.');
+        }
+        if ($outputMime !== 'image/jpeg') {
+            imagealphablending($resized, false);
+            imagesavealpha($resized, true);
+            $transparent = imagecolorallocatealpha($resized, 0, 0, 0, 127);
+            imagefilledrectangle($resized, 0, 0, $targetWidth, $targetHeight, $transparent);
+        }
+        if (!imagecopyresampled(
+            $resized,
+            $image,
+            0,
+            0,
+            0,
+            0,
+            $targetWidth,
+            $targetHeight,
+            $sourceWidth,
+            $sourceHeight
+        )) {
+            imagedestroy($resized);
+            throw new ApiException(503, 'image_processing_unavailable', 'La photo ne peut pas être redimensionnée.');
+        }
+        if ($outputMime !== 'image/jpeg') {
+            imagealphablending($resized, false);
+            imagesavealpha($resized, true);
+        }
+
+        $written = match ($outputMime) {
+            'image/jpeg' => imagejpeg($resized, $destination, 82),
+            'image/png' => imagepng($resized, $destination, 7),
+            'image/webp' => imagewebp($resized, $destination, 82),
+            default => false,
+        };
+        imagedestroy($resized);
+
+        if (!$written || !is_file($destination) || filesize($destination) < 1) {
+            @unlink($destination);
+            throw new ApiException(500, 'upload_write', 'Impossible d’enregistrer l’image traitée.');
+        }
+
+        $maximumOutputBytes = (int) $this->config->get(
+            'uploads.max_output_bytes',
+            6 * 1024 * 1024
+        );
+        if (filesize($destination) > $maximumOutputBytes) {
+            @unlink($destination);
+            throw new ApiException(422, 'upload_output_size', 'La photo reste trop lourde après optimisation. Essayez une autre image.');
+        }
+    }
+
+    /** Décode le fichier reçu et redresse l'orientation EXIF des JPEG. */
+    private function decodeImage(string $source, string $mime): \GdImage
+    {
         $image = match ($mime) {
             'image/jpeg' => function_exists('imagecreatefromjpeg') ? @imagecreatefromjpeg($source) : false,
             'image/png' => function_exists('imagecreatefrompng') ? @imagecreatefrompng($source) : false,
@@ -323,77 +565,7 @@ final class Admin
             }
         }
 
-        $width = imagesx($image);
-        $height = imagesy($image);
-        $maximumDimension = max(800, min(
-            2400,
-            (int) $this->config->get('uploads.max_dimension', 1800)
-        ));
-        if (max($width, $height) > $maximumDimension) {
-            $ratio = $maximumDimension / max($width, $height);
-            $targetWidth = max(1, (int) round($width * $ratio));
-            $targetHeight = max(1, (int) round($height * $ratio));
-            $resized = imagecreatetruecolor($targetWidth, $targetHeight);
-            if ($resized === false) {
-                imagedestroy($image);
-                throw new ApiException(503, 'image_processing_unavailable', 'La photo ne peut pas être redimensionnée.');
-            }
-            if ($mime !== 'image/jpeg') {
-                imagealphablending($resized, false);
-                imagesavealpha($resized, true);
-                $transparent = imagecolorallocatealpha($resized, 0, 0, 0, 127);
-                imagefilledrectangle($resized, 0, 0, $targetWidth, $targetHeight, $transparent);
-            }
-            if (!imagecopyresampled(
-                $resized,
-                $image,
-                0,
-                0,
-                0,
-                0,
-                $targetWidth,
-                $targetHeight,
-                $width,
-                $height
-            )) {
-                imagedestroy($resized);
-                imagedestroy($image);
-                throw new ApiException(503, 'image_processing_unavailable', 'La photo ne peut pas être redimensionnée.');
-            }
-            imagedestroy($image);
-            $image = $resized;
-            $width = $targetWidth;
-            $height = $targetHeight;
-        }
-
-        if ($mime !== 'image/jpeg') {
-            imagealphablending($image, false);
-            imagesavealpha($image, true);
-        }
-
-        $written = match ($mime) {
-            'image/jpeg' => imagejpeg($image, $destination, 88),
-            'image/png' => imagepng($image, $destination, 7),
-            'image/webp' => imagewebp($image, $destination, 86),
-            default => false,
-        };
-        imagedestroy($image);
-
-        if (!$written || !is_file($destination) || filesize($destination) < 1) {
-            @unlink($destination);
-            throw new ApiException(500, 'upload_write', 'Impossible d’enregistrer l’image traitée.');
-        }
-
-        $maximumOutputBytes = (int) $this->config->get(
-            'uploads.max_output_bytes',
-            6 * 1024 * 1024
-        );
-        if (filesize($destination) > $maximumOutputBytes) {
-            @unlink($destination);
-            throw new ApiException(422, 'upload_output_size', 'La photo reste trop lourde après optimisation. Essayez une autre image.');
-        }
-
-        return [$width, $height];
+        return $image;
     }
 
     private function directoryBytes(string $directory): int

@@ -219,10 +219,18 @@ final class Catalog
         return $this->adminProduct($id);
     }
 
+    /**
+     * `$srcset` et `$sizes` sont désormais renseignés : l'envoi depuis
+     * l'administration produit plusieurs largeurs, comme le pipeline du
+     * dépôt. Sans eux, un téléphone téléchargeait l'image prévue pour un
+     * grand écran — environ neuf fois le poids nécessaire.
+     */
     public function updateImage(
         int $id,
         int $version,
         string $url,
+        ?string $srcset,
+        ?string $sizes,
         string $alt,
         int $width,
         int $height,
@@ -230,12 +238,12 @@ final class Catalog
     ): array
     {
         $statement = $this->database->pdo()->prepare(
-            'UPDATE products SET image_url = ?, image_srcset = NULL, image_sizes = NULL,
+            'UPDATE products SET image_url = ?, image_srcset = ?, image_sizes = ?,
              image_alt = ?, image_width = ?, image_height = ?,
              updated_by = ?, version = version + 1
              WHERE id = ? AND version = ?'
         );
-        $statement->execute([$url, $alt, $width, $height, $adminId, $id, $version]);
+        $statement->execute([$url, $srcset, $sizes, $alt, $width, $height, $adminId, $id, $version]);
         if ($statement->rowCount() !== 1) {
             throw new ApiException(
                 409,

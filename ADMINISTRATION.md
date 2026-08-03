@@ -59,7 +59,11 @@ Pour ajouter un produit :
 6. passer à **Publié** quand tout est prêt.
 
 Les photos de téléphone sont automatiquement réorientées, nettoyées et
-redimensionnées. **Indisponible** conserve la fiche mais bloque l’ajout au panier.
+redimensionnées. Elles sont converties en WebP et enregistrées en deux
+largeurs (480 et 810 px) : le téléphone du visiteur télécharge la petite, un
+grand écran la grande. Inutile donc de préparer les images avant l’envoi —
+une photo prise au téléphone convient, et une photo publiée depuis
+l’administration pèse aussi peu qu’une photo intégrée au code. **Indisponible** conserve la fiche mais bloque l’ajout au panier.
 **Sur commande** la laisse achetable avec confirmation. **Archiver** retire le
 produit du site sans casser les anciennes commandes ; il vaut mieux archiver que
 supprimer.
