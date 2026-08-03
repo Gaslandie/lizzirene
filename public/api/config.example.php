@@ -15,6 +15,11 @@ return [
     // Conserver ce troisième secret après l’installation pour les migrations CI.
     'migration_token' => 'CHANGE_ME_THIRD_RANDOM_64_CHARACTERS',
     'whatsapp_number' => '224XXXXXXXXX',
+    // Adresse prévenue à chaque nouvelle commande. C'est le seul canal
+    // d'alerte qui ne dépend pas du client : le message WhatsApp, lui, ne
+    // part que si le client appuie sur « envoyer ».
+    // Laisser vide désactive l'envoi.
+    'shop_email' => 'lizzirenedeco@gmail.com',
     'database' => [
         'dsn' => 'mysql:host=localhost;dbname=CHANGE_ME;charset=utf8mb4',
         'username' => 'CHANGE_ME',

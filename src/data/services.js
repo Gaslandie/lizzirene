@@ -2,9 +2,8 @@
 // le sous-menu « Nos Services ». Une prestation = une carte sur /services.
 import { SERVICE_THEME_PHOTOS } from '../config.js'
 
-// Chaque thème reçoit une photo optimisée pour l'accueil. Sur la page services,
-// seules les prestations qui correspondent vraiment aux images disponibles les
-// utilisent ; les autres gardent un visuel provisoire jusqu'aux prochaines photos.
+// Chaque thème reçoit une photo optimisée pour l'accueil et chaque prestation
+// possède son visuel dédié sur la page services.
 export const THEMES = [
   { id: 'tous', label: 'Tous nos services' },
   {
@@ -192,8 +191,17 @@ const SERVICES_BASE = [
 
 const PHOTOS_PAR_PRESTATION = {
   'decoration-interieur': SERVICE_THEME_PHOTOS.decoration,
+  'salle-conference': SERVICE_THEME_PHOTOS.salleConference,
+  'evenement-professionnel': SERVICE_THEME_PHOTOS.evenementProfessionnel,
+  inauguration: SERVICE_THEME_PHOTOS.inauguration,
+  'conseil-amenagement-floral': SERVICE_THEME_PHOTOS.conseilAmenagementFloral,
   'confection-bouquet': SERVICE_THEME_PHOTOS.creations,
+  'box-cadeau': SERVICE_THEME_PHOTOS.boxCadeau,
+  'accueil-fleuri': SERVICE_THEME_PHOTOS.accueilFleuri,
+  'atelier-creation-florale': SERVICE_THEME_PHOTOS.atelierCreationFlorale,
+  'emballage-conservation': SERVICE_THEME_PHOTOS.emballageConservation,
   mariage: SERVICE_THEME_PHOTOS.evenements,
+  bapteme: SERVICE_THEME_PHOTOS.bapteme,
   anniversaire: SERVICE_THEME_PHOTOS.anniversaire,
   'remise-diplome': SERVICE_THEME_PHOTOS.remiseDiplome,
   naissance: SERVICE_THEME_PHOTOS.naissance,

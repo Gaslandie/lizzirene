@@ -51,6 +51,7 @@ final class Config
             'setup_token' => '',
             'migration_token' => '',
             'whatsapp_number' => '',
+            'shop_email' => '',
             'database' => [],
             'session' => [],
             'uploads' => [],
@@ -163,10 +164,11 @@ final class Config
             $errors[] = 'invalid_database_password';
         }
 
-        $whatsapp = preg_replace('/\D+/', '', (string) ($values['whatsapp_number'] ?? '')) ?? '';
-        if (strlen($whatsapp) < 8 || strlen($whatsapp) > 15) {
-            $errors[] = 'invalid_whatsapp_number';
-        }
+        // Le numéro WhatsApp n'est volontairement PAS une erreur bloquante.
+        // Une erreur de configuration met `configured()` à false, ce qui fait
+        // répondre 503 à toute la base : un numéro mal saisi empêchait alors
+        // d'enregistrer la moindre commande, en silence. Un mauvais numéro
+        // doit dégrader le lien WhatsApp, pas la prise de commande.
 
         return array_values(array_unique($errors));
     }

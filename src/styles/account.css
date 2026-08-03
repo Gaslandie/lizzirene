@@ -189,6 +189,23 @@
   color: #6e5700;
 }
 
+/* La grille étire ses enfants sur toute la largeur : un bouton d'action
+   glissé dans une alerte devenait une barre démesurée. Il reprend ici la
+   largeur de son libellé, et passe pleine largeur seulement sur mobile,
+   où c'est la cible tactile qui prime. */
+.form-alert .btn {
+  justify-self: start;
+  margin-top: 10px;
+  padding: 12px 22px;
+  font-size: 15px;
+}
+
+@media (max-width: 560px) {
+  .form-alert .btn {
+    justify-self: stretch;
+  }
+}
+
 .form-alert-success {
   border-color: #8fd1b0;
   background: #effbf5;

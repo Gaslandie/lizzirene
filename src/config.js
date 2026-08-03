@@ -612,6 +612,97 @@ export const PHOTOS = {
     width: 1080,
     height: 1026,
   }),
+  grandOursBeige: responsivePhoto({
+    nom: 'produit-grand-ours-beige',
+    largeurs: [480, 810],
+    alt: 'Grand ours en peluche beige au nœud vichy',
+    width: 810,
+    height: 1080,
+  }),
+  grandOursBlanc: responsivePhoto({
+    nom: 'produit-grand-ours-blanc',
+    largeurs: [480, 810],
+    alt: 'Grand ours en peluche blanc au nœud vichy',
+    width: 810,
+    height: 1080,
+  }),
+  grandOursRose: responsivePhoto({
+    nom: 'produit-grand-ours-rose',
+    largeurs: [480, 810],
+    alt: 'Grand ours en peluche rose au cœur brodé « Love »',
+    width: 810,
+    height: 1080,
+  }),
+  grandOursMarron: responsivePhoto({
+    nom: 'produit-grand-ours-marron',
+    largeurs: [480, 810],
+    alt: 'Grand ours en peluche marron au nœud vichy',
+    width: 810,
+    height: 1080,
+  }),
+  grandOursViolet: responsivePhoto({
+    nom: 'produit-grand-ours-violet',
+    largeurs: [480, 810],
+    alt: 'Grand ours en peluche violet au nœud vichy',
+    width: 810,
+    height: 1080,
+  }),
+  tableauChevalGris: responsivePhoto({
+    nom: 'produit-tableau-cheval-gris',
+    largeurs: [480, 810],
+    alt: 'Tableau d’un cheval gris à la crinière tressée, harnais noir et or',
+    width: 810,
+    height: 1080,
+  }),
+  tableauPivoinesRoses: responsivePhoto({
+    nom: 'produit-tableau-pivoines-roses',
+    largeurs: [480, 810],
+    alt: 'Tableau peint de pivoines roses et blanches sur fond vert doux',
+    width: 810,
+    height: 1080,
+  }),
+  tableauFeuillesMonstera: responsivePhoto({
+    nom: 'produit-tableau-feuilles-monstera',
+    largeurs: [480, 810],
+    alt: 'Tableau aquarelle de feuilles de monstera vertes sur fond blanc, cadre noir',
+    width: 810,
+    height: 1080,
+  }),
+  tableauHorlogeFemmeRouge: responsivePhoto({
+    nom: 'produit-tableau-horloge-femme-rouge',
+    largeurs: [480, 810],
+    alt: 'Tableau-horloge doré représentant une femme au chapeau rouge',
+    width: 810,
+    height: 1080,
+  }),
+  tableauCerfDore: responsivePhoto({
+    nom: 'produit-tableau-cerf-dore',
+    largeurs: [480, 810],
+    alt: 'Tableau cerf doré sur fond noir et or rehaussé de cristaux, cadre doré',
+    width: 810,
+    height: 1080,
+  }),
+  tableauElephantBleuOr: responsivePhoto({
+    nom: 'produit-tableau-elephant-bleu-or',
+    largeurs: [480, 810],
+    alt: 'Tableau éléphant bleu et or incrusté de cristaux, cadre argenté',
+    width: 810,
+    height: 1080,
+  }),
+  tableauFemmeFleursBlanches: responsivePhoto({
+    nom: 'produit-tableau-femme-fleurs-blanches',
+    largeurs: [480, 810],
+    alt: 'Tableau d’une femme coiffée de fleurs blanches, feuillages dorés',
+    width: 810,
+    height: 1080,
+  }),
+  tableauFemmeRobeOrange: responsivePhoto({
+    nom: 'produit-tableau-femme-robe-orange',
+    largeurs: [480, 810],
+    alt: 'Tableau d’une femme en robe orange à large chapeau, néon doré',
+    width: 810,
+    height: 1080,
+  }),
   inspirationFlorale: responsivePhoto({
     nom: 'inspiration-florale',
     largeurs: [480, 810],
@@ -631,6 +722,42 @@ export const SERVICE_THEME_PHOTOS = {
     sizes:
       '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
   }),
+  salleConference: responsivePhoto({
+    nom: 'service-salle-conference',
+    largeurs: [480, 800, 1280],
+    alt: 'Salle de conférence décorée de compositions florales blanches et vertes',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  evenementProfessionnel: responsivePhoto({
+    nom: 'service-evenement-professionnel',
+    largeurs: [480, 800, 1280],
+    alt: 'Décor floral sobre pour une réception professionnelle',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  inauguration: responsivePhoto({
+    nom: 'service-inauguration',
+    largeurs: [480, 800, 1280],
+    alt: 'Entrée fleurie avec ruban et ciseaux pour une inauguration',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  conseilAmenagementFloral: responsivePhoto({
+    nom: 'service-conseil-amenagement-floral',
+    largeurs: [480, 800, 1280],
+    alt: 'Conseil en aménagement floral dans un hall professionnel',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
   creations: responsivePhoto({
     nom: 'service-creations-florales',
     largeurs: [480, 800, 1280],
@@ -640,12 +767,57 @@ export const SERVICE_THEME_PHOTOS = {
     sizes:
       '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
   }),
+  boxCadeau: responsivePhoto({
+    nom: 'service-box-cadeau',
+    largeurs: [480, 800, 1280],
+    alt: 'Coffret cadeau fleuri avec chocolats, soin et peluche',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  accueilFleuri: responsivePhoto({
+    nom: 'service-accueil-fleuri',
+    largeurs: [480, 800, 1280],
+    alt: 'Bouquet de bienvenue remis dans un hall d’accueil',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  atelierCreationFlorale: responsivePhoto({
+    nom: 'service-atelier-creation-florale',
+    largeurs: [480, 800, 1280],
+    alt: 'Participants composant des bouquets pendant un atelier floral',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  emballageConservation: responsivePhoto({
+    nom: 'service-emballage-conservation',
+    largeurs: [480, 800, 1280],
+    alt: 'Bouquet protégé par un emballage respirant pour mieux conserver les fleurs',
+    width: 1280,
+    height: 720,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
   evenements: responsivePhoto({
     nom: 'service-celebrations',
     largeurs: [480, 800, 1280],
     alt: 'Décoration florale d’événement avec table festive',
     width: 1280,
     height: 853,
+    sizes:
+      '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
+  }),
+  bapteme: responsivePhoto({
+    nom: 'service-bapteme',
+    largeurs: [480, 800, 1280],
+    alt: 'Table de baptême décorée de fleurs pastel et d’une bougie blanche',
+    width: 1280,
+    height: 721,
     sizes:
       '(max-width: 720px) calc(100vw - 40px), (max-width: 1100px) 50vw, 25vw',
   }),

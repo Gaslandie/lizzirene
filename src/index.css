@@ -203,15 +203,19 @@ section[id] {
 }
 
 /* --- Boutons --- */
+/* Gabarit volontairement resserré : à 17px/36px et 16px de texte, les
+   boutons faisaient 60 px de haut et écrasaient tout le reste, surtout dans
+   l'administration et les encarts. À 13px/26px et 15px de texte, ils
+   tombent à ~49 px — au-dessus du plancher tactile de 44 px recommandé. */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 17px 36px;
+  gap: 9px;
+  padding: 13px 26px;
   border-radius: 999px;
   font-family: var(--font-body);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
   letter-spacing: 0.4px;
   cursor: pointer;
@@ -2590,8 +2594,10 @@ section[id] {
     font-size: 16px;
   }
 
+  /* Sur mobile le bouton reste un peu plus généreux que sur ordinateur :
+     c'est le doigt qui vise, pas le pointeur. */
   .btn {
-    padding: 15px 28px;
+    padding: 14px 24px;
   }
 
   /* Hero */
