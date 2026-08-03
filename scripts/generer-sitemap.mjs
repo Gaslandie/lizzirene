@@ -1,6 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
+import { createServer } from 'vite'
 
 // Génère public/sitemap.xml à partir du catalogue réel.
 // Écrit à la main, ce fichier oublierait chaque nouveau produit ; généré
@@ -12,21 +13,23 @@ const SITE = 'https://lizzirenedeco.com/'
 
 const racine = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
-// `products.js` importe `config.js`, qui dépend de `import.meta.env` : il
-// n'est pas exécutable hors de Vite. On lit donc le tableau dans la source
-// plutôt que d'importer le module.
+// `products.js` importe `config.js`, qui dépend de `import.meta.env`.
+// Vite donne le même contexte qu'au build et permet d'exclure les brouillons.
 const identifiantsProduits = async () => {
-  const source = await readFile(
-    resolve(racine, 'src/data/products.js'),
-    'utf8',
-  )
-  const debut = source.indexOf('export const PRODUCTS = [')
-  if (debut === -1) throw new Error('Tableau PRODUCTS introuvable')
-
-  const fin = source.indexOf('\n]', debut)
-  const corps = source.slice(debut, fin === -1 ? undefined : fin)
-
-  return [...corps.matchAll(/^\s{4}id: '([^']+)'/gm)].map(([, id]) => id)
+  const serveur = await createServer({
+    root: racine,
+    configFile: false,
+    appType: 'custom',
+    server: { middlewareMode: true, hmr: false, ws: false },
+  })
+  try {
+    const { PUBLIC_PRODUCTS } = await serveur.ssrLoadModule(
+      '/src/data/products.js',
+    )
+    return PUBLIC_PRODUCTS.map((produit) => produit.id)
+  } finally {
+    await serveur.close()
+  }
 }
 
 // Les familles servent aussi de pages filtrées du catalogue.

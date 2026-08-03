@@ -65,6 +65,7 @@ export const PRODUCTS = [
     category: 'fleurs-naturelles',
     price: 500000,
     tag: 'Bouquet du catalogue',
+    status: 'draft',
     variant: 'slate',
     desc: 'Dôme serré de roses rouges présenté dans un contenant noir.',
   },
@@ -74,6 +75,7 @@ export const PRODUCTS = [
     category: 'fleurs-naturelles',
     price: 300000,
     tag: 'Bouquet du catalogue',
+    status: 'draft',
     variant: 'soft',
     desc: 'Bouquet de roses rouges et de petites fleurs blanches, enveloppé de papier bordeaux bordé d’or.',
   },
@@ -83,6 +85,7 @@ export const PRODUCTS = [
     category: 'fleurs-naturelles',
     price: 500000,
     tag: 'Bouquet du catalogue',
+    status: 'draft',
     variant: 'teal',
     desc: 'Composition de fleurs turquoise et blanches, accompagnée d’un petit ours blanc et enveloppée de papier bleu clair.',
   },
@@ -92,6 +95,7 @@ export const PRODUCTS = [
     category: 'fleurs-naturelles',
     price: 300000,
     tag: 'Bouquet du catalogue',
+    status: 'draft',
     variant: 'soft',
     desc: 'Bouquet de roses rouges présenté dans un emballage blanc imprimé et noué d’un ruban bordeaux.',
   },
@@ -243,6 +247,7 @@ export const PRODUCTS = [
     category: 'box-cadeaux',
     price: 500000,
     tag: 'Création cadeau',
+    status: 'draft',
     variant: 'teal',
     desc: 'Composition cadeau enveloppée de cellophane transparent et ornée de rubans colorés.',
   },
@@ -252,6 +257,7 @@ export const PRODUCTS = [
     category: 'box-cadeaux',
     price: 800000,
     tag: 'Création cadeau',
+    status: 'draft',
     variant: 'soft',
     desc: 'Ensemble cadeau réunissant un ours en peluche blanc, une rose rouge et plusieurs articles emballés.',
   },
@@ -271,6 +277,7 @@ export const PRODUCTS = [
     category: 'box-cadeaux',
     price: 800000,
     tag: 'Création cadeau',
+    status: 'draft',
     variant: 'sun',
     desc: 'Composition en forme de cœur associant des chocolats emballés et des roses rouges, sous cellophane.',
   },
@@ -773,6 +780,7 @@ export const PRODUCTS = [
     category: 'peluches',
     price: null,
     tag: 'Catalogue',
+    status: 'draft',
     variant: 'sun',
     desc: 'Peluches à associer à une box, un bouquet ou une surprise romantique.',
   },
@@ -1011,12 +1019,17 @@ export const PRODUCTS = [
   },
 ]
 
+export const produitEstPublic = (produit) =>
+  (produit.status ?? 'active') === 'active' && Boolean(produit.src)
+
+export const PUBLIC_PRODUCTS = PRODUCTS.filter(produitEstPublic)
+
 export const trouverProduit = (id) =>
-  PRODUCTS.find((produit) => produit.id === id)
+  PUBLIC_PRODUCTS.find((produit) => produit.id === id)
 
 export const produitsPourCategorie = (id) => {
   const categories = categoriesProduitPour(id)
   return categories
-    ? PRODUCTS.filter((produit) => categories.includes(produit.category))
-    : PRODUCTS
+    ? PUBLIC_PRODUCTS.filter((produit) => categories.includes(produit.category))
+    : PUBLIC_PRODUCTS
 }

@@ -25,35 +25,38 @@ const VEDETTES = new Set([
   'bambou',
 ])
 
-const catalogue = PRODUCTS.map((produit, index) => ({
-  slug: produit.id,
-  name: produit.name,
-  category: produit.category,
-  description: produit.desc,
-  priceGnf: produit.price,
-  priceMode:
-    produit.price == null
-      ? 'quote'
-      : produit.prixPrefixe
-        ? 'from'
-        : 'fixed',
-  priceLabel: produit.priceLabel ?? null,
-  pricePrefix: produit.prixPrefixe ?? null,
-  tag: produit.tag,
-  imageUrl: produit.src ?? null,
-  imageSrcSet: produit.srcSet ?? null,
-  imageSizes: produit.sizes ?? null,
-  imageAlt: produit.alt ?? null,
-  imageWidth: produit.width ?? null,
-  imageHeight: produit.height ?? null,
-  imagePosition: produit.imagePosition ?? null,
-  visualVariant: produit.variant ?? null,
-  care: produit.entretien ?? null,
-  status: 'active',
-  availability: 'available',
-  featuredHome: VEDETTES.has(produit.id),
-  sortOrder: (index + 1) * 10,
-}))
+const catalogue = PRODUCTS.map((produit, index) => {
+  const status = produit.status ?? (produit.src ? 'active' : 'draft')
+  return {
+    slug: produit.id,
+    name: produit.name,
+    category: produit.category,
+    description: produit.desc,
+    priceGnf: produit.price,
+    priceMode:
+      produit.price == null
+        ? 'quote'
+        : produit.prixPrefixe
+          ? 'from'
+          : 'fixed',
+    priceLabel: produit.priceLabel ?? null,
+    pricePrefix: produit.prixPrefixe ?? null,
+    tag: produit.tag,
+    imageUrl: produit.src ?? null,
+    imageSrcSet: produit.srcSet ?? null,
+    imageSizes: produit.sizes ?? null,
+    imageAlt: produit.alt ?? null,
+    imageWidth: produit.width ?? null,
+    imageHeight: produit.height ?? null,
+    imagePosition: produit.imagePosition ?? null,
+    visualVariant: produit.variant ?? null,
+    care: produit.entretien ?? null,
+    status,
+    availability: 'available',
+    featuredHome: status === 'active' && VEDETTES.has(produit.id),
+    sortOrder: (index + 1) * 10,
+  }
+})
 
 const cible = resolve(
   racine,

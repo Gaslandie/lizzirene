@@ -18,7 +18,7 @@
     "imagePosition": null,
     "visualVariant": "slate",
     "care": null,
-    "status": "active",
+    "status": "draft",
     "availability": "available",
     "featuredHome": false,
     "sortOrder": 10
@@ -42,7 +42,7 @@
     "imagePosition": null,
     "visualVariant": "soft",
     "care": null,
-    "status": "active",
+    "status": "draft",
     "availability": "available",
     "featuredHome": false,
     "sortOrder": 20
@@ -66,7 +66,7 @@
     "imagePosition": null,
     "visualVariant": "teal",
     "care": null,
-    "status": "active",
+    "status": "draft",
     "availability": "available",
     "featuredHome": false,
     "sortOrder": 30
@@ -90,7 +90,7 @@
     "imagePosition": null,
     "visualVariant": "soft",
     "care": null,
-    "status": "active",
+    "status": "draft",
     "availability": "available",
     "featuredHome": false,
     "sortOrder": 40
@@ -474,7 +474,7 @@
     "imagePosition": null,
     "visualVariant": "teal",
     "care": null,
-    "status": "active",
+    "status": "draft",
     "availability": "available",
     "featuredHome": false,
     "sortOrder": 200
@@ -498,7 +498,7 @@
     "imagePosition": null,
     "visualVariant": "soft",
     "care": null,
-    "status": "active",
+    "status": "draft",
     "availability": "available",
     "featuredHome": false,
     "sortOrder": 210
@@ -546,7 +546,7 @@
     "imagePosition": null,
     "visualVariant": "sun",
     "care": null,
-    "status": "active",
+    "status": "draft",
     "availability": "available",
     "featuredHome": false,
     "sortOrder": 230
@@ -1765,7 +1765,7 @@
     "imagePosition": null,
     "visualVariant": "sun",
     "care": null,
-    "status": "active",
+    "status": "draft",
     "availability": "available",
     "featuredHome": false,
     "sortOrder": 720

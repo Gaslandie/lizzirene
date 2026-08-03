@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import {
-  PRODUCTS as STATIC_PRODUCTS,
+  PUBLIC_PRODUCTS as STATIC_PRODUCTS,
   categoriesProduitPour,
 } from '../data/products.js'
 import { apiRequest } from '../services/api.js'

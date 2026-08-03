@@ -57,22 +57,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://lizzirenedeco.com/produits/poussa</loc>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://lizzirenedeco.com/produits/simoda</loc>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://lizzirenedeco.com/produits/lill-skate</loc>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://lizzirenedeco.com/produits/miss-fati</loc>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://lizzirenedeco.com/produits/bouquet-personnalise</loc>
     <priority>0.6</priority>
   </url>
@@ -133,19 +117,7 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://lizzirenedeco.com/produits/carino</loc>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://lizzirenedeco.com/produits/la-vida</loc>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://lizzirenedeco.com/produits/maritou</loc>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://lizzirenedeco.com/produits/choco-coeur</loc>
     <priority>0.6</priority>
   </url>
   <url>
@@ -338,10 +310,6 @@
   </url>
   <url>
     <loc>https://lizzirenedeco.com/produits/vases-gris-torsades</loc>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://lizzirenedeco.com/produits/peluches-cadeaux</loc>
     <priority>0.6</priority>
   </url>
   <url>
