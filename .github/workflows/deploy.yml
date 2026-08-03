@@ -579,6 +579,8 @@ jobs:
             --max-time 45 \
             --header 'Origin: https://lizzirenedeco.com' \
             --header "X-Migration-Token: $BLUEHOST_MIGRATION_TOKEN" \
+            --header 'Content-Type: application/json' \
+            --data '{}' \
             'https://lizzirenedeco.com/api/v1/setup/migrate')"
           jq -e '
             .data.migrated == true and
@@ -860,6 +862,8 @@ jobs:
               --max-time 45 \
               --header 'Origin: https://lizzirenedeco.com' \
               --header "X-Migration-Token: $BLUEHOST_MIGRATION_TOKEN" \
+              --header 'Content-Type: application/json' \
+              --data '{}' \
               'https://lizzirenedeco.com/api/v1/setup/migrate')"
             jq -e '
               .data.migrated == true and
