@@ -5,6 +5,7 @@ import {
   urlAdminCommandes,
   urlAdminInstallation,
   urlAdminProduits,
+  urlAccueil,
   urlConnexion,
 } from '../../utils/navigation.js'
 
@@ -65,6 +66,9 @@ function AdminLayout({ page, onAller, children, allowInstallation = false }) {
         >
           Se connecter
         </a>
+        <a className="btn btn-outline" href={urlAccueil()}>
+          Retour à l’accueil
+        </a>
       </div>
     )
   }
@@ -100,7 +104,7 @@ function AdminLayout({ page, onAller, children, allowInstallation = false }) {
             className="admin-text-button"
             onClick={async () => {
               await logout()
-              onAller?.('accueil')
+              window.location.assign(urlAccueil())
             }}
           >
             Déconnexion

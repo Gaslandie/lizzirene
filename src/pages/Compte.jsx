@@ -10,6 +10,7 @@ import {
 } from '../utils/orderStatus.js'
 import {
   intercepterNavigation,
+  urlAccueil,
   urlCompteCommande,
   urlConnexion,
 } from '../utils/navigation.js'
@@ -136,7 +137,7 @@ function Compte({ onAller }) {
             className="btn btn-outline"
             onClick={async () => {
               await logout()
-              onAller?.('accueil')
+              window.location.assign(urlAccueil())
             }}
           >
             Se déconnecter
