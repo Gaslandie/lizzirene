@@ -64,6 +64,27 @@ redimensionnées. **Indisponible** conserve la fiche mais bloque l’ajout au pa
 produit du site sans casser les anciennes commandes ; il vaut mieux archiver que
 supprimer.
 
+### Le catalogue du site vient de la base, pas du code
+
+Le site affiche ce que contient la table `products`. Le fichier
+`public/api/database/catalogue-initial.json` ne sert qu’une seule fois, à
+l’installation, et uniquement si la table est vide — c’est ce qui empêche un
+déploiement d’écraser les prix et les photos modifiés ici.
+
+Conséquence : **ajouter un produit dans `src/data/products.js` ne le fait pas
+apparaître en ligne.** Deux voies pour le faire remonter :
+
+- le créer depuis **Produits → Ajouter un produit** (le plus simple) ;
+- ou générer une migration, appliquée au déploiement suivant :
+
+  ```bash
+  node scripts/generer-migration-produits.mjs 00X_nom_de_la_migration slug1 slug2…
+  ```
+
+  Elle insère les produits absents et rafraîchit leur présentation, sans jamais
+  toucher au prix, à la disponibilité ni à la mise en avant : une fois le
+  produit créé, ces réglages appartiennent à l’administration.
+
 Les trois types de prix sont :
 
 - **Prix fixe** : montant normal ;
