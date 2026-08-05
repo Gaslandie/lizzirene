@@ -146,10 +146,12 @@ jobs:
             kill "$server_pid" 2>/dev/null || true
           }
           failure_log() {
+            echo "Le test d’intégration API a échoué près de la ligne ${1:-inconnue}." >&2
+            find "$RUNNER_TEMP" -maxdepth 1 -type f -name '*.json' -print -exec cat {} \; >&2 || true
             cat "$server_log" >&2 || true
           }
           trap cleanup EXIT
-          trap failure_log ERR
+          trap 'failure_log "$LINENO"' ERR
 
           for attempt in {1..30}; do
             if health="$(curl --fail --silent --show-error \
