@@ -84,7 +84,7 @@ final class Request
             throw new ApiException(400, 'invalid_json', 'Le contenu envoyé est invalide.');
         }
 
-        if (!is_array($decoded) || array_is_list($decoded)) {
+        if (!is_array($decoded) || !str_starts_with(ltrim($raw), '{')) {
             throw new ApiException(400, 'invalid_json', 'Un objet JSON est attendu.');
         }
 
