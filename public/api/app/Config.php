@@ -52,6 +52,7 @@ final class Config
             'migration_token' => '',
             'whatsapp_number' => '',
             'shop_email' => '',
+            'mail' => [],
             'database' => [],
             'session' => [],
             'uploads' => [],

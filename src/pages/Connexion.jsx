@@ -2,13 +2,14 @@ import { useState } from 'react'
 import Icon from '../components/Icon.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
 import { useCart } from '../context/CartContext.jsx'
-import { CONTACT, waLink } from '../config.js'
+import { CONTACT } from '../config.js'
 import {
   effacerClaimToken,
   intercepterNavigation,
   lireClaimReference,
   lireClaimToken,
   urlInscription,
+  urlMotDePasseOublie,
 } from '../utils/navigation.js'
 
 function Connexion({ onAller }) {
@@ -167,13 +168,13 @@ function Connexion({ onAller }) {
           </button>
           <a
             className="auth-help"
-            href={waLink(
-              `Bonjour Lizzirene Déco ! J’ai besoin d’aide pour accéder à mon compte. Mon téléphone : `,
-            )}
-            target="_blank"
-            rel="noreferrer"
+            href={urlMotDePasseOublie()}
+            onClick={(event) => {
+              if (!intercepterNavigation(event)) return
+              onAller?.('mot-de-passe-oublie')
+            }}
           >
-            Mot de passe oublié ? Écrivez-nous sur WhatsApp
+            Mot de passe oublié ?
           </a>
           <p className="auth-switch">
             Première commande ?{' '}

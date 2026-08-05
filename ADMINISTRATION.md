@@ -106,10 +106,15 @@ jeton temporaire propre à cette commande.
 Pour protéger un changement de téléphone ou d’e-mail, le mot de passe actuel est
 demandé. Le changement de mot de passe déconnecte les autres appareils.
 
-Si une cliente oublie son mot de passe, elle contacte la boutique sur WhatsApp.
-Avant de demander une intervention technique, vérifier son identité avec des
-informations déjà connues de la commande. Ne jamais demander son ancien mot de
-passe par message.
+Si une cliente oublie son mot de passe, elle peut demander elle-même un lien
+depuis la page de connexion. Dans **Clientes**, la boutique peut aussi cliquer
+sur **Envoyer le lien**. La cliente reçoit un e-mail valable 30 minutes et choisit
+seule son nouveau mot de passe.
+
+Si aucun e-mail n’est enregistré ou si l’adresse doit être corrigée, ouvrir le
+petit formulaire de la cliente, vérifier l’adresse avec elle, cocher la
+confirmation puis cliquer sur **Enregistrer et envoyer**. Ne jamais demander ni
+créer son mot de passe à sa place.
 
 ## Bonnes pratiques
 

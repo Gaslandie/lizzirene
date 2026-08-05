@@ -11,6 +11,7 @@ import {
   urlServices,
   urlAPropos,
   urlAdmin,
+  urlAdminClientes,
   urlAdminCommande,
   urlAdminCommandes,
   urlAdminInstallation,
@@ -22,6 +23,7 @@ import {
   urlCompteCommande,
   urlConnexion,
   urlInscription,
+  urlMotDePasseOublie,
   effacerClaimToken,
   memoriserClaimToken,
 } from '../utils/navigation.js'
@@ -117,6 +119,14 @@ const lireEtat = () => {
     return { ...base, page: 'inscription', categorie: 'tous', theme: 'tous' }
   }
 
+  if (segments.length === 1 && segments[0] === 'mot-de-passe-oublie') {
+    return { ...base, page: 'mot-de-passe-oublie', categorie: 'tous', theme: 'tous' }
+  }
+
+  if (segments.length === 1 && segments[0] === 'reinitialiser-mot-de-passe') {
+    return { ...base, page: 'reinitialiser-mot-de-passe', categorie: 'tous', theme: 'tous' }
+  }
+
   if (segments.length === 1 && segments[0] === 'mon-compte') {
     return { ...base, page: 'compte', categorie: 'tous', theme: 'tous' }
   }
@@ -146,6 +156,10 @@ const lireEtat = () => {
       categorie: 'tous',
       theme: 'tous',
     }
+  }
+
+  if (segments.length === 2 && segments.join('/') === 'admin/clientes') {
+    return { ...base, page: 'admin-clientes', categorie: 'tous', theme: 'tous' }
   }
 
   if (segments.length === 2 && segments.join('/') === 'admin/produits') {
@@ -271,10 +285,12 @@ export function useRouter() {
       if (page === 'confidentialite') href = urlConfidentialite()
       if (page === 'connexion') href = urlConnexion({ claimToken, returnTo })
       if (page === 'inscription') href = urlInscription({ returnTo })
+      if (page === 'mot-de-passe-oublie') href = urlMotDePasseOublie()
       if (page === 'compte') href = urlCompte()
       if (page === 'compte-commande') href = urlCompteCommande(reference)
       if (page === 'admin') href = urlAdmin()
       if (page === 'admin-installation') href = urlAdminInstallation()
+      if (page === 'admin-clientes') href = urlAdminClientes()
       if (page === 'admin-produits') href = urlAdminProduits()
       if (page === 'admin-produit-nouveau') href = urlAdminNouveauProduit()
       if (page === 'admin-produit') href = urlAdminProduit(id)

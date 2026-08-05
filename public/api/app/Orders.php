@@ -24,17 +24,20 @@ final class Orders
     private Database $database;
     private Security $security;
     private Catalog $catalog;
+    private Mailer $mailer;
 
     public function __construct(
         Config $config,
         Database $database,
         Security $security,
-        Catalog $catalog
+        Catalog $catalog,
+        Mailer $mailer
     ) {
         $this->config = $config;
         $this->database = $database;
         $this->security = $security;
         $this->catalog = $catalog;
+        $this->mailer = $mailer;
     }
 
     public function create(Request $request): array
@@ -805,19 +808,9 @@ final class Orders
                 . 'Cette commande est enregistrée même si le client n’a pas '
                 . 'envoyé son message WhatsApp.';
 
-            $host = parse_url((string) $this->config->get('app_url', ''), PHP_URL_HOST);
-            $from = 'no-reply@' . (is_string($host) && $host !== '' ? $host : 'localhost');
-
-            @mail(
-                $to,
-                '=?UTF-8?B?' . base64_encode($subject) . '?=',
-                $body,
-                implode("\r\n", [
-                    'From: Lizzirene Deco <' . $from . '>',
-                    'Content-Type: text/plain; charset=UTF-8',
-                    'Content-Transfer-Encoding: 8bit',
-                ])
-            );
+            if (!$this->mailer->send($to, $subject, $body)) {
+                error_log('[lizzirene-api] notification boutique : envoi refusé par le serveur mail');
+            }
         } catch (\Throwable $exception) {
             error_log('[lizzirene-api] notification boutique : ' . $exception->getMessage());
         }

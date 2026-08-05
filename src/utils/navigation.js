@@ -70,11 +70,13 @@ const queryCompte = ({ returnTo } = {}) => {
 export const urlConnexion = (options) => `${BASE}connexion${queryCompte(options)}`
 export const urlInscription = ({ returnTo } = {}) =>
   `${BASE}inscription${queryCompte({ returnTo })}`
+export const urlMotDePasseOublie = () => `${BASE}mot-de-passe-oublie`
 export const urlCompte = () => `${BASE}mon-compte`
 export const urlCompteCommande = (reference) =>
   `${BASE}mon-compte/commandes/${encodeURIComponent(reference)}`
 export const urlAdmin = () => `${BASE}admin`
 export const urlAdminInstallation = () => `${BASE}admin/installation`
+export const urlAdminClientes = () => `${BASE}admin/clientes`
 export const urlAdminProduits = () => `${BASE}admin/produits`
 export const urlAdminNouveauProduit = () => `${BASE}admin/produits/nouveau`
 export const urlAdminProduit = (id) =>

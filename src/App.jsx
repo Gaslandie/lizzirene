@@ -14,6 +14,8 @@ import Produit from './pages/Produit.jsx'
 import Introuvable from './pages/Introuvable.jsx'
 import Connexion from './pages/Connexion.jsx'
 import Inscription from './pages/Inscription.jsx'
+import MotDePasseOublie from './pages/MotDePasseOublie.jsx'
+import ReinitialisationMotDePasse from './pages/ReinitialisationMotDePasse.jsx'
 import Compte from './pages/Compte.jsx'
 import CommandeClient from './pages/CommandeClient.jsx'
 import AdminLayout from './components/admin/AdminLayout.jsx'
@@ -24,6 +26,7 @@ import ProduitAdminForm from './pages/admin/ProduitAdminForm.jsx'
 import CommandesAdmin from './pages/admin/CommandesAdmin.jsx'
 import CommandeAdmin from './pages/admin/CommandeAdmin.jsx'
 import NouvelleCommandeAdmin from './pages/admin/NouvelleCommandeAdmin.jsx'
+import ClientesAdmin from './pages/admin/ClientesAdmin.jsx'
 import { useRouter } from './hooks/useRouter.js'
 import {
   appliquerDonneesStructurees,
@@ -76,6 +79,14 @@ const METADONNEES = {
     title: 'Créer mon compte — Lizzirene Déco',
     description: 'Créez votre espace client Lizzirene Déco.',
   },
+  'mot-de-passe-oublie': {
+    title: 'Mot de passe oublié — Lizzirene Déco',
+    description: 'Demandez un lien pour choisir un nouveau mot de passe.',
+  },
+  'reinitialiser-mot-de-passe': {
+    title: 'Nouveau mot de passe — Lizzirene Déco',
+    description: 'Choisissez un nouveau mot de passe pour votre compte.',
+  },
   compte: {
     title: 'Mon espace — Lizzirene Déco',
     description: 'Consultez vos commandes et vos informations de livraison.',
@@ -107,6 +118,10 @@ const METADONNEES = {
   'admin-commandes': {
     title: 'Commandes — Administration Lizzirene Déco',
     description: 'Gestion privée des commandes.',
+  },
+  'admin-clientes': {
+    title: 'Clientes — Administration Lizzirene Déco',
+    description: 'Gestion privée des comptes clients.',
   },
   'admin-commande': {
     title: 'Détail commande — Administration Lizzirene Déco',
@@ -186,7 +201,7 @@ function App() {
       .querySelector('meta[name="robots"]')
       ?.setAttribute(
         'content',
-        page.startsWith('admin') || ['connexion', 'inscription', 'compte', 'compte-commande'].includes(page)
+        page.startsWith('admin') || ['connexion', 'inscription', 'mot-de-passe-oublie', 'reinitialiser-mot-de-passe', 'compte', 'compte-commande'].includes(page)
           ? 'noindex, nofollow'
           : 'index, follow',
       )
@@ -237,6 +252,10 @@ function App() {
     contenu = <Connexion onAller={aller} />
   } else if (page === 'inscription') {
     contenu = <Inscription onAller={aller} />
+  } else if (page === 'mot-de-passe-oublie') {
+    contenu = <MotDePasseOublie onAller={aller} />
+  } else if (page === 'reinitialiser-mot-de-passe') {
+    contenu = <ReinitialisationMotDePasse onAller={aller} />
   } else if (page === 'compte') {
     contenu = <Compte onAller={aller} />
   } else if (page === 'compte-commande') {
@@ -257,6 +276,8 @@ function App() {
     )
   } else if (page === 'admin-commandes') {
     contenu = <CommandesAdmin onAller={aller} />
+  } else if (page === 'admin-clientes') {
+    contenu = <ClientesAdmin />
   } else if (page === 'admin-commande-nouvelle') {
     contenu = <NouvelleCommandeAdmin onAller={aller} />
   } else if (page === 'admin-commande') {

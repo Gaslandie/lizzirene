@@ -11,9 +11,11 @@ require __DIR__ . '/Http.php';
 require __DIR__ . '/Database.php';
 require __DIR__ . '/Validation.php';
 require __DIR__ . '/Security.php';
+require __DIR__ . '/Mailer.php';
 require __DIR__ . '/Setup.php';
 require __DIR__ . '/Catalog.php';
 require __DIR__ . '/Auth.php';
+require __DIR__ . '/PasswordReset.php';
 require __DIR__ . '/Orders.php';
 require __DIR__ . '/Admin.php';
 
@@ -52,10 +54,12 @@ function run(): never
         }
 
         $security = new Security($config, $database);
+        $mailer = new Mailer($config);
         $setup = new Setup($config, $database, $security);
         $catalog = new Catalog($database);
         $auth = new Auth($config, $database, $security, $setup);
-        $orders = new Orders($config, $database, $security, $catalog);
+        $passwordReset = new PasswordReset($database, $security, $mailer);
+        $orders = new Orders($config, $database, $security, $catalog, $mailer);
         $admin = new Admin($config, $database, $security, $catalog, $orders);
         $router = new Router();
 
@@ -81,6 +85,16 @@ function run(): never
         });
         $router->add('POST', '/v1/auth/login', static fn (Request $request): array => $auth->login($request));
         $router->add('POST', '/v1/auth/logout', static fn (Request $request): array => $auth->logout($request));
+        $router->add(
+            'POST',
+            '/v1/auth/password-reset/request',
+            static fn (Request $request): array => $passwordReset->request($request)
+        );
+        $router->add(
+            'POST',
+            '/v1/auth/password-reset/complete',
+            static fn (Request $request): array => $passwordReset->complete($request)
+        );
         $router->add('GET', '/v1/me', static function () use ($security): array {
             return ['user' => $security->requireUser()];
         });
@@ -105,6 +119,13 @@ function run(): never
         );
 
         $router->add('GET', '/v1/admin/dashboard', static fn (): array => $admin->dashboard());
+        $router->add('GET', '/v1/admin/customers', static fn (Request $request): array => $admin->customers($request));
+        $router->add(
+            'POST',
+            '/v1/admin/customers/{id}/password-reset',
+            static fn (Request $request, array $params): array =>
+                $passwordReset->requestForCustomer($request, $params['id'])
+        );
         $router->add('GET', '/v1/admin/products', static fn (Request $request): array => $admin->products($request));
         $router->add('POST', '/v1/admin/products', static function (Request $request) use ($admin): array {
             return ['__response' => $admin->createProduct($request), '__status' => 201];

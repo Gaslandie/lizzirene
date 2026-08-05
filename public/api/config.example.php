@@ -20,6 +20,13 @@ return [
     // part que si le client appuie sur « envoyer ».
     // Laisser vide désactive l'envoi.
     'shop_email' => 'lizzirenedeco@gmail.com',
+    'mail' => [
+        // Utiliser une adresse du domaine améliore la délivrabilité chez les
+        // fournisseurs qui refusent les expéditeurs non authentifiés.
+        'from_address' => 'no-reply@lizzirenedeco.com',
+        'from_name' => 'Lizzirene Déco',
+        'reply_to' => 'lizzirenedeco@gmail.com',
+    ],
     'database' => [
         'dsn' => 'mysql:host=localhost;dbname=CHANGE_ME;charset=utf8mb4',
         'username' => 'CHANGE_ME',

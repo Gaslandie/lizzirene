@@ -2,6 +2,7 @@ import { useAuth } from '../../context/AuthContext.jsx'
 import {
   intercepterNavigation,
   urlAdmin,
+  urlAdminClientes,
   urlAdminCommandes,
   urlAdminInstallation,
   urlAdminProduits,
@@ -12,6 +13,7 @@ import {
 const LINKS = [
   { page: 'admin', label: 'Vue d’ensemble', href: urlAdmin() },
   { page: 'admin-commandes', label: 'Commandes', href: urlAdminCommandes() },
+  { page: 'admin-clientes', label: 'Clientes', href: urlAdminClientes() },
   { page: 'admin-produits', label: 'Produits', href: urlAdminProduits() },
 ]
 

@@ -82,6 +82,60 @@ final class Admin
         );
     }
 
+    public function customers(Request $request): array
+    {
+        $this->security->requireAdmin();
+        $search = $request->query('search');
+        $search = is_string($search) ? trim($search) : '';
+        if (mb_strlen($search) > 120) {
+            throw new ApiException(422, 'validation_error', 'La recherche est trop longue.');
+        }
+        $emailFilter = $request->query('email');
+        $emailFilter = is_string($emailFilter) ? $emailFilter : '';
+        if (!in_array($emailFilter, ['', 'with', 'without'], true)) {
+            throw new ApiException(422, 'validation_error', 'Filtre e-mail invalide.');
+        }
+
+        $conditions = ["u.role = 'customer'"];
+        $parameters = [];
+        if ($search !== '') {
+            $conditions[] = '(u.name LIKE ? OR u.phone_e164 LIKE ? OR u.email LIKE ?)';
+            $term = '%' . $search . '%';
+            array_push($parameters, $term, $term, $term);
+        }
+        if ($emailFilter === 'with') {
+            $conditions[] = 'u.email IS NOT NULL';
+        } elseif ($emailFilter === 'without') {
+            $conditions[] = 'u.email IS NULL';
+        }
+
+        $statement = $this->database->pdo()->prepare(
+            'SELECT u.public_id, u.status, u.name, u.phone_e164, u.email,
+                    u.created_at, u.last_login_at,
+                    (SELECT COUNT(*) FROM orders o WHERE o.user_id = u.id) AS order_count,
+                    (SELECT MAX(pr.created_at) FROM password_reset_tokens pr
+                     WHERE pr.user_id = u.id AND pr.used_at IS NULL
+                       AND pr.expires_at >= UTC_TIMESTAMP()) AS last_reset_at
+             FROM users u
+             WHERE ' . implode(' AND ', $conditions) . '
+             ORDER BY u.created_at DESC
+             LIMIT 200'
+        );
+        $statement->execute($parameters);
+
+        return array_map(static fn (array $row): array => [
+            'id' => (string) $row['public_id'],
+            'status' => (string) $row['status'],
+            'name' => (string) $row['name'],
+            'phone' => (string) $row['phone_e164'],
+            'email' => $row['email'] !== null ? (string) $row['email'] : null,
+            'orderCount' => (int) $row['order_count'],
+            'createdAt' => (string) $row['created_at'],
+            'lastLoginAt' => $row['last_login_at'] !== null ? (string) $row['last_login_at'] : null,
+            'lastResetAt' => $row['last_reset_at'] !== null ? (string) $row['last_reset_at'] : null,
+        ], $statement->fetchAll());
+    }
+
     public function product(int $id): array
     {
         $this->security->requireAdmin();

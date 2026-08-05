@@ -2,7 +2,9 @@ name: Déploiement Bluehost
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - 'agent/**'
   workflow_dispatch:
     inputs:
       ref:
@@ -92,7 +94,10 @@ jobs:
           admin_cookies="$RUNNER_TEMP/admin-cookies.txt"
           guest_cookies="$RUNNER_TEMP/guest-cookies.txt"
           customer_secondary_cookies="$RUNNER_TEMP/customer-secondary-cookies.txt"
-          mkdir -p "$sessions" "$uploads"
+          customer_without_email_cookies="$RUNNER_TEMP/customer-without-email-cookies.txt"
+          password_reset_cookies="$RUNNER_TEMP/password-reset-cookies.txt"
+          mail_outbox="$RUNNER_TEMP/lizzirene-mail-outbox"
+          mkdir -p "$sessions" "$uploads" "$mail_outbox"
 
           cat > "$config" <<PHP
           <?php
@@ -104,6 +109,10 @@ jobs:
               'setup_token' => str_repeat('b', 64),
               'migration_token' => str_repeat('c', 64),
               'whatsapp_number' => '224664327554',
+              'shop_email' => 'boutique@example.test',
+              'mail' => [
+                  'outbox_directory' => '$mail_outbox',
+              ],
               'database' => [
                   'dsn' => 'mysql:host=127.0.0.1;port=3306;dbname=lizzirene_test;charset=utf8mb4',
                   'username' => 'lizzirene',
@@ -337,6 +346,182 @@ jobs:
           jq -e '.data.user == null and (.data.csrfToken | length > 20)' \
             <<< "$identity_revoked_session" > /dev/null
 
+          without_email_session="$(curl --fail --silent --show-error \
+            --cookie-jar "$customer_without_email_cookies" \
+            'http://127.0.0.1:8765/api/v1/session')"
+          without_email_csrf="$(jq -er '.data.csrfToken' <<< "$without_email_session")"
+          without_email_registration="$(curl --fail-with-body --silent --show-error \
+            --cookie "$customer_without_email_cookies" --cookie-jar "$customer_without_email_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $without_email_csrf" \
+            --header 'Content-Type: application/json' \
+            --data '{"name":"Cliente Sans Email","phone":"620 00 00 00","email":null,"password":"SansEmail!123","consent":true}' \
+            'http://127.0.0.1:8765/api/v1/auth/register')"
+          jq -e '.data.user.email == null and .data.user.role == "customer"' \
+            <<< "$without_email_registration" > /dev/null
+
+          reset_session="$(curl --fail --silent --show-error \
+            --cookie-jar "$password_reset_cookies" \
+            'http://127.0.0.1:8765/api/v1/session')"
+          reset_csrf="$(jq -er '.data.csrfToken' <<< "$reset_session")"
+          unknown_reset="$(curl --fail-with-body --silent --show-error \
+            --cookie "$password_reset_cookies" --cookie-jar "$password_reset_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $reset_csrf" \
+            --header 'Content-Type: application/json' \
+            --data '{"identifier":"inconnue@example.test"}' \
+            'http://127.0.0.1:8765/api/v1/auth/password-reset/request')"
+          known_reset="$(curl --fail-with-body --silent --show-error \
+            --cookie "$password_reset_cookies" --cookie-jar "$password_reset_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $reset_csrf" \
+            --header 'Content-Type: application/json' \
+            --data '{"identifier":"cliente2@example.test"}' \
+            'http://127.0.0.1:8765/api/v1/auth/password-reset/request')"
+          test "$(jq -er '.data.message' <<< "$unknown_reset")" = \
+            "$(jq -er '.data.message' <<< "$known_reset")"
+
+          customers="$(curl --fail --silent --show-error \
+            --cookie "$admin_cookies" \
+            'http://127.0.0.1:8765/api/v1/admin/customers?search=Cliente')"
+          customer_id="$(jq -er '.data[] | select(.phone == "+224610811717") | .id' \
+            <<< "$customers")"
+          jq -e --arg id "$customer_id" '
+            .data[] | select(.id == $id) |
+            .email == "cliente2@example.test" and .orderCount == 1
+          ' <<< "$customers" > /dev/null
+
+          customers_without_email="$(curl --fail --silent --show-error \
+            --cookie "$admin_cookies" \
+            'http://127.0.0.1:8765/api/v1/admin/customers?email=without')"
+          customer_without_email_id="$(jq -er '
+            .data[] | select(.phone == "+224620000000") | .id
+          ' <<< "$customers_without_email")"
+
+          missing_email_status="$(curl --silent --show-error \
+            --cookie "$admin_cookies" --cookie-jar "$admin_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $admin_csrf" \
+            --header 'Content-Type: application/json' \
+            --data '{}' \
+            --output "$RUNNER_TEMP/reset-email-missing.json" \
+            --write-out '%{http_code}' \
+            "http://127.0.0.1:8765/api/v1/admin/customers/$customer_without_email_id/password-reset")"
+          [[ "$missing_email_status" == '422' ]]
+          jq -e '.error.code == "email_required"' \
+            "$RUNNER_TEMP/reset-email-missing.json" > /dev/null
+
+          email_confirmation_status="$(curl --silent --show-error \
+            --cookie "$admin_cookies" --cookie-jar "$admin_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $admin_csrf" \
+            --header 'Content-Type: application/json' \
+            --data '{"email":"cliente.reset@example.test","emailVerified":false}' \
+            --output "$RUNNER_TEMP/reset-email-not-verified.json" \
+            --write-out '%{http_code}' \
+            "http://127.0.0.1:8765/api/v1/admin/customers/$customer_without_email_id/password-reset")"
+          [[ "$email_confirmation_status" == '422' ]]
+          jq -e '.error.code == "email_verification_required"' \
+            "$RUNNER_TEMP/reset-email-not-verified.json" > /dev/null
+
+          added_email_reset="$(curl --fail-with-body --silent --show-error \
+            --cookie "$admin_cookies" --cookie-jar "$admin_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $admin_csrf" \
+            --header 'Content-Type: application/json' \
+            --data '{"email":"sans.email@example.test","emailVerified":true}' \
+            "http://127.0.0.1:8765/api/v1/admin/customers/$customer_without_email_id/password-reset")"
+          jq -e '
+            .data.sent == true and
+            .data.email == "sans.email@example.test" and
+            .data.validityMinutes == 30
+          ' <<< "$added_email_reset" > /dev/null
+
+          no_email_revoked_session="$(curl --fail --silent --show-error \
+            --cookie "$customer_without_email_cookies" --cookie-jar "$customer_without_email_cookies" \
+            'http://127.0.0.1:8765/api/v1/session')"
+          jq -e '.data.user == null' <<< "$no_email_revoked_session" > /dev/null
+
+          admin_reset="$(curl --fail-with-body --silent --show-error \
+            --cookie "$admin_cookies" --cookie-jar "$admin_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $admin_csrf" \
+            --header 'Content-Type: application/json' \
+            --data '{}' \
+            "http://127.0.0.1:8765/api/v1/admin/customers/$customer_id/password-reset")"
+          jq -e '
+            .data.sent == true and
+            .data.email == "cliente2@example.test" and
+            .data.validityMinutes == 30
+          ' <<< "$admin_reset" > /dev/null
+
+          reset_mail="$(grep -l 'cliente2@example.test' \
+            "$mail_outbox"/*.json | tail -n 1)"
+          test -s "$reset_mail"
+          reset_token="$(jq -r '.body' "$reset_mail" \
+            | sed -n 's|.*token=\([A-Za-z0-9_-]*\).*|\1|p' \
+            | head -n 1)"
+          test "${#reset_token}" -ge 40
+
+          secondary_session="$(curl --fail --silent --show-error \
+            --cookie "$customer_secondary_cookies" --cookie-jar "$customer_secondary_cookies" \
+            'http://127.0.0.1:8765/api/v1/session')"
+          secondary_csrf="$(jq -er '.data.csrfToken' <<< "$secondary_session")"
+          curl --fail-with-body --silent --show-error \
+            --cookie "$customer_secondary_cookies" --cookie-jar "$customer_secondary_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $secondary_csrf" \
+            --header 'Content-Type: application/json' \
+            --data '{"identifier":"cliente2@example.test","password":"NouveauPass!456"}' \
+            'http://127.0.0.1:8765/api/v1/auth/login' > /dev/null
+
+          completed_reset="$(curl --fail-with-body --silent --show-error \
+            --cookie "$password_reset_cookies" --cookie-jar "$password_reset_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $reset_csrf" \
+            --header 'Content-Type: application/json' \
+            --data "{\"token\":\"$reset_token\",\"newPassword\":\"ResetPass!789\",\"passwordConfirmation\":\"ResetPass!789\"}" \
+            'http://127.0.0.1:8765/api/v1/auth/password-reset/complete')"
+          reset_csrf="$(jq -er '.data.csrfToken' <<< "$completed_reset")"
+          jq -e '.data.updated == true and (.data.csrfToken | length > 20)' \
+            <<< "$completed_reset" > /dev/null
+
+          reset_revoked_session="$(curl --fail --silent --show-error \
+            --cookie "$customer_secondary_cookies" --cookie-jar "$customer_secondary_cookies" \
+            'http://127.0.0.1:8765/api/v1/session')"
+          jq -e '.data.user == null' <<< "$reset_revoked_session" > /dev/null
+
+          reused_reset_status="$(curl --silent --show-error \
+            --cookie "$password_reset_cookies" --cookie-jar "$password_reset_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $reset_csrf" \
+            --header 'Content-Type: application/json' \
+            --data "{\"token\":\"$reset_token\",\"newPassword\":\"EncorePass!012\",\"passwordConfirmation\":\"EncorePass!012\"}" \
+            --output "$RUNNER_TEMP/reset-token-reused.json" \
+            --write-out '%{http_code}' \
+            'http://127.0.0.1:8765/api/v1/auth/password-reset/complete')"
+          [[ "$reused_reset_status" == '422' ]]
+          jq -e '.error.code == "invalid_reset_token"' \
+            "$RUNNER_TEMP/reset-token-reused.json" > /dev/null
+
+          old_password_status="$(curl --silent --show-error \
+            --cookie "$password_reset_cookies" --cookie-jar "$password_reset_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $reset_csrf" \
+            --header 'Content-Type: application/json' \
+            --data '{"identifier":"cliente2@example.test","password":"NouveauPass!456"}' \
+            --output "$RUNNER_TEMP/reset-old-password.json" \
+            --write-out '%{http_code}' \
+            'http://127.0.0.1:8765/api/v1/auth/login')"
+          [[ "$old_password_status" == '401' ]]
+          curl --fail-with-body --silent --show-error \
+            --cookie "$password_reset_cookies" --cookie-jar "$password_reset_cookies" \
+            --header 'Origin: http://127.0.0.1:8765' \
+            --header "X-CSRF-Token: $reset_csrf" \
+            --header 'Content-Type: application/json' \
+            --data '{"identifier":"cliente2@example.test","password":"ResetPass!789"}' \
+            'http://127.0.0.1:8765/api/v1/auth/login' > /dev/null
+
           manual="$(curl --fail-with-body --silent --show-error \
             --cookie "$admin_cookies" --cookie-jar "$admin_cookies" \
             --header 'Origin: http://127.0.0.1:8765' \
@@ -435,6 +620,7 @@ jobs:
 
   deploy:
     needs: build
+    if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment:

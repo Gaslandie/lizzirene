@@ -173,6 +173,12 @@
   cursor: pointer;
 }
 
+.btn-compact {
+  min-height: 38px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -226,6 +232,56 @@
   display: block;
   color: var(--muted);
   font-size: 12px;
+}
+
+.admin-customer-actions {
+  min-width: 170px;
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+}
+
+.admin-inline-row > td {
+  padding: 0 12px 18px;
+  background: #f8fbfb;
+}
+
+.admin-inline-editor {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(260px, 1fr) auto;
+  align-items: end;
+  gap: 18px;
+  padding: 18px;
+  border: 1px solid rgba(42, 88, 92, 0.14);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.admin-inline-editor > label:not(.admin-checkbox) {
+  display: grid;
+  gap: 7px;
+  color: var(--primary-dark);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-inline-editor input[type='email'] {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 13px;
+  border: 1px solid rgba(42, 88, 92, 0.2);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.admin-email-confirmation {
+  align-self: center;
+  font-size: 14px;
+}
+
+.admin-inline-actions {
+  display: flex;
+  gap: 10px;
 }
 
 .admin-toolbar {
@@ -510,8 +566,13 @@
   .admin-toolbar,
   .admin-form-grid,
   .admin-form-sidebar,
-  .admin-order-details-editor form {
+  .admin-order-details-editor form,
+  .admin-inline-editor {
     grid-template-columns: 1fr;
+  }
+
+  .admin-inline-actions {
+    flex-wrap: wrap;
   }
 
   .admin-stats {
